@@ -164,5 +164,8 @@ Nota técnica: Turbopack cacheó un error de parseo fantasma dos veces en `pract
 - Modo Examen: se agregó una pantalla de INICIO nueva (antes no existía — el temporizador arrancaba de inmediato al entrar a la ruta) con el mismo aviso de papel y lápiz + botón "Empezar simulacro" que recién ahí arranca el conteo. Estado `iniciado` controla el useEffect del timer.
 - Verificado en navegador: el examen ya no arranca el reloj hasta tocar "Empezar simulacro"; progreso en 0% al iniciar.
 
+## Ajuste: calendario semanal de racha (idea de screensdesign.com, aprobada por el usuario)
+Investigué apps de educación/quiz diario en screensdesign.com (Yuno, GenK, Spark, Mindsnap). Adopté la idea del calendario semanal (L-D con check en días completados) en la tarjeta de racha de `/app` — se calcula sin nueva tabla, derivando de `currentStreak`/`lastActiveOn` (función `calcularSemana`). Descarté 2 patrones vistos por chocar con decisiones ya tomadas: bloquear módulos por racha (viola "nunca bloquear") y mascota animada (viola "no infantil"). Leaderboard anotado como idea de v2 (no implementada).
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

@@ -3,10 +3,51 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { CheckCircle2, Flame, Timer } from 'lucide-react';
+import { Check, CheckCircle2, Flame, Timer } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { leerProgreso, registrarVisitaHoy, type ProgresoUsuario } from '@/lib/progress';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+
+const INICIALES_DIA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // semana empieza lunes
+
+function fechaLocal(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Deriva qué días de ESTA semana (lun-dom) cayeron dentro de la racha actual.
+ * No requiere guardar historial: la racha es consecutiva por definición, así
+ * que basta contar hacia atrás desde `lastActiveOn`. TODO Sesión 6: cuando
+ * exista `user_progress` en Supabase, reemplazar por el historial real.
+ */
+function calcularSemana(progreso: ProgresoUsuario) {
+  const hoy = new Date();
+  const diaSemanaHoy = (hoy.getDay() + 6) % 7; // 0 = lunes
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() - diaSemanaHoy);
+
+  const rachaFechas = new Set<string>();
+  if (progreso.lastActiveOn) {
+    const fin = new Date(progreso.lastActiveOn);
+    for (let i = 0; i < progreso.currentStreak; i++) {
+      const d = new Date(fin);
+      d.setDate(fin.getDate() - i);
+      rachaFechas.add(fechaLocal(d));
+    }
+  }
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    const clave = fechaLocal(d);
+    return {
+      inicial: INICIALES_DIA[i],
+      completado: rachaFechas.has(clave),
+      esHoy: clave === fechaLocal(hoy),
+      esFuturo: d > hoy,
+    };
+  });
+}
 
 export default function InicioApp() {
   const [progreso, setProgreso] = useState<ProgresoUsuario | null>(null);
@@ -19,6 +60,8 @@ export default function InicioApp() {
   }, []);
 
   if (!progreso) return null;
+
+  const semana = calcularSemana(progreso);
 
   return (
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
@@ -52,6 +95,28 @@ export default function InicioApp() {
           <p className="mt-2 text-[12px] text-[var(--text-secondary)]">
             {progreso.currentStreak > 0 ? '¡No la rompas hoy!' : 'Practica hoy y arranca tu racha.'}
           </p>
+
+          {/* Calendario semanal — visualiza el patrón, no solo el número */}
+          <div className="mt-4 flex justify-between gap-1.5">
+            {semana.map((d, i) => (
+              <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-[var(--text-secondary)]">{d.inicial}</span>
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
+                    d.completado
+                      ? 'border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_22%,var(--surface))]'
+                      : d.esHoy
+                        ? 'border-[color-mix(in_oklab,var(--accent)_55%,transparent)] bg-transparent'
+                        : d.esFuturo
+                          ? 'border-[var(--surface-2)] bg-transparent'
+                          : 'border-[var(--surface-2)] bg-[var(--surface-2)]'
+                  }`}
+                >
+                  {d.completado && <Check size={14} strokeWidth={3} className="text-[var(--gold)]" />}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Card destacada — Modo Examen */}
