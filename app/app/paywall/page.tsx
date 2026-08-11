@@ -61,7 +61,7 @@ export default function PaywallPage() {
 
       <div className="mx-auto max-w-[620px] px-5 pb-16 text-center">
         <Link
-          href="/entrar?plan=gratis"
+          href="/app"
           className="text-[15px] font-semibold text-[var(--text-secondary)] underline decoration-[var(--surface-2)] underline-offset-4 hover:text-[var(--text-primary)]"
         >
           Seguir gratis por ahora

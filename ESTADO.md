@@ -100,5 +100,15 @@ FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) +
 - `/entrar`: login passwordless (magic link + Google) por `26-AUTH-MODERNO.md`. ⚠️ PENDIENTE: Supabase real se conecta en Sesión 6 (requiere que el usuario cree el proyecto) — la UI es honesta al respecto, no finge un login exitoso.
 - Verificado en navegador de punta a punta: dolor → 3 preguntas (1 acierto con estrellas, 1 fallo con explicación, 1 acierto) → celebración con confetti → plan → paywall → login. Sin errores de consola ni de servidor.
 
+## Sesión 5 — App interna: CERRADA
+- `/app` (Inicio): hero de racha + card destacada de Modo Examen + camino de 3 módulos — misma composición aprobada en `direccion-final.html` (Sesión 2), ahora con datos reales de progreso.
+- `/app/practicar/[modulo]`: pantalla núcleo "El Descifrador de Pasos" — 4 preguntas por módulo (Ecuaciones, Despejes, Factorización), acierto = StarBurst + avanza solo; fallo = explica el paso exacto (`pasoClave`) y el usuario decide cuándo seguir. Al terminar el módulo: celebración con confetti.
+- `/app/examen`: Modo Examen — 6 preguntas mezcladas de los 3 módulos, temporizador de 4 min, NO revela aciertos hasta el final (simula el examen real), reporte final con score + temas a repasar.
+- Todos los módulos quedan siempre accesibles (nunca bloqueados) — coherente con la Constitución del Producto.
+- Progreso y racha: `app/lib/progress.ts`, localStorage por ahora (mismo algoritmo que `actualizarRacha()` de 24-GAMIFICACION.md). ⚠️ PENDIENTE: migrar a Supabase `user_progress` en Sesión 6 sin cambiar la UI.
+- Contenido de preguntas: `app/lib/modulos.ts` (banco de 12 preguntas, sin nombrar apps competidoras — regla anotada arriba).
+- Verificado en navegador: Inicio con racha real, práctica de un módulo, Modo Examen con temporizador — sin errores de consola ni de servidor.
+- El link "Seguir gratis por ahora" del paywall ahora lleva directo a `/app` (sin pedir cuenta) — coherente con "preview anónimo" del modelo Freemium; `/entrar` queda para cuando el usuario quiere Premium o volver a un dispositivo nuevo.
+
 ## Próximo paso
-Sesión 5 — App interna (los módulos de álgebra, la pantalla del Descifrador de Pasos, el Modo Examen y el sistema de rachas).
+Sesión 6 — Integraciones reales y seguridad: Git/GitHub, Supabase (base de datos + auth real), Vercel, dominio, Hotmart, Resend, y el gate de seguridad antes de vender.
