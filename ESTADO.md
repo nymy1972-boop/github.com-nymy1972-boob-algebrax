@@ -190,5 +190,12 @@ Verificado en navegador de punta a punta: nombre → grado → dolor (multi-sele
 ## Problemas conocidos
 GARANTIA_PENDIENTE_VERIFICACION: la landing y el paywall prometen "la Garantía del Primer Paso Entendido" con plazo de 7 días. Ese número es PROVISIONAL — no está verificado contra el panel real de Hotmart porque la cuenta todavía no existe (Sesión 6 en curso). Detalle completo y plan de resolución en `FICHA-MERCADO.md` §4. Antes de encender tráfico pagado: crear la cuenta de Hotmart, leer el plazo real de reembolso configurado, y actualizar la ficha + el copy si el número real difiere de 7 días.
 
+## Ajuste: paywall mejorado con reglas de Gemini (analizadas, no copiadas a ciegas)
+El usuario trajo 7 "reglas de oro" de paywall de Gemini. Análisis y decisión:
+- **Adoptadas (implementadas):** (3) headline orientado a RESULTADO en vez de features ("Pasa tu examen entrenando 10 min al día" / bullets en lenguaje de resultado) · (6) personalización dinámica: el paywall ahora lee `?tema=` (pasado desde el onboarding, el tema donde falló en el diagnóstico) y cambia el titular a "Tu plan para dominar [tema] está listo".
+- **Descartadas y documentadas en el código (`app/paywall/page.tsx`, comentario de cabecera):** (2) timeline de trial "Hoy→Día 5→Día 7" — asume un modelo de TRIAL con cobro automático que NO es el nuestro (decidimos Freemium sin trial en Sesión 1 justo para eliminar el miedo al cobro de raíz); (5) rating "4.8/5 de 2,000 estudiantes" + testimonio de "Sofi M." — son datos INVENTADOS, el SO prohíbe testimonios/ratings falsos; se sustituyó por la garantía real (honesta, verificable) como prueba social; (7) pop-up de exit-intent con oferta de rescate — el paywall ya tiene una salida sin fricción ("Seguir gratis"), agregar un pop-up de último segundo se sentiría como dark pattern.
+- (1) anclaje anual + desglose diario y (4) CTA orientado a beneficio — ya estaban bien implementados desde la Sesión 4, sin cambios.
+Verificado en navegador con `?tema=Despejes con signos`: título personalizado correcto, sin errores.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

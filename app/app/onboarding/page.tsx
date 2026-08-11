@@ -295,7 +295,7 @@ export default function OnboardingPage() {
                 </div>
               )}
               <button
-                onClick={() => router.push('/paywall')}
+                onClick={() => router.push(`/paywall${temaDebil ? `?tema=${encodeURIComponent(temaDebil)}` : ''}`)}
                 className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
               >
                 Ver mi plan completo
