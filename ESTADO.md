@@ -170,5 +170,19 @@ Investigué apps de educación/quiz diario en screensdesign.com (Yuno, GenK, Spa
 ## Ajuste: pregunta de grado (pedido del usuario)
 Nueva pregunta en el onboarding, entre nombre y dolor: "¿En qué grado estás?" — chips (7°-8° / 9°-10° / 11°-último año / Ya salí del colegio), guardada en `lib/progress.ts` (campo `grado`). Se usa para personalizar el mensaje del plan final ("Ajustado al nivel de [grado]") y se muestra en `/app/perfil`. Verificado en navegador de punta a punta.
 
+## Ajuste: feedback de Gemini + gemas de recompensa + selección múltiple (pedido del usuario)
+Revisé las 3 sugerencias de Gemini contra lo ya construido:
+1. **Cero registro antes del paywall** — YA cumplido desde la Sesión 4 (el CTA de la landing y del onboarding van a `/paywall`, y solo de ahí a `/entrar`). Sin cambios de código, solo confirmado.
+2. **Sin "vidas"/error agresivo en el diagnóstico** — mejorado: el estado de "incorrecto" pasó de rojo+ícono X a azul (`--accent-2`) + ícono de bombilla (Lightbulb), y el copy ahora abre con "¡Casi!" + "Mira lo que pasa cuando pasamos el [número] al otro lado..." (tono instructivo, no punitivo). Aplicado en `Diagnostico.tsx` (onboarding).
+3. **Barra de progreso con "Paso X de Y"** — agregado junto a la barra visual en el onboarding (antes solo había barra, sin número).
+
+**Sistema de gemas** (nuevo, pedido explícito): `lib/progress.ts` agrega `gemas` + `GEMAS_POR_ACIERTO=10` + `sumarGemas()`. Cada acierto en el diagnóstico muestra un "+10 💎" animado y suma al contador visible en la barra superior del onboarding; el total se muestra también en la pantalla de "tu plan está listo". (Pendiente para otra sesión: sumar gemas también en `practicar/[modulo]` y mostrarlas en Inicio/Perfil, hoy solo viven en el onboarding — anotarlo si se pide extender.)
+
+**Selección múltiple en "¿Qué te preocupa...?"**: cambié de selección única (avanzaba al tocar) a checkboxes múltiples + botón "Continuar" (deshabilitado hasta elegir al menos 1). Estado `dolores: string[]`.
+
+Verificado en navegador de punta a punta: nombre → grado → dolor (multi-select) → diagnóstico con gemas y "¡Casi!" en azul → plan con gemas totales. Sin errores de servidor.
+
+⚠️ Nota técnica recurrente: Turbopack sigue cacheando errores de parseo fantasma tras varias ediciones seguidas al mismo archivo — se resuelve reiniciando el servidor dev + borrando `.next/`. Ya pasó 3 veces en el proyecto.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

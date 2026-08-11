@@ -16,10 +16,14 @@ export interface ModuloProgreso {
 export interface ProgresoUsuario {
   nombre: string | null;
   grado: string | null;
+  gemas: number;
   currentStreak: number;
   lastActiveOn: string | null; // YYYY-MM-DD en zona local
   modulos: Record<string, ModuloProgreso>;
 }
+
+/** Gemas por acierto — la recompensa visible de cada respuesta correcta. */
+export const GEMAS_POR_ACIERTO = 10;
 
 function hoyLocal(): string {
   const d = new Date();
@@ -34,6 +38,7 @@ function diasEntre(a: string, b: string): number {
 const DEFAULT_PROGRESO: ProgresoUsuario = {
   nombre: null,
   grado: null,
+  gemas: 0,
   currentStreak: 0,
   lastActiveOn: null,
   modulos: {},
@@ -96,11 +101,20 @@ export function registrarAcierto(moduloSlug: string, totalPreguntas: number): Pr
   const actual = p.modulos[moduloSlug] ?? { completadas: 0, total: totalPreguntas };
   const actualizado: ProgresoUsuario = {
     ...p,
+    gemas: p.gemas + GEMAS_POR_ACIERTO,
     modulos: {
       ...p.modulos,
       [moduloSlug]: { completadas: Math.min(actual.completadas + 1, totalPreguntas), total: totalPreguntas },
     },
   };
+  guardar(actualizado);
+  return actualizado;
+}
+
+/** Para el diagnóstico del onboarding (todavía sin cuenta): suma gemas sin tocar módulos. */
+export function sumarGemas(cantidad: number): ProgresoUsuario {
+  const p = leerProgreso();
+  const actualizado: ProgresoUsuario = { ...p, gemas: p.gemas + cantidad };
   guardar(actualizado);
   return actualizado;
 }

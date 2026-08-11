@@ -3,10 +3,10 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Trophy } from 'lucide-react';
+import { ArrowRight, Check, Gem, Trophy } from 'lucide-react';
 import { Diagnostico, PREGUNTAS } from '@/components/onboarding/Diagnostico';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
-import { guardarGrado, guardarNombre } from '@/lib/progress';
+import { GEMAS_POR_ACIERTO, guardarGrado, guardarNombre } from '@/lib/progress';
 
 type Fase = 'nombre' | 'grado' | 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
 
@@ -26,10 +26,11 @@ export default function OnboardingPage() {
   const [fase, setFase] = useState<Fase>('nombre');
   const [nombre, setNombre] = useState('');
   const [grado, setGrado] = useState<string | null>(null);
-  const [dolor, setDolor] = useState<string | null>(null);
+  const [dolores, setDolores] = useState<string[]>([]);
   const [diagStep, setDiagStep] = useState(0);
   const [temaDebil, setTemaDebil] = useState<string | null>(null);
   const [aciertos, setAciertos] = useState(0);
+  const [gemas, setGemas] = useState(0);
 
   const pasoActual =
     fase === 'nombre'
@@ -57,13 +58,20 @@ export default function OnboardingPage() {
     setFase('dolor');
   }
 
-  function elegirDolor(d: string) {
-    setDolor(d);
+  function toggleDolor(d: string) {
+    setDolores((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
+  }
+
+  function confirmarDolores() {
+    if (dolores.length === 0) return;
     setFase('diagnostico');
   }
 
   function handleAnswer(correct: boolean, tema: string) {
-    if (correct) setAciertos((n) => n + 1);
+    if (correct) {
+      setAciertos((n) => n + 1);
+      setGemas((g) => g + GEMAS_POR_ACIERTO);
+    }
     if (!correct && !temaDebil) setTemaDebil(tema);
 
     if (diagStep + 1 < PREGUNTAS.length) {
@@ -74,25 +82,38 @@ export default function OnboardingPage() {
   }
 
   const reconocimiento = useMemo(() => {
-    if (!dolor) return '';
+    if (dolores.length === 0) return '';
     if (!temaDebil) {
       return 'Respondiste las 3 sin fallar — tienes buena base. Tu reto real está en los simulacros de examen, donde el tiempo aprieta.';
     }
     return `No es que seas malo para los números — es que nadie te mostró bien "${temaDebil}". Eso es exactamente lo que vamos a arreglar primero.`;
-  }, [dolor, temaDebil]);
+  }, [dolores, temaDebil]);
 
   const temaDelPlan = temaDebil ?? 'Simulacro de examen';
 
   return (
     <div className="relative min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
-      {/* Barra de progreso — siempre visible (regla 3 de 02B) */}
+      {/* Barra de progreso — siempre visible, con "Paso X de Y" explícito (feedback: evita abandono por incertidumbre) */}
       <div className="sticky top-0 z-10 bg-[var(--bg)] px-5 pb-3 pt-5">
-        <div className="mx-auto h-2 w-full max-w-[375px] overflow-hidden rounded-full bg-[var(--surface-2)]">
-          <motion.div
-            className="h-full rounded-full bg-[var(--accent)]"
-            animate={{ width: `${progreso}%` }}
-            transition={{ type: 'spring', duration: 0.4 }}
-          />
+        <div className="mx-auto flex w-full max-w-[375px] items-center justify-between gap-3">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--surface-2)]">
+            <motion.div
+              className="h-full rounded-full bg-[var(--accent)]"
+              animate={{ width: `${progreso}%` }}
+              transition={{ type: 'spring', duration: 0.4 }}
+            />
+          </div>
+          {fase !== 'plan' && (
+            <span className="shrink-0 text-[12px] font-semibold text-[var(--text-secondary)]">
+              Paso {Math.min(pasoActual + 1, TOTAL_PASOS)} de {TOTAL_PASOS}
+            </span>
+          )}
+          {gemas > 0 && (
+            <span className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[var(--accent-2)]">
+              <Gem size={14} fill="currentColor" />
+              {gemas}
+            </span>
+          )}
         </div>
       </div>
 
@@ -166,18 +187,41 @@ export default function OnboardingPage() {
               <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
                 ¿Qué te preocupa más de tu próximo examen de álgebra?
               </h1>
+              <p className="-mt-4 text-[13px] text-[var(--text-secondary)]">Elige todas las que apliquen.</p>
               <div className="flex flex-col gap-3">
-                {DOLORES.map((d) => (
-                  <motion.button
-                    key={d}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => elegirDolor(d)}
-                    className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
-                  >
-                    {d}
-                  </motion.button>
-                ))}
+                {DOLORES.map((d) => {
+                  const marcado = dolores.includes(d);
+                  return (
+                    <motion.button
+                      key={d}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => toggleDolor(d)}
+                      className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
+                        marcado
+                          ? 'border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,var(--surface))]'
+                          : 'border-[var(--surface-2)] bg-[var(--surface)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
+                      }`}
+                    >
+                      {d}
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border-2 ${
+                          marcado ? 'border-[var(--accent)] bg-[var(--accent)]' : 'border-[var(--surface-2)]'
+                        }`}
+                      >
+                        {marcado && <Check size={13} strokeWidth={3} className="text-[var(--bg)]" />}
+                      </span>
+                    </motion.button>
+                  );
+                })}
               </div>
+              <button
+                onClick={confirmarDolores}
+                disabled={dolores.length === 0}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none disabled:opacity-40 [font-family:var(--font-display)]"
+              >
+                Continuar
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </button>
             </motion.div>
           )}
 
@@ -214,6 +258,12 @@ export default function OnboardingPage() {
                   </>
                 )}
               </p>
+              {gemas > 0 && (
+                <div className="flex items-center gap-2 rounded-full border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] px-4 py-2 text-[15px] font-bold text-[var(--accent-2)]">
+                  <Gem size={16} fill="currentColor" />
+                  Ganaste {gemas} gemas
+                </div>
+              )}
               <button
                 onClick={() => router.push('/paywall')}
                 className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
