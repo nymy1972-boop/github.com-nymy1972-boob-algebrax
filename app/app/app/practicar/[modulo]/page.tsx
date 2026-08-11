@@ -4,7 +4,7 @@ import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, NotebookPen, XCircle, Sparkles } from 'lucide-react';
 import { getModulo } from '@/lib/modulos';
 import { registrarAcierto } from '@/lib/progress';
 import { StarBurst } from '@/components/onboarding/StarBurst';
@@ -107,6 +107,13 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5">
+              <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+              <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Ten papel y lápiz a la mano: </span>
+                resuélvelo primero en tu hoja, así llegas listo al examen real.
+              </p>
             </div>
             <button
               onClick={() => setVerEjemplo(false)}

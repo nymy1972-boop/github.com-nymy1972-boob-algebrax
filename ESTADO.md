@@ -159,5 +159,10 @@ Nota técnica: Turbopack cacheó un error de parseo fantasma dos veces en `pract
 - `/app/perfil` (nueva pantalla): avatar, nombre, plan actual (Free), racha, progreso por módulo, y "Cerrar sesión" (borra el progreso local — honesto: aclara que hoy vive en el dispositivo, no en una cuenta, hasta Sesión 6).
 - Verificado en navegador: nombre se guarda y se refleja en `/app` y en `/app/perfil`. Sin errores de servidor.
 
+## Ajuste: sugerencia de papel y lápiz (pedido del usuario)
+- Pantalla de ejemplo de cada módulo (`practicar/[modulo]`): tarjeta con ícono antes del botón "Ahora inténtalo tú" — "Ten papel y lápiz a la mano".
+- Modo Examen: se agregó una pantalla de INICIO nueva (antes no existía — el temporizador arrancaba de inmediato al entrar a la ruta) con el mismo aviso de papel y lápiz + botón "Empezar simulacro" que recién ahí arranca el conteo. Estado `iniciado` controla el useEffect del timer.
+- Verificado en navegador: el examen ya no arranca el reloj hasta tocar "Empezar simulacro"; progreso en 0% al iniciar.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, CheckCircle2, Clock, Home, Trophy, XCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Home, NotebookPen, Trophy, XCircle } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
@@ -39,20 +39,21 @@ function formatTiempo(s: number): string {
 export default function ExamenPage() {
   const router = useRouter();
   const preguntas = useMemo(() => armarPreguntas(), []);
+  const [iniciado, setIniciado] = useState(false);
   const [step, setStep] = useState(0);
   const [respuestas, setRespuestas] = useState<(number | null)[]>(() => preguntas.map(() => null));
   const [segundosRestantes, setSegundosRestantes] = useState(DURACION_SEGUNDOS);
   const [terminado, setTerminado] = useState(false);
 
   useEffect(() => {
-    if (terminado) return;
+    if (!iniciado || terminado) return;
     if (segundosRestantes <= 0) {
       setTerminado(true);
       return;
     }
     const t = window.setTimeout(() => setSegundosRestantes((s) => s - 1), 1000);
     return () => window.clearTimeout(t);
-  }, [segundosRestantes, terminado]);
+  }, [segundosRestantes, terminado, iniciado]);
 
   const pregunta = preguntas[step];
   const progreso = Math.round((step / preguntas.length) * 100);
@@ -81,6 +82,36 @@ export default function ExamenPage() {
     const temasAFallar = Array.from(new Set(revision.filter((r) => !r.acertaste).map((r) => r.moduloNombre)));
     return { correctas, total: preguntas.length, temasAFallar, revision };
   }, [respuestas, preguntas]);
+
+  if (!iniciado) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface))]">
+          <Clock size={28} className="text-[var(--accent)]" />
+        </div>
+        <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+          Simulacro cronometrado: {Math.round(DURACION_SEGUNDOS / 60)} minutos
+        </h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          {preguntas.length} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final — igual que en tu examen real.
+        </p>
+        <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5 text-left">
+          <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+          <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <span className="font-semibold text-[var(--text-primary)]">Ten papel y lápiz a la mano: </span>
+            resuelve cada ejercicio en tu hoja antes de elegir la respuesta.
+          </p>
+        </div>
+        <button
+          onClick={() => setIniciado(true)}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+        >
+          Empezar simulacro
+          <ArrowRight size={18} strokeWidth={2.5} />
+        </button>
+      </div>
+    );
+  }
 
   if (terminado) {
     return (
