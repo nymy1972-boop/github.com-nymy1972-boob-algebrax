@@ -69,5 +69,15 @@ Usuario pidió: lo mejor de Duolingo Math / Photomath / Brilliant.org en UX, MÁ
 - **Base de datos y Auth: Supabase** (Postgres + RLS + Supabase Auth). Estándar del SO, sin necesidad de justificar caso por caso.
 - **Pagador real:** se diseña el flujo de checkout pensando en que el padre/madre es quien paga (mensajes de valor claros para adulto en el paywall/landing, aunque el uso diario sea de Santi).
 
+## Sesión 2 — Identidad visual (en curso)
+3 opciones A/B/C renderizadas en `direcciones-abc.html` (mapa de niveles / grid de cartas-bloque / racha protagonista), todas con el mismo contrato visual derivado del mandato "estilo voxel/gamer tipo Roblox, sin marca ni assets":
+- Modo: oscuro · Fondo `#14161C` · Superficie `#1E212B` · Texto `#F4F5F7`/`#9CA1AE`
+- Acento `#FF4D4D` (CTA, racha, nodos activos) + 2ª nota `#3D8BFF` (íconos/badges)
+- Semánticos: éxito `#33D17A` · aviso `#FFB020`
+- Display: Baloo 2 (redondeada, chunky, no infantil) · Body: Plus Jakarta Sans
+- Radio 14-18px · sombra dura offset (efecto "bloque 3D que se presiona") · bordes 2px
+- Dispositivo ownable: botones/nodos con sombra sólida inferior que se hunden al presionar (block-press)
+Esperando elección del usuario (A/B/C, combinar, o ajuste) antes de cerrar FICHA-ARTE.md.
+
 ## Próximo paso
-Plan Maestro presentado. Esperando OK del usuario para arrancar Sesión 1 (Constitución ya cerrada → seguir con esquema de datos + auth) o ajustes al plan.
+Sesión 2 en curso: cerrar dirección visual → FICHA-ARTE.md → tokens CSS → Sesión 3 (página de ventas).

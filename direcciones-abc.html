@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AlgebraX — 3 direcciones visuales (A/B/C)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14161C;
+    --surface: #1E212B;
+    --surface-2: #262A36;
+    --text-1: #F4F5F7;
+    --text-2: #9CA1AE;
+    --accent: #FF4D4D;
+    --accent-2: #3D8BFF;
+    --success: #33D17A;
+    --warning: #FFB020;
+    --font-display: 'Baloo 2', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0A0B0E;
+    font-family: var(--font-body);
+    color: var(--text-1);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+  h1 { font-family: var(--font-display); font-size: 24px; text-align: center; }
+  p.subtitle { color: var(--text-2); text-align: center; max-width: 600px; font-size: 14px; margin-bottom: 8px; }
+  .board {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .col-label { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+  .col-desc { font-size: 12px; color: var(--text-2); text-align: center; max-width: 375px; }
+
+  .phone {
+    width: 375px;
+    height: 720px;
+    background: var(--bg);
+    border-radius: 32px;
+    border: 2px solid #2A2E3A;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .screen { padding: 20px 16px; height: 100%; overflow: hidden; }
+
+  /* Shared chunky button device */
+  .chunky-btn {
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    border: 2px solid #14161C;
+    box-shadow: 0 4px 0 0 #A62E2E;
+    cursor: pointer;
+  }
+  .streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--warning);
+    border: 1.5px solid #333748;
+  }
+
+  /* === OPCION A: Mapa de niveles === */
+  .topbar-a { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .avatar-a { width: 36px; height: 36px; border-radius: 10px; background: var(--accent-2); border: 2px solid #14161C; }
+  .path {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 0;
+  }
+  .node {
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    border: 2px solid #14161C;
+    position: relative;
+  }
+  .node.done { background: var(--success); box-shadow: 0 4px 0 0 #1F8F53; }
+  .node.active { background: var(--accent); box-shadow: 0 4px 0 0 #A62E2E; transform: scale(1.08); }
+  .node.locked { background: var(--surface-2); color: var(--text-2); box-shadow: 0 4px 0 0 #14161C; }
+  .node.left { align-self: flex-start; margin-left: 60px; }
+  .node.right { align-self: flex-end; margin-right: 60px; }
+  .connector { width: 4px; height: 20px; background: var(--surface-2); }
+
+  /* === OPCION B: Grid de cartas-bloque === */
+  .grid-b {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .card-b {
+    background: var(--surface);
+    border-radius: 18px;
+    border: 2.5px solid var(--surface-2);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-b.hero { grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent), #C93A3A); border-color: #14161C; }
+  .icon-block { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-2); border: 2px solid #14161C; }
+  .card-b .icon-block.alt { background: var(--warning); }
+  .card-b .icon-block.alt2 { background: var(--success); }
+  .progress-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent-2); border-radius: 999px; }
+
+  /* === OPCION C: Panel racha-protagonista === */
+  .hero-c {
+    background: linear-gradient(160deg, #22263A, var(--surface));
+    border-radius: 22px;
+    border: 2px solid #2A2E3A;
+    padding: 22px 18px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .streak-num-c { font-family: var(--font-display); font-size: 44px; font-weight: 800; color: var(--warning); line-height: 1; }
+  .list-c { display: flex; flex-direction: column; gap: 10px; }
+  .row-c {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 2px solid var(--surface-2);
+    border-radius: 14px; padding: 12px;
+  }
+  .row-c .dot { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+  <h1>AlgebraX — Dirección visual: inspirada en el mundo "voxel/gamer" (tipo Roblox), sin marca ni assets</h1>
+  <p class="subtitle">Las 3 opciones comparten la misma paleta, tipografía y mood — divergen solo en cómo se organiza la pantalla principal (selección de módulos). Elige una, combina lo mejor de cada una, o pide ajustes.</p>
+
+  <div class="board">
+
+    <div class="col">
+      <div class="col-label">A · Mapa de niveles</div>
+      <div class="col-desc">Camino de nodos tipo videojuego — cada bloque es un tema de álgebra. Se ve el progreso como un mapa que se recorre.</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="topbar-a">
+            <div class="avatar-a"></div>
+            <div class="streak-pill">🔥 4 días</div>
+          </div>
+          <div class="path">
+            <div class="node done">✓</div>
+            <div class="connector"></div>
+            <div class="node active left">▶</div>
+            <div class="connector"></div>
+            <div class="node locked right">🔒</div>
+            <div class="connector"></div>
+            <div class="node locked">🔒</div>
+          </div>
+          <div style="margin-top:24px;">
+            <div class="chunky-btn">Continuar: Despejes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-label">B · Grid de cartas-bloque</div>
+      <div class="col-desc">Tablero de control gamer: cada módulo es una carta grande con ícono voxel. Se siente más "panel de estudio serio" y menos "camino infantil".</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="topbar-a">
+            <div class="avatar-a"></div>
+            <div class="streak-pill">🔥 4 días</div>
+          </div>
+          <div class="grid-b">
+            <div class="card-b hero">
+              <div style="font-family:var(--font-display); font-weight:700; font-size:15px;">Simulacro de examen</div>
+              <div style="font-size:12px; opacity:0.9;">Practica contrarreloj</div>
+            </div>
+            <div class="card-b">
+              <div class="icon-block"></div>
+              <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Ecuaciones</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+            </div>
+            <div class="card-b">
+              <div class="icon-block alt"></div>
+              <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Despejes</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+            </div>
+            <div class="card-b">
+              <div class="icon-block alt2"></div>
+              <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Factorización</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-label">C · Racha protagonista</div>
+      <div class="col-desc">La racha diaria domina arriba (motivación inmediata), módulos abajo en lista compacta. Foco en volver todos los días.</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="hero-c">
+            <div style="font-size:12px; color:var(--text-2); margin-bottom:4px;">TU RACHA</div>
+            <div class="streak-num-c">4 🔥</div>
+            <div style="font-size:12px; color:var(--text-2); margin-top:6px;">¡No la rompas hoy!</div>
+          </div>
+          <div class="list-c">
+            <div class="row-c">
+              <div class="dot" style="background:var(--success);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Ecuaciones básicas</div>
+                <div style="font-size:11px; color:var(--text-2);">Completado</div>
+              </div>
+            </div>
+            <div class="row-c" style="border-color:var(--accent);">
+              <div class="dot" style="background:var(--accent);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Despejes</div>
+                <div style="font-size:11px; color:var(--text-2);">En progreso — 3 de 5</div>
+              </div>
+            </div>
+            <div class="row-c">
+              <div class="dot" style="background:var(--surface-2);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:700; font-size:14px;">Factorización</div>
+                <div style="font-size:11px; color:var(--text-2);">Bloqueado</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <div class="chunky-btn">Seguir mi racha</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
