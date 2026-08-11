@@ -110,5 +110,8 @@ FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) +
 - Verificado en navegador: Inicio con racha real, práctica de un módulo, Modo Examen con temporizador — sin errores de consola ni de servidor.
 - El link "Seguir gratis por ahora" del paywall ahora lleva directo a `/app` (sin pedir cuenta) — coherente con "preview anónimo" del modelo Freemium; `/entrar` queda para cuando el usuario quiere Premium o volver a un dispositivo nuevo.
 
+## Ajuste post-Sesión 5
+Modo Examen: se agregó "Revisión completa" al reporte final — antes solo listaba los TEMAS a repasar, ahora muestra pregunta por pregunta (acertada o no) con tu respuesta, la correcta, y el procedimiento paso a paso. Coincide con el MVP original ("reporte de errores comunes").
+
 ## Próximo paso
 Sesión 6 — Integraciones reales y seguridad: Git/GitHub, Supabase (base de datos + auth real), Vercel, dominio, Hotmart, Resend, y el gate de seguridad antes de vender.

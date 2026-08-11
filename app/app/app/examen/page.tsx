@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, Clock, Trophy } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Trophy, XCircle } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
@@ -15,6 +15,7 @@ interface PreguntaExamen {
   enunciado: string;
   opciones: string[];
   correctaIndex: number;
+  pasoClave: string;
 }
 
 function armarPreguntas(): PreguntaExamen[] {
@@ -24,6 +25,7 @@ function armarPreguntas(): PreguntaExamen[] {
       enunciado: p.enunciado,
       opciones: p.opciones,
       correctaIndex: p.correctaIndex,
+      pasoClave: p.pasoClave,
     })),
   );
 }
@@ -71,19 +73,18 @@ export default function ExamenPage() {
 
   const reporte = useMemo(() => {
     const correctas = respuestas.filter((r, i) => r === preguntas[i]?.correctaIndex).length;
-    const temasAFallar = Array.from(
-      new Set(
-        preguntas
-          .filter((_, i) => respuestas[i] !== preguntas[i].correctaIndex)
-          .map((p) => p.moduloNombre),
-      ),
-    );
-    return { correctas, total: preguntas.length, temasAFallar };
+    const revision = preguntas.map((p, i) => ({
+      ...p,
+      tuRespuesta: respuestas[i],
+      acertaste: respuestas[i] === p.correctaIndex,
+    }));
+    const temasAFallar = Array.from(new Set(revision.filter((r) => !r.acertaste).map((r) => r.moduloNombre)));
+    return { correctas, total: preguntas.length, temasAFallar, revision };
   }, [respuestas, preguntas]);
 
   if (terminado) {
     return (
-      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-5 px-5 text-center text-[var(--text-primary)]">
+      <div className="mx-auto flex min-h-dvh max-w-[420px] flex-col items-center gap-5 px-5 pb-16 pt-10 text-center text-[var(--text-primary)]">
         <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,var(--surface))]">
           <Trophy size={28} className="text-[var(--gold)]" />
         </div>
@@ -103,6 +104,46 @@ export default function ExamenPage() {
         ) : (
           <p className="text-[14px] text-[var(--text-secondary)]">Sin errores — vas muy bien preparado.</p>
         )}
+
+        {/* Revisión pregunta por pregunta — el procedimiento de CADA error, no solo el tema */}
+        <div className="flex w-full flex-col gap-3 text-left">
+          <p className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
+            Revisión completa
+          </p>
+          {reporte.revision.map((r, i) => (
+            <div
+              key={i}
+              className={`rounded-[var(--radius-card)] border-2 p-4 ${
+                r.acertaste
+                  ? 'border-[color-mix(in_oklab,var(--success)_35%,transparent)] bg-[var(--surface)]'
+                  : 'border-[color-mix(in_oklab,var(--accent)_40%,transparent)] bg-[color-mix(in_oklab,var(--accent)_6%,var(--surface))]'
+              }`}
+            >
+              <div className="mb-1 flex items-center gap-2">
+                {r.acertaste ? (
+                  <CheckCircle2 size={16} className="text-[var(--success)]" />
+                ) : (
+                  <XCircle size={16} className="text-[var(--accent)]" />
+                )}
+                <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-[var(--text-secondary)]">
+                  {r.moduloNombre}
+                </span>
+              </div>
+              <p className="font-semibold [font-family:var(--font-display)]">{r.enunciado}</p>
+              {!r.acertaste && (
+                <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+                  Tu respuesta: <span className="text-[var(--accent)]">{r.opciones[r.tuRespuesta ?? -1] ?? 'sin responder'}</span>
+                  {' · '}Correcta: <span className="text-[var(--success)]">{r.opciones[r.correctaIndex]}</span>
+                </p>
+              )}
+              <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Procedimiento: </span>
+                {r.pasoClave}
+              </p>
+            </div>
+          ))}
+        </div>
+
         <button
           onClick={() => router.push('/app')}
           className="mt-2 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
