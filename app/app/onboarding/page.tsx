@@ -116,15 +116,23 @@ export default function OnboardingPage() {
         <div className="mx-auto flex w-full max-w-[375px] items-center gap-3">
           {/* Control y libertad (Nielsen): volver un paso, o salir del onboarding — en TODAS las fases previas al plan */}
           {fase === 'grado' || fase === 'dolor' || fase === 'diagnostico' ? (
-            <button onClick={volver} aria-label="Volver al paso anterior" className="shrink-0 text-[var(--text-secondary)]">
+            <button
+              onClick={volver}
+              aria-label="Volver al paso anterior"
+              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[var(--text-secondary)]"
+            >
               <ArrowLeft size={20} />
             </button>
           ) : fase !== 'plan' ? (
-            <Link href="/" aria-label="Salir del onboarding" className="shrink-0 text-[var(--text-secondary)]">
+            <Link
+              href="/"
+              aria-label="Salir del onboarding"
+              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[var(--text-secondary)]"
+            >
               <X size={20} />
             </Link>
           ) : (
-            <span className="w-5 shrink-0" />
+            <span className="w-11 shrink-0" />
           )}
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--surface-2)]">
             <motion.div
@@ -147,7 +155,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100dvh-92px)] items-center justify-center py-8">
+      <div className="flex min-h-[calc(100dvh-92px)] items-start justify-center pt-8 pb-6 sm:pt-12">
         <AnimatePresence mode="wait">
           {fase === 'nombre' && (
             <motion.div
@@ -197,7 +205,7 @@ export default function OnboardingPage() {
                     key={g}
                     whileTap={{ scale: 0.97, y: 2 }}
                     onClick={() => elegirGrado(g)}
-                    className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_60%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
+                    className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
                   >
                     {g}
                   </motion.button>
@@ -229,7 +237,7 @@ export default function OnboardingPage() {
                       className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
                         marcado
                           ? 'border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,var(--surface))] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_45%,black)]'
-                          : 'border-[var(--surface-2)] bg-[var(--surface)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_60%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
+                          : 'border-[var(--surface-2)] bg-[var(--surface)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
                       }`}
                     >
                       {d}

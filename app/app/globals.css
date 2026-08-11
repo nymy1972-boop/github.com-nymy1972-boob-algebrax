@@ -136,3 +136,14 @@
 :root {
   --accent: #ff4d4d;
 }
+
+/* tokens.css declara --font-display/--font-body con el NOMBRE LITERAL de la
+   fuente ('Baloo 2', 'Plus Jakarta Sans'). next/font (layout.tsx) no expone
+   ese nombre literal: genera un font-family propio accesible SOLO vía las
+   variables --font-baloo2/--font-jakarta que inyecta en <html>. Sin este
+   puente, el navegador nunca encuentra "Baloo 2" y cae al fallback del
+   sistema (bug confirmado por revisor-visual: docs/revisiones/onboarding-veredicto.md). */
+:root {
+  --font-display: var(--font-baloo2), 'Baloo 2', 'Segoe UI', sans-serif;
+  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}

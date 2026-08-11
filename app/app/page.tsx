@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Camera, CircleHelp, AlarmClock, Ban } from 'lucide-react';
 import { Hero } from '@/components/landing/Hero';
 import { Problema } from '@/components/landing/Problema';
@@ -18,12 +19,17 @@ import { StickyCtaMobile } from '@/components/landing/ui';
 const CTA_HREF = '/onboarding';
 const CTA_LABEL = 'Crear mi cuenta gratis';
 
+const LOGO = (
+  <Image src="/isotipo.png" alt="" width={28} height={28} priority className="h-7 w-7 object-contain" />
+);
+
 export default function Home() {
   return (
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
       {/* 1. HERO */}
       <Hero
         appName="AlgebraX"
+        logo={LOGO}
         loginHref="/entrar"
         h1Marked="[acento]Entiende el porqué[/acento] y aprueba tu examen de álgebra"
         subtitleMarked="El Descifrador de Pasos te muestra [b]dónde te pierdes[/b], no solo la respuesta."
@@ -182,6 +188,7 @@ export default function Home() {
       {/* 10. FOOTER LEGAL — páginas legales reales: Sesión 6 (47-LEGAL-FISCAL) */}
       <FooterLegal
         appName="AlgebraX"
+        logo={LOGO}
         soporteEmail="soporte@algebrax.app"
         enlaces={[
           { label: 'Privacidad', href: '/privacidad' },

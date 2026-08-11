@@ -81,6 +81,14 @@ export function Diagnostico({ step, onAnswer }: Props) {
     onAnswer(false, pregunta.tema);
   }
 
+  // Sentinel -1: el estudiante se traba y pide ver la respuesta en vez de
+  // adivinar — cuenta como fallo (mismo camino que una opción incorrecta),
+  // nunca lo deja bloqueado en la pregunta.
+  function handleSkip() {
+    if (selected !== null) return;
+    setSelected(-1);
+  }
+
   const isWrong = selected !== null && selected !== pregunta.correctaIndex;
 
   return (
@@ -123,7 +131,7 @@ export function Diagnostico({ step, onAnswer }: Props) {
               whileTap={{ scale: selected === null ? 0.97 : 1, y: selected === null ? 2 : 0 }}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_60%,black)] transition-colors ${
+              className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] transition-colors ${
                 showAsCorrect
                   ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--success)_45%,black)]'
                   : showAsWrong
@@ -139,32 +147,43 @@ export function Diagnostico({ step, onAnswer }: Props) {
         })}
       </div>
 
-      {!isWrong && (
-        <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_7%,var(--surface))] p-3.5">
-          <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
-          <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
-            <span className="font-semibold text-[var(--text-primary)]">Consejo: </span>
-            resuélvelo en una hoja antes de elegir — así practicas como en el examen real.
-          </p>
-        </div>
-      )}
+      <div aria-live="polite">
+        {!isWrong && (
+          <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_7%,var(--surface))] p-3.5">
+            <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+            <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+              <span className="font-semibold text-[var(--text-primary)]">Consejo: </span>
+              resuélvelo en una hoja antes de elegir — así practicas como en el examen real.
+            </p>
+          </div>
+        )}
 
-      {isWrong && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
-        >
-          <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
-          {pregunta.explicacion}
-          <button
-            onClick={continuar}
-            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+        {isWrong && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
           >
-            Entendido, sigamos
-            <ArrowRight size={16} strokeWidth={2.5} />
-          </button>
-        </motion.div>
+            <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
+            {pregunta.explicacion}
+            <button
+              onClick={continuar}
+              className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+            >
+              Entendido, sigamos
+              <ArrowRight size={16} strokeWidth={2.5} />
+            </button>
+          </motion.div>
+        )}
+      </div>
+
+      {selected === null && (
+        <button
+          onClick={handleSkip}
+          className="self-center text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4"
+        >
+          No lo sé, sigamos
+        </button>
       )}
     </div>
   );
