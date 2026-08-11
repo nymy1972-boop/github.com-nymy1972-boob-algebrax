@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, NotebookPen, Trophy, XCircle } from 'lucide-react';
-import { MODULOS } from '@/lib/modulos';
+import { MODULOS, type PreguntaModulo } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 
@@ -19,27 +19,16 @@ interface PreguntaExamen {
   pasoClave: string;
 }
 
-function barajar<T>(arr: T[]): T[] {
-  const copia = [...arr];
-  for (let i = copia.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copia[i], copia[j]] = [copia[j], copia[i]];
-  }
-  return copia;
-}
-
-/** 2 preguntas al azar por módulo — con el banco ampliado, cada simulacro puede salir distinto. */
+/** 2 preguntas GENERADAS al azar por módulo — banco prácticamente infinito, cada simulacro es distinto. */
 function armarPreguntas(): PreguntaExamen[] {
   return MODULOS.flatMap((m) =>
-    barajar(m.preguntas)
-      .slice(0, 2)
-      .map((p) => ({
-        moduloNombre: m.nombre,
-        enunciado: p.enunciado,
-        opciones: p.opciones,
-        correctaIndex: p.correctaIndex,
-        pasoClave: p.pasoClave,
-      })),
+    m.generarPreguntas(2).map((p: PreguntaModulo) => ({
+      moduloNombre: m.nombre,
+      enunciado: p.enunciado,
+      opciones: p.opciones,
+      correctaIndex: p.correctaIndex,
+      pasoClave: p.pasoClave,
+    })),
   );
 }
 
@@ -51,13 +40,20 @@ function formatTiempo(s: number): string {
 
 export default function ExamenPage() {
   const router = useRouter();
-  const preguntas = useMemo(() => armarPreguntas(), []);
   const [iniciado, setIniciado] = useState(false);
+  const [preguntas, setPreguntas] = useState<PreguntaExamen[]>([]);
   const [step, setStep] = useState(0);
-  const [respuestas, setRespuestas] = useState<(number | null)[]>(() => preguntas.map(() => null));
+  const [respuestas, setRespuestas] = useState<(number | null)[]>([]);
   const [segundosRestantes, setSegundosRestantes] = useState(DURACION_SEGUNDOS);
   const [terminado, setTerminado] = useState(false);
   const gemasAsignadas = useRef(false);
+
+  function empezar() {
+    const nuevas = armarPreguntas();
+    setPreguntas(nuevas);
+    setRespuestas(nuevas.map(() => null));
+    setIniciado(true);
+  }
 
   useEffect(() => {
     if (!iniciado || terminado) return;
@@ -114,7 +110,7 @@ export default function ExamenPage() {
           Simulacro cronometrado: {Math.round(DURACION_SEGUNDOS / 60)} minutos
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          {preguntas.length} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final — igual que en tu examen real.
+          {MODULOS.length * 2} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final — igual que en tu examen real.
         </p>
         <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5 text-left">
           <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
@@ -124,7 +120,7 @@ export default function ExamenPage() {
           </p>
         </div>
         <button
-          onClick={() => setIniciado(true)}
+          onClick={empezar}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
         >
           Empezar simulacro

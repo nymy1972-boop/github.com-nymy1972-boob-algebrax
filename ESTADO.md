@@ -216,5 +216,18 @@ El gate de veredicto caducado se dispara con cualquier .tsx modificado bajo `app
 `Modo Examen`: ahora arma el simulacro con 2 preguntas ALEATORIAS por módulo (antes eran siempre las mismas 2 primeras) — con el banco más grande, cada simulacro puede salir distinto, dando más valor de repetición.
 Verificado con script automatizado: las 8 preguntas de cada uno de los 3 módulos se completan sin errores; el examen carga con la mezcla aleatoria correctamente.
 
+## Ajuste: generación procedural de ejercicios (reemplaza el banco fijo de 8)
+El usuario notó que un banco fijo (aunque fuera de 8 por módulo) se agota si el estudiante vuelve a practicar un módulo ya completado. `lib/modulos.ts` se reescribió: cada módulo ahora expone `generarPreguntas(cantidad)` en vez de una lista `preguntas` fija — genera ejercicios con `Math.random()` en tiempo real (rangos numéricos por módulo, distractores calculados a partir del error típico, posición de la respuesta correcta siempre aleatoria) y `generarUnicas()` descarta duplicados dentro de la misma sesión. Resultado: cada vez que el estudiante entra a practicar o hace el simulacro, los ejercicios son nuevos, sin importar cuántas veces vuelva.
+- `practicar/[modulo]/page.tsx`: genera 8 preguntas dentro de un `useEffect` (solo en cliente, evita el desfase de hidratación de Next).
+- `examen/page.tsx`: genera 2 por módulo (6 total) dentro de la función `empezar()`, disparada al tocar "Empezar simulacro" (no antes, mismo motivo de hidratación).
+Verificado en navegador de punta a punta: sesión completa de práctica (8 preguntas, con acierto y fallo) y simulacro completo (6 preguntas, reporte final con revisión) sin errores de servidor ni de consola.
+
+## Ajuste: animación premium de acierto (Lottie, pedido del usuario)
+El usuario aportó una animación Lottie propia ("Premium.json", tema de felicitación con medalla) pidiendo que se muestre en cada ejercicio completado. Se instaló `lottie-react`, el asset vive en `app/public/lottie/acierto-premium.json`, y el componente nuevo `components/onboarding/AciertoLottie.tsx` reemplazó a `StarBurst` en `practicar/[modulo]/page.tsx` (StarBurst se mantiene intacto para el diagnóstico del onboarding, que sí lo sigue usando).
+Decisión de diseño: la animación original dura 3s a velocidad normal — demasiado larga para una recompensa FRECUENTE (una pregunta correcta, no un hito real, según 11-DISENO-EMOCIONAL.md/56). Se reproduce a 2.4x (~1.25s) dentro de un contenedor compacto (160px), no bloqueante, respeta `prefers-reduced-motion` (muestra un check estático en vez de reproducir). El `CelebrationOverlay` de pantalla completa se conserva sin cambios para el hito real (terminar el módulo).
+Verificado en navegador: la medalla animada aparece al acertar, el contador de gemas sube, y la app avanza limpiamente a la siguiente pregunta sin errores de servidor.
+
+⚠️ Pendiente (no bloqueante, deuda de calidad ya anotada en la ronda anterior del revisor): aria-live en el feedback, opción de saltar pregunta, contraste de la sombra block-press, texto "Consejo" repetido — no se han tocado en este ajuste.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

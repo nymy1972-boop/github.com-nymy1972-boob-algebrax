@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import { Baloo_2, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
+// Nombres deliberadamente distintos de --font-display/--font-body: esos ya
+// son variables propias de components/landing/tokens.css (el brand kit) —
+// usar el mismo nombre aquí pisaría ese valor en el :root (colisión real).
 const baloo2 = Baloo_2({
-  variable: "--font-geist-sans",
+  variable: "--font-baloo2",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
 });
 
 const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-geist-mono",
+  variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });

@@ -1,14 +1,16 @@
 'use client';
 
-import { use, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, MotionConfig } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen, Sparkles } from 'lucide-react';
-import { getModulo } from '@/lib/modulos';
+import { getModulo, type PreguntaModulo } from '@/lib/modulos';
 import { registrarAcierto, GEMAS_POR_ACIERTO } from '@/lib/progress';
-import { StarBurst } from '@/components/onboarding/StarBurst';
+import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+
+const PREGUNTAS_POR_SESION = 8;
 
 export default function PracticarPage({ params }: { params: Promise<{ modulo: string }> }) {
   const { modulo: slug } = use(params);
@@ -16,23 +18,31 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   const modulo = getModulo(slug);
 
   const [verEjemplo, setVerEjemplo] = useState(true);
+  const [preguntas, setPreguntas] = useState<PreguntaModulo[] | null>(null);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [showStars, setShowStars] = useState(false);
+  const [showAcierto, setShowAcierto] = useState(false);
   const [showGemas, setShowGemas] = useState(false);
   const [aciertos, setAciertos] = useState(0);
   const [gemas, setGemas] = useState(0);
   const [terminado, setTerminado] = useState(false);
 
-  const pregunta = modulo?.preguntas[step];
-  const progreso = modulo ? Math.round((step / modulo.preguntas.length) * 100) : 0;
+  // Se genera SOLO en cliente (nunca en el render de servidor) para que cada
+  // sesión de práctica traiga ejercicios nuevos, aunque el estudiante ya haya
+  // completado este módulo antes.
+  useEffect(() => {
+    if (modulo) setPreguntas(modulo.generarPreguntas(PREGUNTAS_POR_SESION));
+  }, [modulo]);
+
+  const pregunta = preguntas?.[step];
+  const progreso = preguntas ? Math.round((step / preguntas.length) * 100) : 0;
 
   const isWrong = selected !== null && pregunta && selected !== pregunta.correctaIndex;
 
   function siguiente() {
-    if (!modulo) return;
+    if (!preguntas) return;
     setSelected(null);
-    if (step + 1 < modulo.preguntas.length) {
+    if (step + 1 < preguntas.length) {
       setStep((s) => s + 1);
     } else {
       setTerminado(true);
@@ -46,24 +56,24 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     if (correct) {
       setAciertos((n) => n + 1);
       setGemas((g) => g + GEMAS_POR_ACIERTO);
-      registrarAcierto(slug, modulo!.preguntas.length);
-      setShowStars(true);
+      registrarAcierto(slug, preguntas!.length);
+      setShowAcierto(true);
       setShowGemas(true);
       window.setTimeout(() => {
-        setShowStars(false);
+        setShowAcierto(false);
         setShowGemas(false);
         siguiente();
-      }, 800);
+      }, 1250);
     }
   }
 
   const mensajeFinal = useMemo(() => {
-    if (!modulo) return '';
-    if (aciertos === modulo.preguntas.length) {
-      return `Perfecto: ${aciertos} de ${modulo.preguntas.length}. Dominas ${modulo.nombre.toLowerCase()}. Ganaste ${gemas} gemas.`;
+    if (!modulo || !preguntas) return '';
+    if (aciertos === preguntas.length) {
+      return `Perfecto: ${aciertos} de ${preguntas.length}. Dominas ${modulo.nombre.toLowerCase()}. Ganaste ${gemas} gemas.`;
     }
-    return `Acertaste ${aciertos} de ${modulo.preguntas.length} en ${modulo.nombre}. Ganaste ${gemas} gemas — vuelve mañana a reforzar.`;
-  }, [aciertos, modulo, gemas]);
+    return `Acertaste ${aciertos} de ${preguntas.length} en ${modulo.nombre}. Ganaste ${gemas} gemas — vuelve cuando quieras, te esperan ejercicios nuevos.`;
+  }, [aciertos, modulo, preguntas, gemas]);
 
   if (!modulo) {
     return (
@@ -74,6 +84,10 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
         </Link>
       </div>
     );
+  }
+
+  if (!verEjemplo && !preguntas) {
+    return <div className="min-h-dvh bg-[var(--bg)]" />;
   }
 
   return (
@@ -147,7 +161,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
           </h1>
 
           <div className="relative flex flex-col gap-3">
-            <StarBurst active={showStars} />
+            <AciertoLottie active={showAcierto} />
             <AnimatePresence>
               {showGemas && (
                 <motion.div

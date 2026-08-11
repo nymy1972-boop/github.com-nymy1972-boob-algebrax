@@ -1,6 +1,9 @@
 // Banco de contenido de los 3 módulos MVP (ESTADO.md → "Funciones núcleo").
-// Cada pregunta trae el paso exacto en el que se equivocan los estudiantes que
-// fallan — eso es lo que el Descifrador de Pasos les muestra (nunca solo "mal").
+// Cada pregunta se GENERA (no es una lista fija): así el estudiante nunca se
+// topa con el mismo ejercicio dos veces seguidas, aunque complete el módulo y
+// vuelva a practicar. Cada pregunta trae el paso exacto en el que se
+// equivocan los estudiantes que fallan — eso es lo que el Descifrador de
+// Pasos les muestra (nunca solo "mal").
 
 export interface PreguntaModulo {
   enunciado: string;
@@ -24,7 +27,129 @@ export interface Modulo {
   nombre: string;
   descripcion: string;
   ejemplo: EjemploModulo; // se muestra ANTES de la primera pregunta — enseña, luego practica
-  preguntas: PreguntaModulo[];
+  generarPreguntas: (cantidad: number) => PreguntaModulo[];
+}
+
+// ── utilidades compartidas de generación ──────────────────────────────────
+
+function entero(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function barajar<T>(arr: T[]): T[] {
+  const copia = [...arr];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+function fmt(n: number): string {
+  return n < 0 ? `-${Math.abs(n)}` : `${n}`;
+}
+
+/** Arma las 4 opciones (correcta + 3 distractores únicos) en posición aleatoria. */
+function armarOpciones(correcta: string, distractoresPosibles: string[]): { opciones: string[]; correctaIndex: number } {
+  const unicos = Array.from(new Set(distractoresPosibles.filter((d) => d !== correcta)));
+  const distractores = barajar(unicos).slice(0, 3);
+  // relleno de emergencia si por coincidencia numérica quedaron <3 distractores únicos
+  let relleno = 1;
+  while (distractores.length < 3) {
+    const candidato = `x = ${relleno}`;
+    if (candidato !== correcta && !distractores.includes(candidato)) distractores.push(candidato);
+    relleno++;
+  }
+  const opciones = barajar([correcta, ...distractores]);
+  return { opciones, correctaIndex: opciones.indexOf(correcta) };
+}
+
+// ── Módulo 1: Ecuaciones básicas (x ± a = b) ───────────────────────────────
+
+function generarEcuacion(): PreguntaModulo {
+  const x = entero(-15, 25);
+  const a = entero(2, 20);
+  const suma = Math.random() < 0.5;
+  const b = suma ? x + a : x - a;
+  const enunciado = suma ? `Resuelve: x + ${a} = ${b}` : `Resuelve: x − ${a} = ${b}`;
+  const correcta = `x = ${fmt(x)}`;
+  const pasoClave = suma
+    ? `El ${a} pasa restando al otro lado: x = ${b} − ${a} = ${x}.`
+    : `El ${a} pasa sumando al otro lado: x = ${b} + ${a} = ${x}.`;
+  const distractores = [
+    `x = ${fmt(-x)}`, // sign flip
+    `x = ${fmt(suma ? b + a : b - a)}`, // aplicó la operación contraria
+    `x = ${fmt(a)}`, // confunde x con a
+    `x = ${fmt(x + 1)}`,
+  ];
+  const { opciones, correctaIndex } = armarOpciones(correcta, distractores);
+  return { enunciado, opciones, correctaIndex, pasoClave };
+}
+
+// ── Módulo 2: Despejes con signos (a·x ± b = c) ────────────────────────────
+
+function generarDespeje(): PreguntaModulo {
+  const a = entero(2, 6);
+  const x = entero(-10, 12);
+  const b = entero(1, 15);
+  const suma = Math.random() < 0.5;
+  const c = suma ? a * x + b : a * x - b;
+  const enunciado = suma ? `Despeja x: ${a}x + ${b} = ${c}` : `Despeja x: ${a}x − ${b} = ${c}`;
+  const correcta = `x = ${fmt(x)}`;
+  const pasoClave = suma
+    ? `Restas ${b} en ambos lados (${a}x = ${c - b}), luego divides entre ${a}.`
+    : `Sumas ${b} en ambos lados (${a}x = ${c + b}), luego divides entre ${a}.`;
+  const distractores = [
+    `x = ${fmt(Math.round(c / a))}`, // olvidó mover el término independiente
+    `x = ${fmt(-x)}`, // sign flip
+    `x = ${fmt(x + a)}`,
+    `x = ${fmt(suma ? x - 1 : x + 1)}`,
+  ];
+  const { opciones, correctaIndex } = armarOpciones(correcta, distractores);
+  return { enunciado, opciones, correctaIndex, pasoClave };
+}
+
+// ── Módulo 3: Factorización (x² + (p+q)x + pq = (x+p)(x+q)) ───────────────
+
+function factorTexto(p: number): string {
+  return p < 0 ? `(x-${Math.abs(p)})` : `(x+${p})`;
+}
+
+function generarFactorizacion(): PreguntaModulo {
+  let p = 0;
+  let q = 0;
+  // evita p=0, q=0 o p===q (para que el enunciado no sea un binomio al cuadrado disfrazado)
+  while (p === 0 || q === 0 || p === q) {
+    p = entero(-9, 9);
+    q = entero(-9, 9);
+  }
+  const b = p + q;
+  const c = p * q;
+  const enunciado = `Factoriza: x² ${b >= 0 ? '+' : '−'} ${Math.abs(b)}x ${c >= 0 ? '+' : '−'} ${Math.abs(c)}`;
+  const correcta = `${factorTexto(p)}${factorTexto(q)}`;
+  const pasoClave = `Buscas 2 números que multiplicados den ${c} y sumados den ${b}: son ${p} y ${q}.`;
+  const distractores = [
+    `${factorTexto(-p)}${factorTexto(q)}`,
+    `${factorTexto(p)}${factorTexto(-q)}`,
+    `${factorTexto(p + 1)}${factorTexto(q - 1)}`,
+    `${factorTexto(-p)}${factorTexto(-q)}`,
+  ];
+  const { opciones, correctaIndex } = armarOpciones(correcta, distractores);
+  return { enunciado, opciones, correctaIndex, pasoClave };
+}
+
+function generarUnicas(generador: () => PreguntaModulo, cantidad: number): PreguntaModulo[] {
+  const vistas = new Set<string>();
+  const resultado: PreguntaModulo[] = [];
+  let intentos = 0;
+  while (resultado.length < cantidad && intentos < cantidad * 20) {
+    intentos++;
+    const p = generador();
+    if (vistas.has(p.enunciado)) continue;
+    vistas.add(p.enunciado);
+    resultado.push(p);
+  }
+  return resultado;
 }
 
 export const MODULOS: Modulo[] = [
@@ -40,56 +165,7 @@ export const MODULOS: Modulo[] = [
         { titulo: 'Resuelve la operación', detalle: 'x = 8' },
       ],
     },
-    preguntas: [
-      {
-        enunciado: 'Resuelve: x + 8 = 15',
-        opciones: ['x = 23', 'x = 7', 'x = -7', 'x = 8'],
-        correctaIndex: 1,
-        pasoClave: 'El 8 pasa restando al otro lado: x = 15 − 8 = 7.',
-      },
-      {
-        enunciado: 'Resuelve: x − 6 = 4',
-        opciones: ['x = -2', 'x = 2', 'x = 10', 'x = 24'],
-        correctaIndex: 2,
-        pasoClave: 'El 6 pasa sumando al otro lado: x = 4 + 6 = 10.',
-      },
-      {
-        enunciado: 'Resuelve: 20 = x + 12',
-        opciones: ['x = 32', 'x = -8', 'x = 8', 'x = 12'],
-        correctaIndex: 2,
-        pasoClave: 'El 12 pasa restando: x = 20 − 12 = 8.',
-      },
-      {
-        enunciado: 'Resuelve: x + 15 = 9',
-        opciones: ['x = 6', 'x = 24', 'x = -6', 'x = -24'],
-        correctaIndex: 2,
-        pasoClave: 'El 15 pasa restando: x = 9 − 15 = -6 (el resultado negativo es válido).',
-      },
-      {
-        enunciado: 'Resuelve: x − 9 = -3',
-        opciones: ['x = -12', 'x = 6', 'x = 12', 'x = -6'],
-        correctaIndex: 1,
-        pasoClave: 'El 9 pasa sumando al otro lado: x = -3 + 9 = 6.',
-      },
-      {
-        enunciado: 'Resuelve: x + 4 = -1',
-        opciones: ['x = 3', 'x = 5', 'x = -5', 'x = -3'],
-        correctaIndex: 2,
-        pasoClave: 'El 4 pasa restando: x = -1 − 4 = -5.',
-      },
-      {
-        enunciado: 'Resuelve: 30 = x − 5',
-        opciones: ['x = 25', 'x = 35', 'x = -25', 'x = 6'],
-        correctaIndex: 1,
-        pasoClave: 'El 5 pasa sumando al otro lado: x = 30 + 5 = 35.',
-      },
-      {
-        enunciado: 'Resuelve: x − 20 = 5',
-        opciones: ['x = -15', 'x = 15', 'x = 25', 'x = 100'],
-        correctaIndex: 2,
-        pasoClave: 'El 20 pasa sumando al otro lado: x = 5 + 20 = 25.',
-      },
-    ],
+    generarPreguntas: (cantidad) => generarUnicas(generarEcuacion, cantidad),
   },
   {
     slug: 'despejes',
@@ -103,56 +179,7 @@ export const MODULOS: Modulo[] = [
         { titulo: 'Resuelve la división', detalle: 'x = 6' },
       ],
     },
-    preguntas: [
-      {
-        enunciado: 'Despeja x: 3x − 4 = 11',
-        opciones: ['x = 5', 'x = 2.33', 'x = 21/3', 'x = -5'],
-        correctaIndex: 0,
-        pasoClave: 'Primero sumas 4 en ambos lados (3x = 15), luego divides entre 3.',
-      },
-      {
-        enunciado: 'Despeja x: 2x + 6 = 20',
-        opciones: ['x = 7', 'x = 13', 'x = 10', 'x = 4'],
-        correctaIndex: 0,
-        pasoClave: 'Restas 6 en ambos lados (2x = 14), luego divides entre 2.',
-      },
-      {
-        enunciado: 'Despeja x: 5x = 30 − x',
-        opciones: ['x = 5', 'x = 6', 'x = 25', 'x = -5'],
-        correctaIndex: 0,
-        pasoClave: 'Pasas la x del lado derecho sumando (6x = 30), luego divides entre 6.',
-      },
-      {
-        enunciado: 'Despeja x: -2x + 3 = 9',
-        opciones: ['x = -3', 'x = 3', 'x = 6', 'x = -6'],
-        correctaIndex: 0,
-        pasoClave: 'Restas 3 (-2x = 6), divides entre -2 — y el signo se invierte: x = -3.',
-      },
-      {
-        enunciado: 'Despeja x: 4x + 3 = 19',
-        opciones: ['x = 5.5', 'x = 4', 'x = 22', 'x = -4'],
-        correctaIndex: 1,
-        pasoClave: 'Restas 3 en ambos lados (4x = 16), luego divides entre 4.',
-      },
-      {
-        enunciado: 'Despeja x: 2x − 7 = 9',
-        opciones: ['x = 1', 'x = 8', 'x = 32', 'x = -8'],
-        correctaIndex: 1,
-        pasoClave: 'Sumas 7 en ambos lados (2x = 16), luego divides entre 2.',
-      },
-      {
-        enunciado: 'Despeja x: 3x + 2 = -13',
-        opciones: ['x = 5', 'x = -11/3', 'x = -5', 'x = -15'],
-        correctaIndex: 2,
-        pasoClave: 'Restas 2 en ambos lados (3x = -15), luego divides entre 3.',
-      },
-      {
-        enunciado: 'Despeja x: 5x − 10 = 0',
-        opciones: ['x = 0', 'x = -2', 'x = 2', 'x = 50'],
-        correctaIndex: 2,
-        pasoClave: 'Sumas 10 en ambos lados (5x = 10), luego divides entre 5.',
-      },
-    ],
+    generarPreguntas: (cantidad) => generarUnicas(generarDespeje, cantidad),
   },
   {
     slug: 'factorizacion',
@@ -166,56 +193,7 @@ export const MODULOS: Modulo[] = [
         { titulo: 'Arma los dos paréntesis con esos números', detalle: '(x+2)(x+4)' },
       ],
     },
-    preguntas: [
-      {
-        enunciado: 'Factoriza: x² + 5x + 6',
-        opciones: ['(x+2)(x+3)', '(x+1)(x+6)', '(x+5)(x+1)', '(x-2)(x-3)'],
-        correctaIndex: 0,
-        pasoClave: 'Buscas 2 números que multiplicados den 6 y sumados den 5: son 2 y 3.',
-      },
-      {
-        enunciado: 'Factoriza: x² + 7x + 10',
-        opciones: ['(x+2)(x+5)', '(x+1)(x+10)', '(x+7)(x+3)', '(x-2)(x-5)'],
-        correctaIndex: 0,
-        pasoClave: 'Buscas 2 números que den 10 al multiplicar y 7 al sumar: son 2 y 5.',
-      },
-      {
-        enunciado: 'Factoriza: x² − x − 6',
-        opciones: ['(x-3)(x+2)', '(x+3)(x-2)', '(x-6)(x+1)', '(x+6)(x-1)'],
-        correctaIndex: 0,
-        pasoClave: 'Buscas 2 números que multiplicados den -6 y sumados den -1: son -3 y 2.',
-      },
-      {
-        enunciado: 'Factoriza: x² + 2x − 8',
-        opciones: ['(x+4)(x-2)', '(x-4)(x+2)', '(x+8)(x-1)', '(x-8)(x+1)'],
-        correctaIndex: 0,
-        pasoClave: 'Buscas 2 números que den -8 al multiplicar y 2 al sumar: son 4 y -2.',
-      },
-      {
-        enunciado: 'Factoriza: x² + 8x + 15',
-        opciones: ['(x+1)(x+15)', '(x+3)(x+5)', '(x-3)(x-5)', '(x+15)(x-1)'],
-        correctaIndex: 1,
-        pasoClave: 'Buscas 2 números que multiplicados den 15 y sumados den 8: son 3 y 5.',
-      },
-      {
-        enunciado: 'Factoriza: x² − 7x + 12',
-        opciones: ['(x-2)(x-6)', '(x-3)(x-4)', '(x+3)(x+4)', '(x-1)(x-12)'],
-        correctaIndex: 1,
-        pasoClave: 'Buscas 2 números que multiplicados den 12 y sumados den -7: son -3 y -4.',
-      },
-      {
-        enunciado: 'Factoriza: x² + 3x − 10',
-        opciones: ['(x+2)(x-5)', '(x+5)(x-2)', '(x-5)(x-2)', '(x+10)(x-1)'],
-        correctaIndex: 1,
-        pasoClave: 'Buscas 2 números que multiplicados den -10 y sumados den 3: son 5 y -2.',
-      },
-      {
-        enunciado: 'Factoriza: x² − 5x − 6',
-        opciones: ['(x-1)(x+6)', '(x+2)(x-3)', '(x-6)(x+1)', '(x+6)(x+1)'],
-        correctaIndex: 2,
-        pasoClave: 'Buscas 2 números que multiplicados den -6 y sumados den -5: son -6 y 1.',
-      },
-    ],
+    generarPreguntas: (cantidad) => generarUnicas(generarFactorizacion, cantidad),
   },
 ];
 
