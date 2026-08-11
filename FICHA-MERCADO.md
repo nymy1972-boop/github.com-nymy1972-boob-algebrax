@@ -19,10 +19,10 @@
 - NO ENCONTRADO — requiere abrir el checkout real de Hotmart (pendiente cuenta, Sesión 6). Protocolo: `18-VENTA-HOTMART.md`.
 
 ## 4. PRUEBA Y GARANTÍA (plazos que la pasarela permite DE VERDAD)
-- Plazos de prueba/garantía que admite Hotmart: **NO VERIFICADO TODAVÍA** — requiere el panel real de Hotmart, que no existe hasta que el usuario cree la cuenta (Sesión 6, en curso — ver ESTADO.md "Sesión 6 — Integraciones reales y seguridad: EN CURSO").
-- **Prueba elegida: 0 días** (modelo Freemium sin trial de fecha límite — decidido en Sesión 1 por 02C nicho Educación; el "probar gratis" lo cubre el plan Free permanente, no un trial con cobro automático).
-- **Garantía elegida (provisional): 7 días**, basada en el piso legal estándar que `18-VENTA-HOTMART.md` documenta para productos digitales en Hotmart — PENDIENTE de confirmar en el panel real antes de publicitarla como definitiva.
-- Comprobación de la regla dura (garantía > prueba): 7 > 0 → SÍ. Cobertura real: como no hay trial con cobro automático, la garantía de 7 días aplica sobre la primera compra Premium directa — sin el problema de "garantía que vence antes de que exista algo que devolver" que describe `18`.
+- Plazos de prueba/garantía que admite Hotmart: NO VERIFICADO TODAVÍA — requiere el panel real de Hotmart, que no existe hasta que el usuario cree la cuenta (Sesión 6, en curso — ver ESTADO.md "Sesión 6 — Integraciones reales y seguridad: EN CURSO"). Modelo Freemium sin trial de fecha límite (decidido en Sesión 1 por 02C nicho Educación): el "probar gratis" lo cubre el plan Free permanente, no un trial con cobro automático. El plazo de garantía de 7 días es provisional, basado en el piso legal estándar que `18-VENTA-HOTMART.md` documenta para productos digitales en Hotmart, PENDIENTE de confirmar en el panel real antes de publicitarlo como definitivo. Ver también "Problema conocido" al final de esta ficha.
+- Prueba elegida: 0 días
+- Garantía elegida: 7 días
+- ⚠️ **REGLA DURA (`18`): la garantía tiene que durar MÁS que la prueba.** Comprobación: garantía 7 > prueba 0 → SÍ. Cobertura real: como no hay trial con cobro automático, la garantía de 7 días aplica sobre la primera compra Premium directa — sin el problema de "garantía que vence antes de que exista algo que devolver".
 - ¿Desde cuándo cuenta el plazo? NO CONFIRMADO — el copy actual dice "en 7 días" sin fijar fecha de inicio exacta (cumple la regla de `18` de no prometer un ancla que no está confirmada).
 
 ## 5. CONVERSIÓN ESPERABLE

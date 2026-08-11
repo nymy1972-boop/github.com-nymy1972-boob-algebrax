@@ -197,5 +197,8 @@ El usuario trajo 7 "reglas de oro" de paywall de Gemini. Análisis y decisión:
 - (1) anclaje anual + desglose diario y (4) CTA orientado a beneficio — ya estaban bien implementados desde la Sesión 4, sin cambios.
 Verificado en navegador con `?tema=Despejes con signos`: título personalizado correcto, sin errores.
 
+## Re-cierre del gate (código cambió tras el veredicto anterior)
+Tras los ajustes del paywall (temaDebil en la URL) y el fix de altura del botón, se re-capturó el screenshot y se volvió a lanzar `revisor-visual`: **Veredicto: LISTA · Usabilidad: 38/40 · Craft: 18/20**, sin regresiones. `FICHA-MERCADO.md` §4 reformateada con las líneas exactas `Prueba elegida: 0 días` y `Garantía elegida: 7 días` (antes tenían texto extra que rompía el parseo del gate automático) — el contexto de "provisional, pendiente Hotmart" se movió a la línea de arriba para no interferir.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
