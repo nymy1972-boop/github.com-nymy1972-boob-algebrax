@@ -19,15 +19,27 @@ interface PreguntaExamen {
   pasoClave: string;
 }
 
+function barajar<T>(arr: T[]): T[] {
+  const copia = [...arr];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+/** 2 preguntas al azar por módulo — con el banco ampliado, cada simulacro puede salir distinto. */
 function armarPreguntas(): PreguntaExamen[] {
   return MODULOS.flatMap((m) =>
-    m.preguntas.slice(0, 2).map((p) => ({
-      moduloNombre: m.nombre,
-      enunciado: p.enunciado,
-      opciones: p.opciones,
-      correctaIndex: p.correctaIndex,
-      pasoClave: p.pasoClave,
-    })),
+    barajar(m.preguntas)
+      .slice(0, 2)
+      .map((p) => ({
+        moduloNombre: m.nombre,
+        enunciado: p.enunciado,
+        opciones: p.opciones,
+        correctaIndex: p.correctaIndex,
+        pasoClave: p.pasoClave,
+      })),
   );
 }
 

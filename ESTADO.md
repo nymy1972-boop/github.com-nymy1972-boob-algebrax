@@ -211,5 +211,10 @@ Verificado en navegador: gemas del onboarding persisten y se acumulan al seguir 
 ## Re-verificación de rutina (gate detecta cambios en OTRAS pantallas de /app)
 El gate de veredicto caducado se dispara con cualquier .tsx modificado bajo `app/app/app/`, no solo el propio onboarding — es un chequeo de fecha, no semántico. Como el código de onboarding (`app/onboarding/page.tsx`, `Diagnostico.tsx`) no cambió, la re-verificación confirmó sin regresión: **Veredicto: LISTA · Usabilidad: 38/40 · Craft: 18/20**. Nota para el futuro: cualquier edición en Inicio/Examen/Perfil/Práctica va a re-disparar este gate aunque no toque el onboarding — hay que re-correr el revisor como rutina de cierre, no es un bug.
 
+## Ajuste: banco de ejercicios ampliado (pedido del usuario)
+`lib/modulos.ts`: cada módulo pasó de 4 a 8 preguntas (Ecuaciones, Despejes, Factorización), manteniendo dificultad fácil→intermedia y variando la posición de la respuesta correcta entre opciones (antes siempre era la primera — mala práctica de examen, ya corregida). Cada pregunta nueva sigue el mismo formato (`pasoClave` explicando el paso exacto).
+`Modo Examen`: ahora arma el simulacro con 2 preguntas ALEATORIAS por módulo (antes eran siempre las mismas 2 primeras) — con el banco más grande, cada simulacro puede salir distinto, dando más valor de repetición.
+Verificado con script automatizado: las 8 preguntas de cada uno de los 3 módulos se completan sin errores; el examen carga con la mezcla aleatoria correctamente.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
