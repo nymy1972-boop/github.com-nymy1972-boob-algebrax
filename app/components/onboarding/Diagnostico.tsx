@@ -12,7 +12,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, CheckCircle2, Gem, Lightbulb } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen } from 'lucide-react';
 import { StarBurst } from './StarBurst';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 
@@ -117,14 +117,17 @@ export function Diagnostico({ step, onAnswer }: Props) {
           return (
             <motion.button
               key={i}
-              whileTap={{ scale: selected === null ? 0.97 : 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06, duration: 0.25 }}
+              whileTap={{ scale: selected === null ? 0.97 : 1, y: selected === null ? 2 : 0 }}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
+              className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_60%,black)] transition-colors ${
                 showAsCorrect
-                  ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))] text-[var(--text-primary)]'
+                  ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--success)_45%,black)]'
                   : showAsWrong
-                    ? 'border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] text-[var(--text-primary)]'
+                    ? 'border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent-2)_45%,black)]'
                     : 'border-[var(--surface-2)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
               }`}
             >
@@ -136,6 +139,16 @@ export function Diagnostico({ step, onAnswer }: Props) {
         })}
       </div>
 
+      {!isWrong && (
+        <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_7%,var(--surface))] p-3.5">
+          <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+          <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <span className="font-semibold text-[var(--text-primary)]">Consejo: </span>
+            resuélvelo en una hoja antes de elegir — así practicas como en el examen real.
+          </p>
+        </div>
+      )}
+
       {isWrong && (
         <motion.div
           initial={{ opacity: 0, y: 6 }}
@@ -146,7 +159,7 @@ export function Diagnostico({ step, onAnswer }: Props) {
           {pregunta.explicacion}
           <button
             onClick={continuar}
-            className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
+            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
           >
             Entendido, sigamos
             <ArrowRight size={16} strokeWidth={2.5} />

@@ -184,5 +184,11 @@ Verificado en navegador de punta a punta: nombre → grado → dolor (multi-sele
 
 ⚠️ Nota técnica recurrente: Turbopack sigue cacheando errores de parseo fantasma tras varias ediciones seguidas al mismo archivo — se resuelve reiniciando el servidor dev + borrando `.next/`. Ya pasó 3 veces en el proyecto.
 
+## Gate de cierre: onboarding revisado y aprobado
+`docs/revisiones/onboarding-veredicto.md` (escrito por el subagente `revisor-visual`, no por quien construyó): **Veredicto: LISTA · Usabilidad: 38/40 · Craft: 18/20**. Pasó por 6 rondas de corrección real (24/40→38/40, 8/20→18/20): vacío vertical resuelto con contenido útil (tip de papel y lápiz), control de volver/salir en todas las fases, sombra "block-press" consistente en todos los CTAs, `MotionConfig reducedMotion="user"` en todo el árbol, colores de acento corregidos según FICHA-ARTE. Screenshot: `docs/revisiones/onboarding-375.png`.
+
+## Problemas conocidos
+GARANTIA_PENDIENTE_VERIFICACION: la landing y el paywall prometen "la Garantía del Primer Paso Entendido" con plazo de 7 días. Ese número es PROVISIONAL — no está verificado contra el panel real de Hotmart porque la cuenta todavía no existe (Sesión 6 en curso). Detalle completo y plan de resolución en `FICHA-MERCADO.md` §4. Antes de encender tráfico pagado: crear la cuenta de Hotmart, leer el plazo real de reembolso configurado, y actualizar la ficha + el copy si el número real difiere de 7 días.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
