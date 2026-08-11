@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Trophy } from 'lucide-react';
 import { Diagnostico, PREGUNTAS } from '@/components/onboarding/Diagnostico';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+import { guardarNombre } from '@/lib/progress';
 
-type Fase = 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
+type Fase = 'nombre' | 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
 
 const DOLORES = [
   'Quedarme en blanco en el examen',
@@ -16,18 +17,28 @@ const DOLORES = [
   'No tener tiempo para estudiar',
 ];
 
-const TOTAL_PASOS = 1 + PREGUNTAS.length; // dolor + 3 preguntas
+const TOTAL_PASOS = 2 + PREGUNTAS.length; // nombre + dolor + 3 preguntas
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [fase, setFase] = useState<Fase>('dolor');
+  const [fase, setFase] = useState<Fase>('nombre');
+  const [nombre, setNombre] = useState('');
   const [dolor, setDolor] = useState<string | null>(null);
   const [diagStep, setDiagStep] = useState(0);
   const [temaDebil, setTemaDebil] = useState<string | null>(null);
   const [aciertos, setAciertos] = useState(0);
 
-  const pasoActual = fase === 'dolor' ? 0 : fase === 'diagnostico' ? 1 + diagStep : TOTAL_PASOS;
+  const pasoActual =
+    fase === 'nombre' ? 0 : fase === 'dolor' ? 1 : fase === 'diagnostico' ? 2 + diagStep : TOTAL_PASOS;
   const progreso = Math.min(100, Math.round((pasoActual / TOTAL_PASOS) * 100));
+
+  function confirmarNombre(e: React.FormEvent) {
+    e.preventDefault();
+    const limpio = nombre.trim();
+    if (!limpio) return;
+    guardarNombre(limpio);
+    setFase('dolor');
+  }
 
   function elegirDolor(d: string) {
     setDolor(d);
@@ -70,6 +81,37 @@ export default function OnboardingPage() {
 
       <div className="flex min-h-[70dvh] items-center justify-center py-10">
         <AnimatePresence mode="wait">
+          {fase === 'nombre' && (
+            <motion.div
+              key="nombre"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              className="mx-auto flex w-full max-w-[375px] flex-col gap-6 px-5"
+            >
+              <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+                ¿Cómo te llamas?
+              </h1>
+              <form onSubmit={confirmarNombre} className="flex flex-col gap-3">
+                <input
+                  autoFocus
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  placeholder="Tu nombre"
+                  className="h-12 w-full rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 text-[16px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-2)]"
+                />
+                <button
+                  type="submit"
+                  disabled={!nombre.trim()}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none disabled:opacity-40 [font-family:var(--font-display)]"
+                >
+                  Continuar
+                  <ArrowRight size={18} strokeWidth={2.5} />
+                </button>
+              </form>
+            </motion.div>
+          )}
+
           {fase === 'dolor' && (
             <motion.div
               key="dolor"

@@ -24,9 +24,19 @@ export default function InicioApp() {
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
       <div className="mx-auto max-w-[420px] px-5 pb-24 pt-6">
         {/* Topbar */}
-        <div className="mb-5 flex items-center justify-between">
-          <div className="h-9 w-9 rounded-[10px] border-2 border-[#14161c] bg-[var(--accent-2)]" />
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-[color-mix(in_oklab,var(--gold)_35%,transparent)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-bold text-[var(--gold)]">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <Link
+            href="/app/perfil"
+            className="flex min-w-0 items-center gap-2 rounded-full border-2 border-[#14161c] bg-[var(--surface)] py-1 pl-1 pr-3 hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-2)] font-bold text-white [font-family:var(--font-display)]">
+              {(progreso.nombre?.charAt(0) ?? 'S').toUpperCase()}
+            </span>
+            <span className="truncate text-[14px] font-bold [font-family:var(--font-display)]">
+              {progreso.nombre ?? 'Estudiante'}
+            </span>
+          </Link>
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color-mix(in_oklab,var(--gold)_35%,transparent)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-bold text-[var(--gold)]">
             <Flame size={14} /> {progreso.currentStreak} {progreso.currentStreak === 1 ? 'día' : 'días'}
           </div>
         </div>

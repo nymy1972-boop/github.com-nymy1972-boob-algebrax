@@ -14,6 +14,7 @@ export interface ModuloProgreso {
 }
 
 export interface ProgresoUsuario {
+  nombre: string | null;
   currentStreak: number;
   lastActiveOn: string | null; // YYYY-MM-DD en zona local
   modulos: Record<string, ModuloProgreso>;
@@ -30,6 +31,7 @@ function diasEntre(a: string, b: string): number {
 }
 
 const DEFAULT_PROGRESO: ProgresoUsuario = {
+  nombre: null,
   currentStreak: 0,
   lastActiveOn: null,
   modulos: {},
@@ -66,6 +68,18 @@ export function registrarVisitaHoy(): { progreso: ProgresoUsuario; milestone: nu
 
   const milestone = [7, 30, 100, 365].includes(nuevaRacha) ? nuevaRacha : null;
   return { progreso: actualizado, milestone };
+}
+
+export function guardarNombre(nombre: string): ProgresoUsuario {
+  const p = leerProgreso();
+  const actualizado: ProgresoUsuario = { ...p, nombre: nombre.trim() };
+  guardar(actualizado);
+  return actualizado;
+}
+
+export function cerrarSesionLocal() {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem(KEY);
 }
 
 export function registrarAcierto(moduloSlug: string, totalPreguntas: number): ProgresoUsuario {

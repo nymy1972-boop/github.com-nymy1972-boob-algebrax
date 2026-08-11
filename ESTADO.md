@@ -153,5 +153,11 @@ Se agregó ícono a TODOS los botones de acción primaria del proyecto (antes va
 - Login: "Enviarme el enlace mágico" → ícono de enviar. "Continuar con Google" → logo oficial de Google (SVG de 4 colores). Confirmación de envío → check verde.
 Nota técnica: Turbopack cacheó un error de parseo fantasma dos veces en `practicar/[modulo]/page.tsx` tras ediciones — se resolvió reiniciando el servidor dev y limpiando `.next/`.
 
+## Ajuste: nombre del usuario + perfil (pedido del usuario)
+- Onboarding: nueva primera pregunta "¿Cómo te llamas?" antes del dolor — se guarda en `lib/progress.ts` (campo `nombre`).
+- `/app`: el cuadro decorativo de la esquina superior izquierda ahora es una pastilla real con la inicial + nombre del usuario, que lleva a `/app/perfil`.
+- `/app/perfil` (nueva pantalla): avatar, nombre, plan actual (Free), racha, progreso por módulo, y "Cerrar sesión" (borra el progreso local — honesto: aclara que hoy vive en el dispositivo, no en una cuenta, hasta Sesión 6).
+- Verificado en navegador: nombre se guarda y se refleja en `/app` y en `/app/perfil`. Sin errores de servidor.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
