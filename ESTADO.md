@@ -82,5 +82,16 @@ Esperando elección del usuario (A/B/C, combinar, o ajuste) antes de cerrar FICH
 ## Sesión 2 — CERRADA
 FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) + card destacada de Modo Examen (B) + camino de nodos (A). Paleta y tipografía fijadas con justificación de teoría del color (cálidos = atención primaria, azul = navegación, verde = progreso sin ansiedad, gris = lo bloqueado retrocede).
 
+## Sesión 3 — Página de ventas: CERRADA
+- Proyecto Next.js creado en `app/` (App Router, Tailwind v4, shadcn/ui, stack pineado de 51).
+- Kit canónico de landing copiado a `app/components/landing/`, tematizado en `tokens.css` con FICHA-ARTE (fix aplicado: --accent de shadcn colisionaba con el del kit — reafirmado al final de `globals.css`).
+- Big Idea + mecanismo bautizado: **"el Descifrador de Pasos"** (aparece en Hero, Solución y Oferta).
+- Copy completo trazado a la ficha del avatar Santi en `docs/copy/landing.md`.
+- 10 secciones canónicas compuestas en `app/app/page.tsx`: Hero → Problema → Agitación → Solución → App por dentro (placeholders honestos) → Oferta (Freemium, sin trial, $3.33/mes anual · $4.99/mes mensual) → Garantía → FAQ → CTA final → Footer legal.
+- Páginas legales creadas como stubs honestos (`/privacidad`, `/terminos`, `/reembolsos`, `/aviso-ia`) — ⚠️ PENDIENTE: contenido legal real con `47-LEGAL-FISCAL-Y-PRIVACIDAD.md` antes de vender (Sesión 6).
+- Verificado en el navegador: compila sin errores, todas las secciones renderizan con la paleta/tipografía correctas.
+- ⚠️ PENDIENTE: screenshots reales del carrusel "La app por dentro" (hoy son placeholders con nombre de pantalla) — se reemplazan cuando la app interna exista (Sesión 5).
+- `.claude/launch.json` creado para poder previsualizar el proyecto (`npm run dev --prefix app`).
+
 ## Próximo paso
-Sesión 3 — Página de ventas (landing con las 10 secciones canónicas).
+Sesión 4 — Onboarding, paywall y login (el diagnóstico exprés de 3 preguntas, la pantalla de upgrade a Premium, y el acceso sin fricción).
