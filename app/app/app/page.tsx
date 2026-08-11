@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Check, CheckCircle2, Flame, Timer } from 'lucide-react';
+import { Check, CheckCircle2, Flame, Gem, Timer } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { leerProgreso, registrarVisitaHoy, type ProgresoUsuario } from '@/lib/progress';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
@@ -79,8 +79,15 @@ export default function InicioApp() {
               {progreso.nombre ?? 'Estudiante'}
             </span>
           </Link>
-          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color-mix(in_oklab,var(--gold)_35%,transparent)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-bold text-[var(--gold)]">
-            <Flame size={14} /> {progreso.currentStreak} {progreso.currentStreak === 1 ? 'día' : 'días'}
+          <div className="flex shrink-0 items-center gap-2">
+            {progreso.gemas > 0 && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-[color-mix(in_oklab,var(--accent-2)_35%,transparent)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-bold text-[var(--accent-2)]">
+                <Gem size={14} fill="currentColor" /> {progreso.gemas}
+              </div>
+            )}
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[color-mix(in_oklab,var(--gold)_35%,transparent)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-bold text-[var(--gold)]">
+              <Flame size={14} /> {progreso.currentStreak} {progreso.currentStreak === 1 ? 'día' : 'días'}
+            </div>
           </div>
         </div>
 

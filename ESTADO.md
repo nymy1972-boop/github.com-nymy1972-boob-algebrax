@@ -200,5 +200,13 @@ Verificado en navegador con `?tema=Despejes con signos`: título personalizado c
 ## Re-cierre del gate (código cambió tras el veredicto anterior)
 Tras los ajustes del paywall (temaDebil en la URL) y el fix de altura del botón, se re-capturó el screenshot y se volvió a lanzar `revisor-visual`: **Veredicto: LISTA · Usabilidad: 38/40 · Craft: 18/20**, sin regresiones. `FICHA-MERCADO.md` §4 reformateada con las líneas exactas `Prueba elegida: 0 días` y `Garantía elegida: 7 días` (antes tenían texto extra que rompía el parseo del gate automático) — el contexto de "provisional, pendiente Hotmart" se movió a la línea de arriba para no interferir.
 
+## Ajuste: gemas en toda la app (pendiente cerrado)
+Antes las gemas solo se ganaban en el onboarding. Ahora:
+- `/app/practicar/[modulo]`: gemas por acierto (con animación +10), visible en la barra superior, y sumadas al mensaje de celebración final. También se unificó el tono de "incorrecto" (azul + bombilla + "¡Casi!", igual que onboarding) y se agregó `MotionConfig reducedMotion`.
+- `/app/examen`: las gemas se asignan al terminar el simulacro (correctas × 10, una sola vez con `useRef` para evitar doble conteo) y se muestran en el reporte final.
+- `/app` (Inicio): pastilla de gemas junto a la de racha en la topbar.
+- `/app/perfil`: tarjetas de racha y gemas lado a lado.
+Verificado en navegador: gemas del onboarding persisten y se acumulan al seguir practicando. Sin errores de servidor.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

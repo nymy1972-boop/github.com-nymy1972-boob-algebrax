@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Flame, LogOut, Sparkles } from 'lucide-react';
+import { ArrowLeft, Flame, Gem, LogOut, Sparkles } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { cerrarSesionLocal, leerProgreso, type ProgresoUsuario } from '@/lib/progress';
 
@@ -40,13 +40,24 @@ export default function PerfilPage() {
           </span>
         </div>
 
-        <div className="mb-6 flex items-center gap-4 rounded-[var(--radius-card)] border border-[#3a2a22] bg-gradient-to-br from-[#2a1e1b] to-[var(--surface)] p-5">
-          <Flame size={28} className="text-[var(--gold)]" />
-          <div>
-            <p className="text-[22px] font-extrabold leading-none text-[var(--gold)] [font-family:var(--font-display)]">
-              {progreso.currentStreak} {progreso.currentStreak === 1 ? 'día' : 'días'}
-            </p>
-            <p className="mt-1 text-[12px] text-[var(--text-secondary)]">de racha activa</p>
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-3 rounded-[var(--radius-card)] border border-[#3a2a22] bg-gradient-to-br from-[#2a1e1b] to-[var(--surface)] p-4">
+            <Flame size={24} className="text-[var(--gold)]" />
+            <div>
+              <p className="text-[18px] font-extrabold leading-none text-[var(--gold)] [font-family:var(--font-display)]">
+                {progreso.currentStreak}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--text-secondary)]">{progreso.currentStreak === 1 ? 'día' : 'días'} de racha</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-4">
+            <Gem size={24} className="text-[var(--accent-2)]" fill="currentColor" />
+            <div>
+              <p className="text-[18px] font-extrabold leading-none text-[var(--accent-2)] [font-family:var(--font-display)]">
+                {progreso.gemas}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--text-secondary)]">gemas ganadas</p>
+            </div>
           </div>
         </div>
 

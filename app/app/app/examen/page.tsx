@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Home, NotebookPen, Trophy, XCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, NotebookPen, Trophy, XCircle } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 
 const DURACION_SEGUNDOS = 4 * 60; // 4 min — simulacro corto, coherente con "10 min/día"
 
@@ -44,6 +45,7 @@ export default function ExamenPage() {
   const [respuestas, setRespuestas] = useState<(number | null)[]>(() => preguntas.map(() => null));
   const [segundosRestantes, setSegundosRestantes] = useState(DURACION_SEGUNDOS);
   const [terminado, setTerminado] = useState(false);
+  const gemasAsignadas = useRef(false);
 
   useEffect(() => {
     if (!iniciado || terminado) return;
@@ -82,6 +84,13 @@ export default function ExamenPage() {
     const temasAFallar = Array.from(new Set(revision.filter((r) => !r.acertaste).map((r) => r.moduloNombre)));
     return { correctas, total: preguntas.length, temasAFallar, revision };
   }, [respuestas, preguntas]);
+
+  useEffect(() => {
+    if (terminado && !gemasAsignadas.current) {
+      gemasAsignadas.current = true;
+      sumarGemas(reporte.correctas * GEMAS_POR_ACIERTO);
+    }
+  }, [terminado, reporte.correctas]);
 
   if (!iniciado) {
     return (
@@ -123,6 +132,12 @@ export default function ExamenPage() {
         <p className="text-[32px] font-bold tabular-nums [font-family:var(--font-display)]">
           {reporte.correctas}/{reporte.total}
         </p>
+        {reporte.correctas > 0 && (
+          <div className="flex items-center gap-2 rounded-full border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] px-4 py-2 text-[15px] font-bold text-[var(--accent-2)]">
+            <Gem size={16} fill="currentColor" />
+            Ganaste {reporte.correctas * GEMAS_POR_ACIERTO} gemas
+          </div>
+        )}
         {reporte.temasAFallar.length > 0 ? (
           <div className="w-full rounded-[var(--radius-card)] bg-[var(--surface)] p-4 text-left text-[14px] text-[var(--text-secondary)]">
             <p className="mb-2 font-semibold text-[var(--text-primary)]">Repasa antes del examen real:</p>

@@ -3,10 +3,10 @@
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, NotebookPen, XCircle, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, MotionConfig } from 'motion/react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen, Sparkles } from 'lucide-react';
 import { getModulo } from '@/lib/modulos';
-import { registrarAcierto } from '@/lib/progress';
+import { registrarAcierto, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { StarBurst } from '@/components/onboarding/StarBurst';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
@@ -19,7 +19,9 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showStars, setShowStars] = useState(false);
+  const [showGemas, setShowGemas] = useState(false);
   const [aciertos, setAciertos] = useState(0);
+  const [gemas, setGemas] = useState(0);
   const [terminado, setTerminado] = useState(false);
 
   const pregunta = modulo?.preguntas[step];
@@ -43,22 +45,25 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     const correct = index === pregunta.correctaIndex;
     if (correct) {
       setAciertos((n) => n + 1);
+      setGemas((g) => g + GEMAS_POR_ACIERTO);
       registrarAcierto(slug, modulo!.preguntas.length);
       setShowStars(true);
+      setShowGemas(true);
       window.setTimeout(() => {
         setShowStars(false);
+        setShowGemas(false);
         siguiente();
-      }, 700);
+      }, 800);
     }
   }
 
   const mensajeFinal = useMemo(() => {
     if (!modulo) return '';
     if (aciertos === modulo.preguntas.length) {
-      return `Perfecto: ${aciertos} de ${modulo.preguntas.length}. Dominas ${modulo.nombre.toLowerCase()}.`;
+      return `Perfecto: ${aciertos} de ${modulo.preguntas.length}. Dominas ${modulo.nombre.toLowerCase()}. Ganaste ${gemas} gemas.`;
     }
-    return `Acertaste ${aciertos} de ${modulo.preguntas.length} en ${modulo.nombre}. Vas mejorando — vuelve mañana a reforzar.`;
-  }, [aciertos, modulo]);
+    return `Acertaste ${aciertos} de ${modulo.preguntas.length} en ${modulo.nombre}. Ganaste ${gemas} gemas — vuelve mañana a reforzar.`;
+  }, [aciertos, modulo, gemas]);
 
   if (!modulo) {
     return (
@@ -72,6 +77,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
       <div className="sticky top-0 z-10 flex items-center gap-3 bg-[var(--bg)] px-5 pb-3 pt-5">
         <Link href="/app" aria-label="Volver al inicio">
@@ -84,6 +90,12 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
             transition={{ type: 'spring', duration: 0.4 }}
           />
         </div>
+        {gemas > 0 && (
+          <span className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[var(--accent-2)]">
+            <Gem size={14} fill="currentColor" />
+            {gemas}
+          </span>
+        )}
       </div>
 
       {verEjemplo ? (
@@ -136,6 +148,19 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
 
           <div className="relative flex flex-col gap-3">
             <StarBurst active={showStars} />
+            <AnimatePresence>
+              {showGemas && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.8 }}
+                  animate={{ opacity: 1, y: -18, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  className="pointer-events-none absolute left-1/2 top-0 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-[color-mix(in_oklab,var(--accent-2)_20%,var(--surface))] px-3 py-1 text-[13px] font-bold text-[var(--accent-2)]"
+                >
+                  <Gem size={14} fill="currentColor" />+{GEMAS_POR_ACIERTO}
+                </motion.div>
+              )}
+            </AnimatePresence>
             {pregunta?.opciones.map((op, i) => {
               const isSelected = selected === i;
               const isCorrectChoice = i === pregunta.correctaIndex;
@@ -144,36 +169,49 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
               return (
                 <motion.button
                   key={i}
-                  whileTap={{ scale: selected === null ? 0.97 : 1 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, duration: 0.25 }}
+                  whileTap={{ scale: selected === null ? 0.97 : 1, y: selected === null ? 2 : 0 }}
                   onClick={() => handleSelect(i)}
                   disabled={selected !== null}
-                  className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
+                  className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_60%,black)] transition-colors ${
                     showAsCorrect
-                      ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))]'
+                      ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))] shadow-[0_4px_0_0_color-mix(in_oklab,var(--success)_45%,black)]'
                       : showAsWrong
-                        ? 'border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,var(--surface))]'
+                        ? 'border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent-2)_45%,black)]'
                         : 'border-[var(--surface-2)] bg-[var(--surface)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
                   }`}
                 >
                   <span>{op}</span>
                   {showAsCorrect && <CheckCircle2 size={20} className="text-[var(--success)]" />}
-                  {showAsWrong && <XCircle size={20} className="text-[var(--accent)]" />}
+                  {showAsWrong && <Lightbulb size={20} className="text-[var(--accent-2)]" />}
                 </motion.button>
               );
             })}
           </div>
 
+          {!isWrong && (
+            <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_7%,var(--surface))] p-3.5">
+              <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+              <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Consejo: </span>
+                resuélvelo en tu hoja antes de elegir.
+              </p>
+            </div>
+          )}
+
           {isWrong && pregunta && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-[var(--radius-card)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
+              className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
             >
-              <span className="font-semibold text-[var(--text-primary)]">Así se resuelve: </span>
+              <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
               {pregunta.pasoClave}
               <button
                 onClick={siguiente}
-                className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
+                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
               >
                 Entendido, sigamos
                 <ArrowRight size={16} strokeWidth={2.5} />
@@ -198,5 +236,6 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
         </div>
       </CelebrationOverlay>
     </div>
+    </MotionConfig>
   );
 }
