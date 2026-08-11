@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import confetti from 'canvas-confetti';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
 
 function brandColors(): string[] {
   if (typeof window === 'undefined') return [];
@@ -104,9 +105,10 @@ export function CelebrationOverlay({
             <p className="text-[14px] leading-relaxed text-[var(--text-secondary)]">{message}</p>
             <button
               onClick={onCta}
-              className="mt-1 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] px-6 text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+              className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] px-6 text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
             >
               {ctaLabel}
+              <ArrowRight size={18} strokeWidth={2.5} />
             </button>
             <p aria-live="polite" className="sr-only">
               {title}. {message}

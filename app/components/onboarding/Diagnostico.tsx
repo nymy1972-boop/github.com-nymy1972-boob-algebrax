@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import { StarBurst } from './StarBurst';
 
 export interface PreguntaDiagnostico {
@@ -125,9 +125,10 @@ export function Diagnostico({ step, onAnswer }: Props) {
           {pregunta.explicacion}
           <button
             onClick={continuar}
-            className="mt-3 flex h-11 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
+            className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
           >
             Entendido, sigamos
+            <ArrowRight size={16} strokeWidth={2.5} />
           </button>
         </motion.div>
       )}

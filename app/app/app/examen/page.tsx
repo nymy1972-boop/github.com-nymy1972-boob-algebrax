@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, CheckCircle2, Clock, Trophy, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Home, Trophy, XCircle } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
@@ -146,8 +146,9 @@ export default function ExamenPage() {
 
         <button
           onClick={() => router.push('/app')}
-          className="mt-2 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+          className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
         >
+          <Home size={18} strokeWidth={2.5} />
           Volver al inicio
         </button>
         <CelebrationOverlay

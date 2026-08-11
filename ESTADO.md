@@ -126,5 +126,32 @@ Código de conexión preparado (no requiere cuentas todavía, listo para cuando 
 ## Ajuste post-Sesión 5 (2)
 Cada módulo de práctica ahora muestra un EJEMPLO resuelto (3 pasos) antes de la primera pregunta — botón "Ahora inténtalo tú" para pasar a practicar. El diagnóstico del onboarding y el Modo Examen quedan igual (miden, no enseñan primero). Contenido en `modulo.ejemplo` (lib/modulos.ts), UI en practicar/[modulo]/page.tsx.
 
+## Auditoría de escaneabilidad de la landing (a 375px, post pedido del usuario)
+`FICHA-AVATAR.md` creada en la raíz (antes vivía embebida en ESTADO.md). Auditoría sección por sección:
+
+| Sección | ✅/❌ | Nota |
+|---|---|---|
+| Hero | ✅ | Titular ≤10 palabras, subtítulo corto, CTA + prueba social día-1 |
+| Problema | ✅ | 4 dolores en tarjetas con ícono, ninguno >4 líneas |
+| Agitación | ✅ | Frases cortas + tarjetas "Hoy" vs "Si nada cambia" |
+| Solución | ✅ | 3 pasos numerados con chip + antes/después en tarjetas |
+| App por dentro | ✅ | Carrusel con peek + dots + CTA mid-page |
+| Oferta | ✅ | Stack de valor + planes en tarjetas con checkmarks |
+| Garantía | ✅ | Tarjeta con ícono de escudo, nombre propio |
+| FAQ | ✅ | Acordeón con chevrons, 1ª pregunta abierta |
+| CTA final | ✅ (corregido) | El PS pasaba de 4 líneas — se recortó a 4 |
+| Footer | ✅ | Enlaces reales (sin "#"), sin competir visualmente |
+
+Sin hallazgos graves — la landing ya se construyó desde el kit canónico premium (Sesión 3), que trae la escaneabilidad embebida por diseño.
+
+## Ajuste: íconos en todas las acciones (pedido del usuario)
+Se agregó ícono a TODOS los botones de acción primaria del proyecto (antes varios eran texto plano):
+- Landing: `CtaButton` (usado en Hero/AppPorDentro/Oferta anual/CtaFinal), botón mensual de Oferta y StickyCtaMobile → flecha derecha.
+- Onboarding: "Ver mi plan completo" → flecha. `CelebrationOverlay` (compartido por onboarding/práctica/examen) → flecha en su CTA.
+- Diagnóstico y práctica: "Entendido, sigamos" → flecha. "Ahora inténtalo tú" → flecha.
+- Examen: "Volver al inicio" → ícono de casa.
+- Login: "Enviarme el enlace mágico" → ícono de enviar. "Continuar con Google" → logo oficial de Google (SVG de 4 colores). Confirmación de envío → check verde.
+Nota técnica: Turbopack cacheó un error de parseo fantasma dos veces en `practicar/[modulo]/page.tsx` tras ediciones — se resolvió reiniciando el servidor dev y limpiando `.next/`.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

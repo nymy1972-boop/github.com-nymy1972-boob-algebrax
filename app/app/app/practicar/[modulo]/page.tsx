@@ -4,7 +4,7 @@ import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import { getModulo } from '@/lib/modulos';
 import { registrarAcierto } from '@/lib/progress';
 import { StarBurst } from '@/components/onboarding/StarBurst';
@@ -110,9 +110,10 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
             </div>
             <button
               onClick={() => setVerEjemplo(false)}
-              className="mt-1 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+              className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
             >
               Ahora inténtalo tú
+              <ArrowRight size={18} strokeWidth={2.5} />
             </button>
           </div>
         </div>
@@ -165,9 +166,10 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
               {pregunta.pasoClave}
               <button
                 onClick={siguiente}
-                className="mt-3 flex h-11 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
+                className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent-2)] text-[15px] font-bold text-white [font-family:var(--font-display)]"
               >
                 Entendido, sigamos
+                <ArrowRight size={16} strokeWidth={2.5} />
               </button>
             </motion.div>
           )}

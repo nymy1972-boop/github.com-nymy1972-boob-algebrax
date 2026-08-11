@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy } from 'lucide-react';
+import { ArrowRight, Trophy } from 'lucide-react';
 import { Diagnostico, PREGUNTAS } from '@/components/onboarding/Diagnostico';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
@@ -125,9 +125,10 @@ export default function OnboardingPage() {
               </p>
               <button
                 onClick={() => router.push('/paywall')}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
               >
                 Ver mi plan completo
+                <ArrowRight size={18} strokeWidth={2.5} />
               </button>
             </motion.div>
           )}

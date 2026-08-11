@@ -176,7 +176,7 @@ export default function Home() {
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
         recap="Garantía del Primer Paso Entendido · Empieza gratis, sin tarjeta"
-        psMarked="PS: AlgebraX te muestra el paso exacto donde te pierdes con el Descifrador de Pasos — no solo la respuesta. Empieza gratis hoy, sin tarjeta, y si en 7 días no entiendes al menos un paso nuevo, te devolvemos todo con la Garantía del Primer Paso Entendido."
+        psMarked="PS: el Descifrador de Pasos te muestra dónde te pierdes, no solo la respuesta. Empieza gratis, sin tarjeta — y con la Garantía del Primer Paso Entendido."
       />
 
       {/* 10. FOOTER LEGAL — páginas legales reales: Sesión 6 (47-LEGAL-FISCAL) */}
