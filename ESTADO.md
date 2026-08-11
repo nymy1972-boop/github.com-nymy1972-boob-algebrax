@@ -79,5 +79,8 @@ Usuario pidió: lo mejor de Duolingo Math / Photomath / Brilliant.org en UX, MÁ
 - Dispositivo ownable: botones/nodos con sombra sólida inferior que se hunden al presionar (block-press)
 Esperando elección del usuario (A/B/C, combinar, o ajuste) antes de cerrar FICHA-ARTE.md.
 
+## Sesión 2 — CERRADA
+FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) + card destacada de Modo Examen (B) + camino de nodos (A). Paleta y tipografía fijadas con justificación de teoría del color (cálidos = atención primaria, azul = navegación, verde = progreso sin ansiedad, gris = lo bloqueado retrocede).
+
 ## Próximo paso
-Sesión 2 en curso: cerrar dirección visual → FICHA-ARTE.md → tokens CSS → Sesión 3 (página de ventas).
+Sesión 3 — Página de ventas (landing con las 10 secciones canónicas).

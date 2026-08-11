@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AlgebraX — Dirección visual final (combinada)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14161C;
+    --surface: #1E212B;
+    --surface-2: #262A36;
+    --text-1: #F4F5F7;
+    --text-2: #9CA1AE;
+    --accent: #FF4D4D;
+    --accent-2: #3D8BFF;
+    --gold: #FFB020;
+    --success: #33D17A;
+    --font-display: 'Baloo 2', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0A0B0E;
+    font-family: var(--font-body);
+    color: var(--text-1);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  h1 { font-family: var(--font-display); font-size: 24px; text-align: center; max-width: 700px; }
+  p.note { color: var(--text-2); text-align: center; max-width: 640px; font-size: 13px; line-height: 1.6; }
+  .phone {
+    width: 375px;
+    background: var(--bg);
+    border-radius: 32px;
+    border: 2px solid #2A2E3A;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .screen { padding: 20px 16px 28px; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--accent-2); border: 2px solid #14161C; }
+  .streak-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border-radius: 999px; padding: 6px 12px;
+    font-size: 13px; font-weight: 700; color: var(--gold);
+    border: 1.5px solid #333748;
+  }
+
+  /* Hero racha — color cálido (dorado/rojo) = dopamina, lo primero que el ojo agarra */
+  .hero-streak {
+    background: linear-gradient(155deg, #2A1E1B, var(--surface));
+    border: 2px solid #3A2A22;
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .streak-num { font-family: var(--font-display); font-size: 38px; font-weight: 800; color: var(--gold); line-height: 1; }
+  .streak-label { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+  /* Card destacada simulacro — acento cálido = urgencia/acción, atrae primero */
+  .featured {
+    background: linear-gradient(135deg, var(--accent), #C93A3A);
+    border: 2px solid #14161C;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 0 0 #8E2828;
+  }
+  .featured .tag { font-size: 11px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.04em; }
+  .featured .title { font-family: var(--font-display); font-weight: 700; font-size: 17px; margin-top: 4px; }
+
+  .section-label { font-size: 12px; color: var(--text-2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+
+  /* Camino de nodos — verde progreso (universal "correcto", calma) / acento cálido = activo (atrae el ojo) / gris frío = bloqueado (retrocede) */
+  .path { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .node {
+    width: 60px; height: 60px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 20px; font-weight: 700;
+    border: 2px solid #14161C;
+  }
+  .node.done { background: var(--success); box-shadow: 0 4px 0 0 #1F8F53; }
+  .node.active { background: var(--accent); box-shadow: 0 4px 0 0 #A62E2E; transform: scale(1.06); }
+  .node.locked { background: var(--surface-2); color: var(--text-2); box-shadow: 0 4px 0 0 #14161C; }
+  .node.left { align-self: flex-start; margin-left: 70px; }
+  .node.right { align-self: flex-end; margin-right: 70px; }
+  .connector { width: 4px; height: 16px; background: var(--surface-2); }
+
+  .chunky-btn {
+    background: var(--accent-2);
+    color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 15px;
+    border-radius: 14px; padding: 14px; text-align: center;
+    border: 2px solid #14161C; box-shadow: 0 4px 0 0 #2A63B8;
+    margin-top: 18px;
+  }
+
+  .legend {
+    max-width: 375px;
+    background: var(--surface);
+    border: 1px solid var(--surface-2);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .legend b { color: var(--text-1); }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+  <h1>AlgebraX — Combinación final: racha (C) + destacado (B) + mapa de niveles (A)</h1>
+  <p class="note">La jerarquía de color no es decorativa: el dorado/rojo (colores cálidos que "avanzan" visualmente) captan el ojo primero — van en la racha y en la acción principal, exactamente donde queremos que Santi mire primero al abrir la app. El azul (frío, "retrocede") se reserva para navegación y elementos secundarios. El verde universal de "correcto" confirma progreso sin generar ansiedad. El gris apagado hace que lo bloqueado no compita por atención.</p>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="topbar">
+        <div class="avatar"></div>
+        <div class="streak-pill">🔥 4 días</div>
+      </div>
+
+      <div class="hero-streak">
+        <div>
+          <div class="streak-num">4 🔥</div>
+          <div class="streak-label">¡No rompas tu racha hoy!</div>
+        </div>
+      </div>
+
+      <div class="featured">
+        <div class="tag">Modo examen</div>
+        <div class="title">Simulacro cronometrado →</div>
+      </div>
+
+      <div class="section-label">Tu camino de hoy</div>
+      <div class="path">
+        <div class="node done">✓</div>
+        <div class="connector"></div>
+        <div class="node active left">▶</div>
+        <div class="connector"></div>
+        <div class="node locked right">🔒</div>
+        <div class="connector"></div>
+        <div class="node locked">🔒</div>
+      </div>
+
+      <div class="chunky-btn">Continuar: Despejes</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div><span class="swatch" style="background:#FFB020"></span><b>Dorado</b> — racha/recompensa (dopamina, lo primero que se mira)</div>
+    <div><span class="swatch" style="background:#FF4D4D"></span><b>Rojo cálido</b> — acción principal / nodo activo (urgencia sana, invita al toque)</div>
+    <div><span class="swatch" style="background:#33D17A"></span><b>Verde</b> — completado (universal, tranquiliza)</div>
+    <div><span class="swatch" style="background:#3D8BFF"></span><b>Azul</b> — navegación/identidad, nunca compite con el CTA</div>
+    <div><span class="swatch" style="background:#262A36"></span><b>Gris apagado</b> — bloqueado, retrocede visualmente</div>
+  </div>
+</body>
+</html>
