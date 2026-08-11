@@ -30,6 +30,8 @@
   /* ── MARCA ── */
   --accent: #ff4d4d;           /* cálido — CTA, urgencia sana, dato clave (teoría del color: atrae primero) */
   --accent-2: #3d8bff;         /* frío — navegación/identidad secundaria, nunca compite con el CTA */
+  --gold: #ffb020;             /* racha/recompensa — dopamina, celebraciones (FICHA-ARTE) */
+  --success: #33d17a;          /* completado — universal, tranquiliza */
 
   /* ── FORMA ── */
   --radius-card: 20px;

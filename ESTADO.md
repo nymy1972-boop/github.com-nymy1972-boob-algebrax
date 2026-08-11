@@ -93,5 +93,12 @@ FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) +
 - ⚠️ PENDIENTE: screenshots reales del carrusel "La app por dentro" (hoy son placeholders con nombre de pantalla) — se reemplazan cuando la app interna exista (Sesión 5).
 - `.claude/launch.json` creado para poder previsualizar el proyecto (`npm run dev --prefix app`).
 
+## Sesión 4 — Onboarding, paywall y login: CERRADA
+- `/onboarding`: 1 pregunta de dolor (echo de la ficha) → diagnóstico de 3 preguntas de álgebra real (Ecuaciones, Despejes, Factorización) → reconocimiento personalizado según el tema donde falló → plan generado. Barra de progreso siempre visible.
+- **Celebraciones (pedido del usuario, con base en 11/56):** acertar una pregunta = `StarBurst` (Nivel 1, sutil, estrellas doradas, 600ms, no bloquea — es una acción frecuente). Terminar el diagnóstico completo = `CelebrationOverlay` (Nivel 2, hito real: confetti con los colores de marca vía canvas-confetti, mensaje personalizado, respeta prefers-reduced-motion). Fallar una pregunta NUNCA bloquea: se explica el paso exacto y se sigue (regla dura de la Constitución).
+- `/paywall`: reutiliza el componente `Oferta` del kit de landing (mismos precios/planes) + link "Seguir gratis por ahora" siempre visible (freemium, nunca bloquea el acceso).
+- `/entrar`: login passwordless (magic link + Google) por `26-AUTH-MODERNO.md`. ⚠️ PENDIENTE: Supabase real se conecta en Sesión 6 (requiere que el usuario cree el proyecto) — la UI es honesta al respecto, no finge un login exitoso.
+- Verificado en navegador de punta a punta: dolor → 3 preguntas (1 acierto con estrellas, 1 fallo con explicación, 1 acierto) → celebración con confetti → plan → paywall → login. Sin errores de consola ni de servidor.
+
 ## Próximo paso
-Sesión 4 — Onboarding, paywall y login (el diagnóstico exprés de 3 preguntas, la pantalla de upgrade a Premium, y el acceso sin fricción).
+Sesión 5 — App interna (los módulos de álgebra, la pantalla del Descifrador de Pasos, el Modo Examen y el sistema de rachas).
