@@ -167,5 +167,8 @@ Nota técnica: Turbopack cacheó un error de parseo fantasma dos veces en `pract
 ## Ajuste: calendario semanal de racha (idea de screensdesign.com, aprobada por el usuario)
 Investigué apps de educación/quiz diario en screensdesign.com (Yuno, GenK, Spark, Mindsnap). Adopté la idea del calendario semanal (L-D con check en días completados) en la tarjeta de racha de `/app` — se calcula sin nueva tabla, derivando de `currentStreak`/`lastActiveOn` (función `calcularSemana`). Descarté 2 patrones vistos por chocar con decisiones ya tomadas: bloquear módulos por racha (viola "nunca bloquear") y mascota animada (viola "no infantil"). Leaderboard anotado como idea de v2 (no implementada).
 
+## Ajuste: pregunta de grado (pedido del usuario)
+Nueva pregunta en el onboarding, entre nombre y dolor: "¿En qué grado estás?" — chips (7°-8° / 9°-10° / 11°-último año / Ya salí del colegio), guardada en `lib/progress.ts` (campo `grado`). Se usa para personalizar el mensaje del plan final ("Ajustado al nivel de [grado]") y se muestra en `/app/perfil`. Verificado en navegador de punta a punta.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).

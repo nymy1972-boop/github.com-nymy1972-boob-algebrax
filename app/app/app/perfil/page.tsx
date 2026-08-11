@@ -34,6 +34,7 @@ export default function PerfilPage() {
             {(progreso.nombre?.charAt(0) ?? 'S').toUpperCase()}
           </span>
           <h1 className="text-[22px] font-bold [font-family:var(--font-display)]">{progreso.nombre ?? 'Estudiante'}</h1>
+          {progreso.grado && <p className="text-[13px] text-[var(--text-secondary)]">{progreso.grado}</p>}
           <span className="rounded-full border border-[var(--surface-2)] bg-[var(--surface)] px-3 py-1 text-[12px] font-semibold text-[var(--text-secondary)]">
             Plan Free
           </span>

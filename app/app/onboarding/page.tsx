@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Trophy } from 'lucide-react';
 import { Diagnostico, PREGUNTAS } from '@/components/onboarding/Diagnostico';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
-import { guardarNombre } from '@/lib/progress';
+import { guardarGrado, guardarNombre } from '@/lib/progress';
 
-type Fase = 'nombre' | 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
+type Fase = 'nombre' | 'grado' | 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
+
+const GRADOS = ['7° y 8°', '9° y 10°', '11° / último año', 'Ya salí del colegio'];
 
 const DOLORES = [
   'Quedarme en blanco en el examen',
@@ -17,19 +19,28 @@ const DOLORES = [
   'No tener tiempo para estudiar',
 ];
 
-const TOTAL_PASOS = 2 + PREGUNTAS.length; // nombre + dolor + 3 preguntas
+const TOTAL_PASOS = 3 + PREGUNTAS.length; // nombre + grado + dolor + 3 preguntas
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [fase, setFase] = useState<Fase>('nombre');
   const [nombre, setNombre] = useState('');
+  const [grado, setGrado] = useState<string | null>(null);
   const [dolor, setDolor] = useState<string | null>(null);
   const [diagStep, setDiagStep] = useState(0);
   const [temaDebil, setTemaDebil] = useState<string | null>(null);
   const [aciertos, setAciertos] = useState(0);
 
   const pasoActual =
-    fase === 'nombre' ? 0 : fase === 'dolor' ? 1 : fase === 'diagnostico' ? 2 + diagStep : TOTAL_PASOS;
+    fase === 'nombre'
+      ? 0
+      : fase === 'grado'
+        ? 1
+        : fase === 'dolor'
+          ? 2
+          : fase === 'diagnostico'
+            ? 3 + diagStep
+            : TOTAL_PASOS;
   const progreso = Math.min(100, Math.round((pasoActual / TOTAL_PASOS) * 100));
 
   function confirmarNombre(e: React.FormEvent) {
@@ -37,6 +48,12 @@ export default function OnboardingPage() {
     const limpio = nombre.trim();
     if (!limpio) return;
     guardarNombre(limpio);
+    setFase('grado');
+  }
+
+  function elegirGrado(g: string) {
+    setGrado(g);
+    guardarGrado(g);
     setFase('dolor');
   }
 
@@ -112,6 +129,32 @@ export default function OnboardingPage() {
             </motion.div>
           )}
 
+          {fase === 'grado' && (
+            <motion.div
+              key="grado"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              className="mx-auto flex w-full max-w-[375px] flex-col gap-6 px-5"
+            >
+              <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+                ¿En qué grado estás?
+              </h1>
+              <div className="flex flex-col gap-3">
+                {GRADOS.map((g) => (
+                  <motion.button
+                    key={g}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => elegirGrado(g)}
+                    className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
+                  >
+                    {g}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           {fase === 'dolor' && (
             <motion.div
               key="dolor"
@@ -164,6 +207,12 @@ export default function OnboardingPage() {
               </h1>
               <p className="text-[15px] text-[var(--text-secondary)]">
                 Empezamos por <span className="font-semibold text-[var(--text-primary)]">{temaDelPlan}</span> — acertaste {aciertos} de {PREGUNTAS.length} en el diagnóstico.
+                {grado && (
+                  <>
+                    {' '}
+                    Ajustado al nivel de <span className="font-semibold text-[var(--text-primary)]">{grado}</span>.
+                  </>
+                )}
               </p>
               <button
                 onClick={() => router.push('/paywall')}
