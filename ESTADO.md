@@ -113,5 +113,15 @@ FICHA-ARTE.md aprobada por el usuario. Combinación elegida: hero de racha (C) +
 ## Ajuste post-Sesión 5
 Modo Examen: se agregó "Revisión completa" al reporte final — antes solo listaba los TEMAS a repasar, ahora muestra pregunta por pregunta (acertada o no) con tu respuesta, la correcta, y el procedimiento paso a paso. Coincide con el MVP original ("reporte de errores comunes").
 
+## Sesión 6 — Integraciones reales y seguridad: EN CURSO
+Código de conexión preparado (no requiere cuentas todavía, listo para cuando existan):
+- `app/supabase/migrations/0001_init.sql`: tablas `profiles` (plan free/premium), `user_progress` (racha), `module_progress` (aciertos por módulo) — todas con RLS de alto rendimiento ((select auth.uid())) y trigger que crea el profile automáticamente al nacer el usuario.
+- `app/lib/supabase/{client,server,admin}.ts`: los 3 clientes canónicos (browser, RSC/server, admin solo-servidor con secret key).
+- `app/middleware.ts`: protege `/app`, deja público el resto del funnel — con guard: si `NEXT_PUBLIC_SUPABASE_URL` no existe todavía, no bloquea nada (así `/app` sigue funcionando con progreso local mientras se completa esta sesión).
+- `app/app/api/webhooks/hotmart/route.ts`: webhook con verificación de hottok en tiempo constante, matching por email (sube a Pro sin duplicar cuenta), responde 501 (no 200 falso) si `HOTMART_HOTTOK` no está configurado.
+- `app/.env.example`: plantilla de variables — sin valores reales.
+
+⚠️ PENDIENTE (requiere que el usuario cree cuentas — se guía una a la vez): GitHub → Supabase → Vercel → dominio → Hotmart → Resend.
+
 ## Próximo paso
-Sesión 6 — Integraciones reales y seguridad: Git/GitHub, Supabase (base de datos + auth real), Vercel, dominio, Hotmart, Resend, y el gate de seguridad antes de vender.
+Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
