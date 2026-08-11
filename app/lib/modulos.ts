@@ -9,10 +9,21 @@ export interface PreguntaModulo {
   pasoClave: string; // el paso que separa el acierto del error — se muestra SIEMPRE, acierte o no
 }
 
+export interface PasoEjemplo {
+  titulo: string;
+  detalle: string;
+}
+
+export interface EjemploModulo {
+  enunciado: string;
+  pasos: PasoEjemplo[]; // exactamente 3 — el mismo formato que "El método" de la landing
+}
+
 export interface Modulo {
   slug: string;
   nombre: string;
   descripcion: string;
+  ejemplo: EjemploModulo; // se muestra ANTES de la primera pregunta — enseña, luego practica
   preguntas: PreguntaModulo[];
 }
 
@@ -21,6 +32,14 @@ export const MODULOS: Modulo[] = [
     slug: 'ecuaciones',
     nombre: 'Ecuaciones básicas',
     descripcion: 'Despejar x cuando suma o resta a un lado.',
+    ejemplo: {
+      enunciado: 'Resuelve: x + 6 = 14',
+      pasos: [
+        { titulo: 'Mira qué le está sumando a la x', detalle: 'Aquí es +6.' },
+        { titulo: 'Pásalo al otro lado con signo contrario', detalle: 'x = 14 − 6' },
+        { titulo: 'Resuelve la operación', detalle: 'x = 8' },
+      ],
+    },
     preguntas: [
       {
         enunciado: 'Resuelve: x + 8 = 15',
@@ -52,6 +71,14 @@ export const MODULOS: Modulo[] = [
     slug: 'despejes',
     nombre: 'Despejes con signos',
     descripcion: 'Cuando x va multiplicada y hay que dividir.',
+    ejemplo: {
+      enunciado: 'Despeja x: 4x − 5 = 19',
+      pasos: [
+        { titulo: 'Pasa el número que resta, sumando', detalle: '4x = 19 + 5 = 24' },
+        { titulo: 'El número que multiplica a x pasa dividiendo', detalle: 'x = 24 ÷ 4' },
+        { titulo: 'Resuelve la división', detalle: 'x = 6' },
+      ],
+    },
     preguntas: [
       {
         enunciado: 'Despeja x: 3x − 4 = 11',
@@ -83,6 +110,14 @@ export const MODULOS: Modulo[] = [
     slug: 'factorizacion',
     nombre: 'Factorización',
     descripcion: 'Encontrar los dos números que arman la expresión.',
+    ejemplo: {
+      enunciado: 'Factoriza: x² + 6x + 8',
+      pasos: [
+        { titulo: 'Busca 2 números que MULTIPLICADOS den el último término', detalle: '2 × 4 = 8' },
+        { titulo: 'Verifica que esos mismos números SUMADOS den el término del medio', detalle: '2 + 4 = 6 ✓' },
+        { titulo: 'Arma los dos paréntesis con esos números', detalle: '(x+2)(x+4)' },
+      ],
+    },
     preguntas: [
       {
         enunciado: 'Factoriza: x² + 5x + 6',

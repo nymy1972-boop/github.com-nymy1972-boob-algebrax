@@ -15,6 +15,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   const router = useRouter();
   const modulo = getModulo(slug);
 
+  const [verEjemplo, setVerEjemplo] = useState(true);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showStars, setShowStars] = useState(false);
@@ -85,6 +86,37 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
         </div>
       </div>
 
+      {verEjemplo ? (
+        <div className="flex min-h-[75dvh] items-center justify-center py-10">
+          <div className="mx-auto flex w-full max-w-[375px] flex-col gap-6 px-5">
+            <p className="flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--accent-2)]">
+              <Sparkles size={14} /> Antes de practicar, mira este ejemplo
+            </p>
+            <h1 className="text-[22px] font-bold leading-tight [font-family:var(--font-display)]">
+              {modulo.ejemplo.enunciado}
+            </h1>
+            <div className="flex flex-col gap-3">
+              {modulo.ejemplo.pasos.map((p, i) => (
+                <div key={i} className="flex gap-3 rounded-[var(--radius-card)] border-2 border-[var(--surface-2)] bg-[var(--surface)] p-4">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--accent)_16%,var(--surface))] text-[13px] font-bold text-[var(--accent)] [font-family:var(--font-display)]">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <p className="font-semibold">{p.titulo}</p>
+                    <p className="mt-0.5 text-[14px] text-[var(--text-secondary)]">{p.detalle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setVerEjemplo(false)}
+              className="mt-1 flex h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+            >
+              Ahora inténtalo tú
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="flex min-h-[75dvh] items-center justify-center py-10">
         <div className="relative mx-auto flex w-full max-w-[375px] flex-col gap-6 px-5">
           <p className="flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--accent-2)]">
@@ -141,6 +173,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
           )}
         </div>
       </div>
+      )}
 
       <CelebrationOverlay
         open={terminado}

@@ -123,5 +123,8 @@ Código de conexión preparado (no requiere cuentas todavía, listo para cuando 
 
 ⚠️ PENDIENTE (requiere que el usuario cree cuentas — se guía una a la vez): GitHub → Supabase → Vercel → dominio → Hotmart → Resend.
 
+## Ajuste post-Sesión 5 (2)
+Cada módulo de práctica ahora muestra un EJEMPLO resuelto (3 pasos) antes de la primera pregunta — botón "Ahora inténtalo tú" para pasar a practicar. El diagnóstico del onboarding y el Modo Examen quedan igual (miden, no enseñan primero). Contenido en `modulo.ejemplo` (lib/modulos.ts), UI en practicar/[modulo]/page.tsx.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
