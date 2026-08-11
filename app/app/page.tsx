@@ -37,7 +37,7 @@ export default function Home() {
       <Problema
         titulo="¿Te suena?"
         preguntas={[
-          { icon: Camera, textoMarked: '¿Copias en Photomath y te quedas en blanco en el examen?' },
+          { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta y te quedas en blanco en el examen?' },
           { icon: CircleHelp, textoMarked: '¿Te da vergüenza preguntar en clase y quedar como el tonto?' },
           { icon: AlarmClock, textoMarked: '¿Sientes un nudo en el estómago cuando anuncian examen sorpresa?' },
           { icon: Ban, textoMarked: '¿Odias que las apps te bloqueen justo cuando más necesitas practicar?' },
@@ -49,7 +49,7 @@ export default function Home() {
         frases={[
           'Cada semana que pasa sin entender, [b]se acumula más miedo[/b] al examen final.',
           'En 6 meses vas a estar en el mismo lugar — pero con [acento]6 meses menos[/acento] para prepararte.',
-          'Copiar la tarea no te salva en el examen: ahí no hay cámara ni Photomath.',
+          'Copiar la tarea no te salva en el examen: ahí no hay cámara que te dé la respuesta.',
         ]}
         contraste={{
           labelHoy: 'Hoy',

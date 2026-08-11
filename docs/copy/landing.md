@@ -18,7 +18,7 @@
 - Placeholder visual: captura del diagnóstico exprés mostrando en qué paso se equivocó el estudiante
 
 ## 2. PROBLEMA (dolores literales de la ficha)
-1. "¿Copias en Photomath y te quedas en blanco en el examen?"
+1. "¿Le tomas foto al ejercicio para copiar la respuesta y te quedas en blanco en el examen?"
 2. "¿Te da vergüenza preguntar en clase y quedar como el tonto?"
 3. "¿Sientes un nudo en el estómago cuando anuncian examen sorpresa?"
 4. "¿Odias que las apps te bloqueen justo cuando más necesitas practicar?"
@@ -26,7 +26,7 @@
 ## 3. AGITACIÓN
 - "Cada semana que pasa sin entender, [b]se acumula más miedo[/b] al examen final."
 - "En 6 meses vas a estar en el mismo lugar — pero con [acento]6 meses menos[/acento] para prepararte."
-- "Copiar la tarea no te salva en el examen: ahí no hay cámara ni Photomath."
+- "Copiar la tarea no te salva en el examen: ahí no hay cámara que te dé la respuesta."
 - Contraste — Hoy: "Copias la tarea a las 10 PM y sigues sin entender nada." / Si nada cambia: "Mismo miedo al examen — con menos tiempo para arreglarlo."
 
 ## 4. SOLUCIÓN

@@ -56,7 +56,7 @@ Sesión 1 — Constitución del producto (B3), en curso. Idea ya validada (docum
 
 ## Constitución del Producto — CERRADA (B3)
 **Promesa central:** "Ayudo a estudiantes de secundaria y bachillerato a aprobar sus exámenes de álgebra a la primera, sin perder horas en videos aburridos ni quedarse en blanco frente al examen — enseñándoles el porqué de cada paso, no solo la respuesta."
-**La app NUNCA:** muestra la respuesta sin intento previo del usuario · bloquea/penaliza por equivocarse (nada de "vidas") · usa lenguaje infantil de juego para niños · comparte datos del estudiante sin permiso.
+**La app NUNCA:** muestra la respuesta sin intento previo del usuario · bloquea/penaliza por equivocarse (nada de "vidas") · usa lenguaje infantil de juego para niños · comparte datos del estudiante sin permiso · **nombra apps competidoras (Photomath, Duolingo, etc.) en copy visible al usuario** — el dolor se describe genérico ("le tomas foto al ejercicio para copiar"), nunca comparación directa con marca (pedido explícito del usuario, 2026-08-11). Los nombres de competidores SÍ pueden vivir en ESTADO.md/FICHA-ARTE.md como investigación interna — la restricción es solo para lo que ve el usuario final de la app.
 
 ## Dirección visual (B4) — referencia mandato
 Usuario pidió: lo mejor de Duolingo Math / Photomath / Brilliant.org en UX, MÁS una dirección visual tipo **voxel/low-poly 3D estilo Roblox** (parecido, NO clon — sin marca, sin assets, sin logo, para evitar riesgo legal). Se trata como caso A-bis (APP NOMBRADA): investigar patrones de Roblox (paleta, geometría blocky, personajes voxel, UI de juego casual) y replicar el SISTEMA, no los assets ni la marca. Se ejecuta en Sesión 2 con 16-DIRECCION-DE-ARTE.md.
