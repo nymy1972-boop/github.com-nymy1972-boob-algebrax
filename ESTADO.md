@@ -208,5 +208,8 @@ Antes las gemas solo se ganaban en el onboarding. Ahora:
 - `/app/perfil`: tarjetas de racha y gemas lado a lado.
 Verificado en navegador: gemas del onboarding persisten y se acumulan al seguir practicando. Sin errores de servidor.
 
+## Re-verificación de rutina (gate detecta cambios en OTRAS pantallas de /app)
+El gate de veredicto caducado se dispara con cualquier .tsx modificado bajo `app/app/app/`, no solo el propio onboarding — es un chequeo de fecha, no semántico. Como el código de onboarding (`app/onboarding/page.tsx`, `Diagnostico.tsx`) no cambió, la re-verificación confirmó sin regresión: **Veredicto: LISTA · Usabilidad: 38/40 · Craft: 18/20**. Nota para el futuro: cualquier edición en Inicio/Examen/Perfil/Práctica va a re-disparar este gate aunque no toque el onboarding — hay que re-correr el revisor como rutina de cierre, no es un bug.
+
 ## Próximo paso
 Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
