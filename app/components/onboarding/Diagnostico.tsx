@@ -10,7 +10,7 @@
 // Los ejercicios son deliberadamente fácil→intermedio: la meta del diagnóstico
 // es que el estudiante SIENTA que puede, no que se enfrente a algo difícil.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen } from 'lucide-react';
 import { StarBurst } from './StarBurst';
@@ -81,6 +81,17 @@ export function Diagnostico({ step, onAnswer }: Props) {
     onAnswer(false, pregunta.tema);
   }
 
+  // Atajo de teclado 1-4: mismo criterio que el tap (bloqueado tras elegir).
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const n = Number(e.key);
+      if (n >= 1 && n <= pregunta.opciones.length) handleSelect(n - 1);
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, pregunta]);
+
   // Sentinel -1: el estudiante se traba y pide ver la respuesta en vez de
   // adivinar — cuenta como fallo (mismo camino que una opción incorrecta),
   // nunca lo deja bloqueado en la pregunta.
@@ -91,16 +102,23 @@ export function Diagnostico({ step, onAnswer }: Props) {
 
   const isWrong = selected !== null && selected !== pregunta.correctaIndex;
 
+  // Énfasis del titular en superficies de conversión (52-COPY): el dato clave
+  // — el resultado que el ejercicio pide encontrar — se resalta en --accent.
+  const partesEnunciado = pregunta.enunciado.split(' ');
+  const datoClave = partesEnunciado.pop();
+
   return (
     <div className="relative mx-auto flex w-full max-w-[375px] flex-col gap-6 px-5">
+      <div className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--text-secondary)_22%,transparent)] bg-[var(--surface-2)] p-5 shadow-[inset_0_3px_14px_rgba(0,0,0,0.55)]">
       <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--accent-2)]">
         {pregunta.tema}
       </p>
-      <h1 className="text-[24px] font-bold leading-tight text-[var(--text-primary)] [font-family:var(--font-display)]">
-        {pregunta.enunciado}
+      <div className="mt-3 h-px w-10 bg-gradient-to-r from-[var(--accent-2)] to-transparent" />
+      <h1 className="mt-3 text-[24px] font-bold leading-tight text-[var(--text-primary)] [font-family:var(--font-display)]">
+        {partesEnunciado.join(' ')} <span className="text-[var(--accent)]">{datoClave}</span>
       </h1>
 
-      <div className="relative flex flex-col gap-3">
+      <div className="relative mt-5 flex flex-col gap-3">
         <div className="relative">
           <StarBurst active={showStars} />
           <AnimatePresence>
@@ -131,20 +149,30 @@ export function Diagnostico({ step, onAnswer }: Props) {
               whileTap={{ scale: selected === null ? 0.97 : 1, y: selected === null ? 2 : 0 }}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] transition-colors ${
+              className={`flex items-center gap-3 rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] transition-colors ${
                 showAsCorrect
                   ? 'border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_14%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--success)_45%,black)]'
                   : showAsWrong
-                    ? 'border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent-2)_45%,black)]'
+                    ? 'border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_12%,var(--surface))] text-[var(--text-primary)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--gold)_45%,black)]'
                     : 'border-[var(--surface-2)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
               }`}
             >
-              <span>{op}</span>
-              {showAsCorrect && <CheckCircle2 size={20} className="text-[var(--success)]" />}
-              {showAsWrong && <Lightbulb size={20} className="text-[var(--accent-2)]" />}
+              <span
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px] border text-[12px] font-bold ${
+                  showAsWrong
+                    ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--bg)]'
+                    : 'border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)] bg-transparent text-[var(--accent-2)]'
+                }`}
+              >
+                {i + 1}
+              </span>
+              <span className="flex-1">{op}</span>
+              {showAsCorrect && <CheckCircle2 size={20} className="shrink-0 text-[var(--success)]" />}
+              {showAsWrong && <Lightbulb size={20} className="shrink-0 text-[var(--gold)]" />}
             </motion.button>
           );
         })}
+      </div>
       </div>
 
       <div aria-live="polite">
@@ -162,7 +190,7 @@ export function Diagnostico({ step, onAnswer }: Props) {
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
+            className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--gold)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
           >
             <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
             {pregunta.explicacion}

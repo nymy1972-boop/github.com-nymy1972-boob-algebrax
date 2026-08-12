@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, MotionConfig } from 'motion/react';
 import { ArrowLeft, ArrowRight, Check, Gem, Trophy, X } from 'lucide-react';
@@ -68,6 +68,20 @@ export default function OnboardingPage() {
     setFase('diagnostico');
   }
 
+  // Atajo de teclado 1-4: mismo criterio de alcance que en Diagnostico.tsx —
+  // grado elige y avanza, dolor marca/desmarca (selección múltiple).
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const n = Number(e.key);
+      if (n < 1 || n > 4) return;
+      if (fase === 'grado' && GRADOS[n - 1]) elegirGrado(GRADOS[n - 1]);
+      else if (fase === 'dolor' && DOLORES[n - 1]) toggleDolor(DOLORES[n - 1]);
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fase]);
+
   /** Control y libertad (Nielsen): siempre hay un paso atrás, en TODAS las fases. */
   function volver() {
     if (fase === 'grado') setFase('nombre');
@@ -105,21 +119,21 @@ export default function OnboardingPage() {
   return (
     <MotionConfig reducedMotion="user">
     <div
-      className="relative min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]"
+      className="relative flex min-h-dvh flex-col bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]"
       style={{
         backgroundImage:
-          'radial-gradient(480px 320px at 50% 0%, color-mix(in oklab, var(--accent-2) 8%, transparent) 0%, transparent 70%)',
+          'radial-gradient(480px 320px at 50% 0%, color-mix(in oklab, var(--accent-2) 8%, transparent) 0%, transparent 70%), radial-gradient(600px 480px at 50% 100%, color-mix(in oklab, var(--accent) 14%, transparent) 0%, transparent 75%)',
       }}
     >
       {/* Barra de progreso — siempre visible, con "Paso X de Y" explícito (feedback: evita abandono por incertidumbre) */}
-      <div className="sticky top-0 z-10 bg-[var(--bg)] px-5 pb-3 pt-5">
+      <div className="sticky top-0 z-10 shrink-0 bg-[var(--bg)] px-5 pb-3 pt-5">
         <div className="mx-auto flex w-full max-w-[375px] items-center gap-3">
           {/* Control y libertad (Nielsen): volver un paso, o salir del onboarding — en TODAS las fases previas al plan */}
           {fase === 'grado' || fase === 'dolor' || fase === 'diagnostico' ? (
             <button
               onClick={volver}
               aria-label="Volver al paso anterior"
-              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[var(--text-secondary)]"
+              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--text-secondary)_35%,transparent)] bg-[var(--surface)] text-[var(--text-primary)]"
             >
               <ArrowLeft size={20} />
             </button>
@@ -127,7 +141,7 @@ export default function OnboardingPage() {
             <Link
               href="/"
               aria-label="Salir del onboarding"
-              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[var(--text-secondary)]"
+              className="-m-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--text-secondary)_35%,transparent)] bg-[var(--surface)] text-[var(--text-primary)]"
             >
               <X size={20} />
             </Link>
@@ -155,7 +169,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100dvh-92px)] items-start justify-center pt-8 pb-6 sm:pt-12">
+      <div className="flex flex-1 items-center justify-center py-8">
         <AnimatePresence mode="wait">
           {fase === 'nombre' && (
             <motion.div
@@ -199,17 +213,22 @@ export default function OnboardingPage() {
               <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
                 ¿En qué grado estás?
               </h1>
+              <div className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[var(--surface-2)] p-5 shadow-[inset_0_3px_14px_rgba(0,0,0,0.55)]">
               <div className="flex flex-col gap-3">
-                {GRADOS.map((g) => (
+                {GRADOS.map((g, i) => (
                   <motion.button
                     key={g}
                     whileTap={{ scale: 0.97, y: 2 }}
                     onClick={() => elegirGrado(g)}
-                    className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
+                    className="flex items-center gap-3 rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
                   >
-                    {g}
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px] border border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)] bg-transparent text-[12px] font-bold text-[var(--accent-2)]">
+                      {i + 1}
+                    </span>
+                    <span className="flex-1">{g}</span>
                   </motion.button>
                 ))}
+              </div>
               </div>
             </motion.div>
           )}
@@ -226,21 +245,25 @@ export default function OnboardingPage() {
                 ¿Qué te preocupa más de tu próximo examen de álgebra?
               </h1>
               <p className="-mt-4 text-[13px] text-[var(--text-secondary)]">Elige todas las que apliquen.</p>
+              <div className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[var(--surface-2)] p-5 shadow-[inset_0_3px_14px_rgba(0,0,0,0.55)]">
               <div className="flex flex-col gap-3">
-                {DOLORES.map((d) => {
+                {DOLORES.map((d, i) => {
                   const marcado = dolores.includes(d);
                   return (
                     <motion.button
                       key={d}
                       whileTap={{ scale: 0.97, y: 2 }}
                       onClick={() => toggleDolor(d)}
-                      className={`flex items-center justify-between rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
+                      className={`flex items-center gap-3 rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
                         marcado
                           ? 'border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,var(--surface))] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_45%,black)]'
                           : 'border-[var(--surface-2)] bg-[var(--surface)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--surface-2)_30%,black)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
                       }`}
                     >
-                      {d}
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px] border border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)] bg-transparent text-[12px] font-bold text-[var(--accent-2)]">
+                        {i + 1}
+                      </span>
+                      <span className="flex-1">{d}</span>
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border-2 ${
                           marcado ? 'border-[var(--accent)] bg-[var(--accent)]' : 'border-[var(--surface-2)]'
@@ -251,6 +274,7 @@ export default function OnboardingPage() {
                     </motion.button>
                   );
                 })}
+              </div>
               </div>
               <button
                 onClick={confirmarDolores}
