@@ -262,5 +262,10 @@ El usuario tenía una clave de DeepSeek lista y pidió usarla para que la explic
 - ⚠️ Efecto colateral encontrado y corregido: al crear `app/.env` desde la plantilla, las variables de Supabase quedaron con valores de ejemplo no vacíos (`https://xxxx.supabase.co`), lo que activaba sin querer el guard de login del middleware y bloqueaba `/app`. Se vaciaron esas líneas — Supabase real se conecta recién en la fase de servicios externos.
 - Pendiente del usuario: pegar su clave real de DeepSeek en `DEEPSEEK_API_KEY=` dentro de `app/.env` (nunca en el chat).
 
+## Sesión 6 — GitHub conectado (P0-P1 del protocolo de publicación)
+Repo: `github.com/nymy1972-boop/github.com-nymy1972-boob-algebrax` (privado). El usuario lo creó desde la web de GitHub, luego usó **GitHub Desktop** (no terminal — mis herramientas no pueden abrir la ventana de login interactiva de Git Credential Manager en este entorno) para publicar la rama `main`. Verificado desde el agente: `git fetch origin` + `git rev-parse HEAD` == `origin/main` (mismo SHA `8681bac...`) — el código local y el de GitHub coinciden exactamente.
+Nota: el usuario pegó su clave real de DeepSeek Y también valores reales de Supabase (URL + claves) directo en `app/.env` (nunca en el chat) — Supabase ahora tiene datos reales de conexión, aunque la Sesión 6 de integración real (migraciones, RLS, `/app` con cuenta real) sigue sin ejecutarse formalmente. Anotarlo como punto de partida cuando se retome esa fase: las credenciales ya existen, falta el trabajo de conectar el código.
+Pendiente (protocolo `62-PUBLICACION-SEGURA-Y-CONTINUA.md`): P2 (conectar Vercel al repo con auto-deploy), P3 (Supabase `link` + migraciones), P4-P8 (variables por ambiente, preview real, dominio, producción, segunda publicación de prueba).
+
 ## Próximo paso
-Pedir al usuario la primera cuenta: GitHub (para poder desplegar a Vercel).
+Conectar Vercel al repositorio de GitHub para el primer despliegue automático (P2 del protocolo de publicación).
