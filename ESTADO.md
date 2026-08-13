@@ -267,5 +267,12 @@ Repo: `github.com/nymy1972-boop/github.com-nymy1972-boob-algebrax` (privado). El
 Nota: el usuario pegó su clave real de DeepSeek Y también valores reales de Supabase (URL + claves) directo en `app/.env` (nunca en el chat) — Supabase ahora tiene datos reales de conexión, aunque la Sesión 6 de integración real (migraciones, RLS, `/app` con cuenta real) sigue sin ejecutarse formalmente. Anotarlo como punto de partida cuando se retome esa fase: las credenciales ya existen, falta el trabajo de conectar el código.
 Pendiente (protocolo `62-PUBLICACION-SEGURA-Y-CONTINUA.md`): P2 (conectar Vercel al repo con auto-deploy), P3 (Supabase `link` + migraciones), P4-P8 (variables por ambiente, preview real, dominio, producción, segunda publicación de prueba).
 
+## Sesión 6 — Vercel conectado y primer deploy en vivo (P2 del protocolo de publicación)
+El usuario creó cuenta en Vercel con "Continue with GitHub" (mismo login, sin pasos extra) e importó el repo directo desde la web de Vercel — detectó Next.js automáticamente y el build quedó **Ready** al primer intento (Production Checklist: "Connect Git Repository ✓"). Verificado por el agente abriendo la URL en el navegador: la landing carga igual que en local, sin errores.
+- **URL de producción:** `https://github-com-nymy1972-boob-algebrax.vercel.app`
+- **SHA confirmado:** el deployment de Vercel muestra el commit `38cc0e9` — el mismo que ya había verificado como HEAD local y de GitHub. Los tres (local, GitHub, Vercel) coinciden.
+- Sin variables de entorno configuradas todavía en Vercel (Supabase/DeepSeek/Hotmart) — el sitio corre en modo "todo local" (localStorage), igual que en desarrollo, así que el build no falla por falta de claves.
+- Pendiente del protocolo `62`: P3 (Supabase `link` + migraciones), P4 (agregar las variables de entorno reales en Vercel — Settings → Environment Variables, nunca en el chat), P5 (probar que un push a una rama nueva crea un Preview automático), P6 (dominio propio si aplica), P7 (confirmar que push a `main` sigue actualizando Production), P8 (prueba obligatoria de una segunda publicación + reversión antes de certificar `automatic_updates_verified: true`).
+
 ## Próximo paso
-Conectar Vercel al repositorio de GitHub para el primer despliegue automático (P2 del protocolo de publicación).
+Agregar las variables de entorno reales en Vercel (Supabase, DeepSeek) y probar que un nuevo push a `main` actualiza la producción automáticamente (P4 y P7-P8 del protocolo de publicación).
