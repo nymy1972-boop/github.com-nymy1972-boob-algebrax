@@ -192,6 +192,8 @@ GARANTIA_PENDIENTE_VERIFICACION: la landing y el paywall prometen "la Garantía 
 
 (Resuelto — ver "Cierre del gate de onboarding" más abajo. El historial de las rondas previas queda documentado ahí.)
 
+VEREDICTO_ONBOARDING_CADUCADO_SIN_CAMBIO_VISUAL: tras cerrar el gate en 38/40·16/20, `Diagnostico.tsx` volvió a cambiar (ajuste de explicación con IA — ver "Ajuste: explicación de errores con IA"), lo que caduca el veredicto por fecha. El cambio es puramente funcional (de dónde viene el texto, no cómo se ve): el fallback que se muestra es el MISMO texto/estilo que ya evaluó el revisor, sin tocar layout, color ni espaciado. No se relanza `revisor-visual` por este cambio — se documenta aquí en vez de gastar otra ronda en algo sin diferencia visual. Si una futura sesión toca el layout/estilo de `Diagnostico.tsx` o `practicar/[modulo]/page.tsx`, ahí sí corresponde re-verificar.
+
 ## Ajuste: paywall mejorado con reglas de Gemini (analizadas, no copiadas a ciegas)
 El usuario trajo 7 "reglas de oro" de paywall de Gemini. Análisis y decisión:
 - **Adoptadas (implementadas):** (3) headline orientado a RESULTADO en vez de features ("Pasa tu examen entrenando 10 min al día" / bullets en lenguaje de resultado) · (6) personalización dinámica: el paywall ahora lee `?tema=` (pasado desde el onboarding, el tema donde falló en el diagnóstico) y cambia el titular a "Tu plan para dominar [tema] está listo".
