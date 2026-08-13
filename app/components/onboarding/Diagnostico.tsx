@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen } from 'lucide-react';
 import { StarBurst } from './StarBurst';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
+import { useExplicacionIA } from '@/lib/useExplicacionIA';
 
 export interface PreguntaDiagnostico {
   tema: string;
@@ -101,6 +102,14 @@ export function Diagnostico({ step, onAnswer }: Props) {
   }
 
   const isWrong = selected !== null && selected !== pregunta.correctaIndex;
+
+  const textoExplicacion = useExplicacionIA(isWrong, {
+    enunciado: pregunta.enunciado,
+    opciones: pregunta.opciones,
+    correctaTexto: pregunta.opciones[pregunta.correctaIndex],
+    elegidaTexto: selected !== null && selected >= 0 ? pregunta.opciones[selected] : null,
+    fallback: pregunta.explicacion,
+  });
 
   // Énfasis del titular en superficies de conversión (52-COPY): el dato clave
   // — el resultado que el ejercicio pide encontrar — se resalta en --accent.
@@ -193,7 +202,7 @@ export function Diagnostico({ step, onAnswer }: Props) {
             className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--gold)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
           >
             <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
-            {pregunta.explicacion}
+            {textoExplicacion}
             <button
               onClick={continuar}
               className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"

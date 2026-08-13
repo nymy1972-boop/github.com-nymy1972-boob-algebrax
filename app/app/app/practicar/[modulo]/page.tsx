@@ -9,6 +9,7 @@ import { getModulo, type PreguntaModulo } from '@/lib/modulos';
 import { registrarAcierto, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+import { useExplicacionIA } from '@/lib/useExplicacionIA';
 
 const PREGUNTAS_POR_SESION = 8;
 
@@ -38,6 +39,14 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   const progreso = preguntas ? Math.round((step / preguntas.length) * 100) : 0;
 
   const isWrong = selected !== null && pregunta && selected !== pregunta.correctaIndex;
+
+  const textoExplicacion = useExplicacionIA(Boolean(isWrong), {
+    enunciado: pregunta?.enunciado ?? '',
+    opciones: pregunta?.opciones ?? [],
+    correctaTexto: pregunta ? pregunta.opciones[pregunta.correctaIndex] : '',
+    elegidaTexto: pregunta && selected !== null ? pregunta.opciones[selected] : null,
+    fallback: pregunta?.pasoClave ?? '',
+  });
 
   function siguiente() {
     if (!preguntas) return;
@@ -222,7 +231,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
               className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_25%,transparent)] bg-[var(--surface-2)] p-4 text-[14px] leading-relaxed text-[var(--text-secondary)]"
             >
               <span className="font-semibold text-[var(--text-primary)]">¡Casi! </span>
-              {pregunta.pasoClave}
+              {textoExplicacion}
               <button
                 onClick={siguiente}
                 className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[15px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-transform active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
