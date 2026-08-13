@@ -289,3 +289,11 @@ igual porque compara fechas de archivo contra `docs/revisiones/onboarding-veredi
 distinguir si el cambio fue en esta sesión o en una anterior. No corresponde re-lanzar
 `revisor-visual` sin cambios de código reales que lo justifiquen — se re-verificará cuando la
 próxima sesión que SÍ edite `.tsx` de onboarding/práctica cierre su trabajo.
+
+## Ajuste: carrusel "La app por dentro" — punto activo desincronizado (bug real, corregido)
+El usuario reportó que al tocar los puntos del carrusel "a veces sí funciona, a veces no" (inconsistente, no roto del todo). Diagnóstico: el `IntersectionObserver` que sincroniza el punto activo con la tarjeta visible solo recibe, en cada tanda, los frames cuyo ratio de visibilidad CRUZÓ el umbral — no todos los frames observados. El código anterior hacía `setActivo(idx)` con el ÚLTIMO frame de la tanda que estuviera intersectando, sin comparar cuál tenía más visibilidad real; durante un scroll rápido esto podía dejar el punto marcado en un frame distinto al que realmente quedó centrado.
+Fix en `components/landing/AppPorDentro.tsx`: se mantiene el ratio de visibilidad más reciente de CADA frame (no solo los de la tanda actual) y siempre se elige el de mayor ratio como activo; el umbral pasó de un solo valor (0.6) a una lista (`[0, 0.25, 0.5, 0.6, 0.75, 1]`) para que el observer reporte más puntos intermedios y la comparación sea más precisa.
+Verificado con script automatizado (Playwright, clics reales con `.click()` de Playwright — no `.click()` de JS directo): 10 rondas alternando los 4 puntos, **10/10 correctas** (antes del fix no se había medido con este método, pero el reporte del usuario y el análisis del código explican el fallo intermitente). `tsc` ✓, `npm run build` ✓.
+
+## Próximo paso
+Subir este commit (arreglo del carrusel) con GitHub Desktop y luego seguir con el protocolo de publicación: agregar variables de entorno reales en Vercel (Supabase, DeepSeek) y probar que un push a `main` sigue actualizando producción automáticamente (P4 y P7-P8 de `62-PUBLICACION-SEGURA-Y-CONTINUA.md`).

@@ -50,20 +50,29 @@ export function AppPorDentro({
   const frameRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activo, setActivo] = useState(0);
 
-  // Dots sincronizados con el frame más visible — obligatorios SIEMPRE (19 §5)
+  // Dots sincronizados con el frame más visible — obligatorios SIEMPRE (19 §5).
+  // El callback del observer solo entrega los frames cuyo ratio CAMBIÓ de umbral
+  // en esta tanda, no todos — decidir "activo" mirando solo esa tanda hace que,
+  // durante un scroll rápido, el último frame en llegar gane aunque no sea el
+  // más centrado (el punto quedaba desincronizado de la tarjeta real). Se
+  // mantiene el ratio más reciente de CADA frame y siempre se elige el mayor.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
+    const ratios = new Array(frames.length).fill(0);
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) {
-            const idx = frameRefs.current.indexOf(e.target as HTMLDivElement);
-            if (idx >= 0) setActivo(idx);
-          }
+          const idx = frameRefs.current.indexOf(e.target as HTMLDivElement);
+          if (idx >= 0) ratios[idx] = e.intersectionRatio;
         }
+        let mejor = 0;
+        for (let i = 1; i < ratios.length; i++) {
+          if (ratios[i] > ratios[mejor]) mejor = i;
+        }
+        if (ratios[mejor] > 0) setActivo(mejor);
       },
-      { root: scroller, threshold: 0.6 }
+      { root: scroller, threshold: [0, 0.25, 0.5, 0.6, 0.75, 1] }
     );
     for (const f of frameRefs.current) {
       if (f) io.observe(f);
