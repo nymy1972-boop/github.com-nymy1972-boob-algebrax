@@ -87,10 +87,10 @@ export default function Home() {
       <AppPorDentro
         tituloMarked="Así se ve [acento]tu progreso[/acento] día a día"
         frames={[
-          { label: 'Tu diagnóstico en 3 preguntas', nombrePantalla: 'Diagnóstico' },
-          { label: 'El paso exacto donde te confundiste', nombrePantalla: 'Descifrador de Pasos' },
-          { label: 'Tu racha y tus módulos del día', nombrePantalla: 'Inicio' },
-          { label: 'Practica contrarreloj como en el examen real', nombrePantalla: 'Modo Examen' },
+          { label: 'Tu diagnóstico en 3 preguntas', nombrePantalla: 'Diagnóstico', src: '/landing/diagnostico.png' },
+          { label: 'El paso exacto donde te confundiste', nombrePantalla: 'Descifrador de Pasos', src: '/landing/descifrador.png' },
+          { label: 'Tu racha y tus módulos del día', nombrePantalla: 'Inicio', src: '/landing/inicio.png' },
+          { label: 'Practica contrarreloj como en el examen real', nombrePantalla: 'Modo Examen', src: '/landing/examen.png' },
         ]}
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
