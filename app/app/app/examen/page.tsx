@@ -46,6 +46,7 @@ export default function ExamenPage() {
   const [respuestas, setRespuestas] = useState<(number | null)[]>([]);
   const [segundosRestantes, setSegundosRestantes] = useState(DURACION_SEGUNDOS);
   const [terminado, setTerminado] = useState(false);
+  const [seleccionado, setSeleccionado] = useState<number | null>(null);
   const gemasAsignadas = useRef(false);
 
   function empezar() {
@@ -70,15 +71,20 @@ export default function ExamenPage() {
   const urgente = segundosRestantes <= 30;
 
   function responder(index: number) {
+    if (seleccionado !== null) return;
+    setSeleccionado(index);
     setRespuestas((prev) => {
       const copia = [...prev];
       copia[step] = index;
       return copia;
     });
     if (step + 1 < preguntas.length) {
-      window.setTimeout(() => setStep((s) => s + 1), 250);
+      window.setTimeout(() => {
+        setSeleccionado(null);
+        setStep((s) => s + 1);
+      }, 350);
     } else {
-      window.setTimeout(() => setTerminado(true), 250);
+      window.setTimeout(() => setTerminado(true), 350);
     }
   }
 
@@ -248,16 +254,25 @@ export default function ExamenPage() {
             {pregunta.enunciado}
           </h1>
           <div className="flex flex-col gap-3">
-            {pregunta.opciones.map((op, i) => (
-              <motion.button
-                key={i}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => responder(i)}
-                className="rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 py-3.5 text-left text-[16px] font-semibold hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]"
-              >
-                {op}
-              </motion.button>
-            ))}
+            {pregunta.opciones.map((op, i) => {
+              const estaSeleccionada = seleccionado === i;
+              return (
+                <motion.button
+                  key={i}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => responder(i)}
+                  disabled={seleccionado !== null}
+                  aria-pressed={estaSeleccionada}
+                  className={`rounded-[var(--radius-button)] border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${
+                    estaSeleccionada
+                      ? 'border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_12%,var(--surface))]'
+                      : 'border-[var(--surface-2)] bg-[var(--surface)] hover:border-[color-mix(in_oklab,var(--accent-2)_40%,transparent)]'
+                  }`}
+                >
+                  {op}
+                </motion.button>
+              );
+            })}
           </div>
           <p className="text-center text-[12px] text-[var(--text-secondary)]">
             Como en tu examen real: no te decimos si acertaste hasta el final.
