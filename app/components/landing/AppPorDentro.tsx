@@ -131,8 +131,10 @@ export function AppPorDentro({
             ))}
           </div>
 
-          {/* Dots: activo en acento, resto neutro 30% — tocables (ir al frame) */}
-          <div className="mt-4 flex justify-center gap-2">
+          {/* Dots: activo en acento, resto neutro 30% — tocables (ir al frame).
+              Botón a 44px (mínimo táctil) aunque el punto visible siga en 8px —
+              mismo patrón -m/-11 usado en el botón "volver" del onboarding. */}
+          <div className="mt-4 flex justify-center gap-0.5">
             {frames.map((f, i) => (
               <button
                 key={i}
@@ -140,7 +142,7 @@ export function AppPorDentro({
                 onClick={() => irA(i)}
                 aria-label={`Ir a: ${f.label}`}
                 aria-current={activo === i ? 'true' : undefined}
-                className="flex size-6 items-center justify-center [touch-action:manipulation]"
+                className="flex size-11 items-center justify-center [touch-action:manipulation]"
               >
                 <span
                   className={`size-2 rounded-full transition-colors duration-200 ${

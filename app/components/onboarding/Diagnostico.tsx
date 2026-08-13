@@ -10,7 +10,7 @@
 // Los ejercicios son deliberadamente fácil→intermedio: la meta del diagnóstico
 // es que el estudiante SIENTA que puede, no que se enfrente a algo difícil.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen } from 'lucide-react';
 import { StarBurst } from './StarBurst';
@@ -54,11 +54,36 @@ interface Props {
   onAnswer: (correct: boolean, tema: string) => void;
 }
 
+// Las 3 preguntas de PREGUNTAS están escritas con la correcta siempre en el
+// índice 0 (más fácil de leer/mantener) — se baraja aquí, una vez por
+// pregunta, para que la posición en pantalla sea impredecible.
+function barajarOpciones<T>(arr: T[]): T[] {
+  const copia = [...arr];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
 export function Diagnostico({ step, onAnswer }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
   const [showStars, setShowStars] = useState(false);
   const [showGemas, setShowGemas] = useState(false);
-  const pregunta = PREGUNTAS[step];
+  const preguntaBase = PREGUNTAS[step];
+
+  // Baraja una sola vez por pregunta (no en cada re-render, así no se mueven
+  // las opciones mientras el estudiante está mirándolas).
+  const pregunta = useMemo(() => {
+    const opcionesConIndice = preguntaBase.opciones.map((op, i) => ({ op, esCorrecta: i === preguntaBase.correctaIndex }));
+    const barajadas = barajarOpciones(opcionesConIndice);
+    return {
+      ...preguntaBase,
+      opciones: barajadas.map((o) => o.op),
+      correctaIndex: barajadas.findIndex((o) => o.esCorrecta),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   function handleSelect(index: number) {
     if (selected !== null) return;

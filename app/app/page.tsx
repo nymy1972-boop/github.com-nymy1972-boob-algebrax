@@ -37,6 +37,26 @@ export default function Home() {
         ctaHref={CTA_HREF}
         socialProof={<span>Garantía Hotmart de 7 días — sin preguntas</span>}
         visualPlaceholderSugerencia="captura del diagnóstico exprés mostrando en qué paso se equivocó el estudiante"
+        visual={
+          <div
+            className="flex aspect-[4/3] w-full items-center justify-center"
+            style={{
+              background:
+                'radial-gradient(480px 320px at 50% 40%, color-mix(in oklab, var(--accent-2) 10%, transparent) 0%, transparent 70%)',
+            }}
+          >
+            <div
+              className="relative aspect-[9/19.5] h-[86%] overflow-hidden rounded-[30px] border-[5px] shadow-[var(--shadow-2)]"
+              style={{ borderColor: 'color-mix(in oklab, var(--text-primary) 90%, var(--accent))' }}
+            >
+              <img
+                src="/landing/descifrador.png"
+                alt="El Descifrador de Pasos mostrando en qué paso exacto se equivocó el estudiante"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+        }
       />
 
       {/* 2. PROBLEMA */}

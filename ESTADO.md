@@ -274,5 +274,17 @@ El usuario creó cuenta en Vercel con "Continue with GitHub" (mismo login, sin p
 - Sin variables de entorno configuradas todavía en Vercel (Supabase/DeepSeek/Hotmart) — el sitio corre en modo "todo local" (localStorage), igual que en desarrollo, así que el build no falla por falta de claves.
 - Pendiente del protocolo `62`: P3 (Supabase `link` + migraciones), P4 (agregar las variables de entorno reales en Vercel — Settings → Environment Variables, nunca en el chat), P5 (probar que un push a una rama nueva crea un Preview automático), P6 (dominio propio si aplica), P7 (confirmar que push a `main` sigue actualizando Production), P8 (prueba obligatoria de una segunda publicación + reversión antes de certificar `automatic_updates_verified: true`).
 
-## Próximo paso
-Agregar las variables de entorno reales en Vercel (Supabase, DeepSeek) y probar que un nuevo push a `main` actualiza la producción automáticamente (P4 y P7-P8 del protocolo de publicación).
+## Ajuste: capturas reales en landing + 2 bugs reales encontrados y corregidos
+El usuario pidió reemplazar los placeholders de la landing por capturas reales — se tomaron 4 (diagnóstico, descifrador de pasos en estado de error, inicio, examen) desde la app ya publicada en Vercel, guardadas en `app/public/landing/*.png`, y conectadas en el carrusel "La app por dentro" (`app/app/page.tsx`) y en el Hero (usa `descifrador.png` dentro de un frame de teléfono, prop `visual`).
+Durante la revisión, el usuario reportó 2 problemas reales, ambos confirmados y corregidos:
+1. **Puntos del carrusel sin responder al tocar:** el botón de cada punto medía 24px (`size-6`), por debajo del mínimo táctil de 44px de la Regla de UX #5. Se agrandó el botón a `size-11` (44px) manteniendo el punto visible en 8px — mismo patrón `-m/-11` ya usado en el botón "volver" del onboarding. `components/landing/AppPorDentro.tsx`.
+2. **La respuesta correcta del diagnóstico del onboarding siempre salía primera:** las 3 preguntas fijas de `Diagnostico.tsx` (`PREGUNTAS`) tenían `correctaIndex: 0` desde que se crearon en la Sesión 4 — nunca se barajaban (a diferencia de practicar/examen, que sí generan posiciones aleatorias). Se agregó un `useMemo` que baraja las opciones una vez por pregunta (no en cada render, para que no se muevan mientras el estudiante mira). Verificado con script automatizado: 5 vueltas seguidas, la posición de la correcta varió cada vez (últimas: 4ª, 1ª, 3ª, 1ª, 3ª).
+Verificado: `tsc` ✓, `npm run build` ✓, sin errores de servidor.
+
+VEREDICTO_ONBOARDING_CADUCADO_SESION_PROMPT_FOTO: en esta sesión solo se redactó (en el chat, sin
+tocar archivos) un prompt para una futura función de "escanear ejercicio por foto" + mejora del
+tono de las explicaciones de IA — ningún `.tsx` se editó. El gate de veredicto caducado se disparó
+igual porque compara fechas de archivo contra `docs/revisiones/onboarding-veredicto.md`, sin
+distinguir si el cambio fue en esta sesión o en una anterior. No corresponde re-lanzar
+`revisor-visual` sin cambios de código reales que lo justifiquen — se re-verificará cuando la
+próxima sesión que SÍ edite `.tsx` de onboarding/práctica cierre su trabajo.
