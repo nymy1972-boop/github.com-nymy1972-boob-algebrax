@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Next.js 16 regenera estos automáticamente cada vez que arranca `next dev`
+# (guía para agentes de IA) — no son código del proyecto, no se versionan.
+AGENTS.md
+CLAUDE.md
