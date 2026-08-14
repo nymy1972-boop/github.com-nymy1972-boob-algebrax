@@ -5,12 +5,12 @@
 // de la compra, no con un teléfono). Antes solo mandaba un enlace mágico: el
 // estudiante tenía que salir de la app, abrir el correo y volver — pedido
 // explícito del usuario (2026-08-11): que se sienta más simple y directo.
-// Ahora el correo trae un CÓDIGO DE 6 DÍGITOS que se escribe en la misma
+// Ahora el correo trae un CÓDIGO (ver CODIGO_LARGO) que se escribe en la misma
 // pantalla, sin cambiar de pestaña ni copiar/pegar un enlace. Conectado a
 // Supabase Auth real (signInWithOtp/verifyOtp) — requiere que la plantilla de
 // correo "Magic Link" en el dashboard de Supabase incluya {{ .Token }} para
-// que el código de 6 dígitos aparezca en el cuerpo del correo (si solo trae
-// el enlace, igual funciona tocándolo, pero no muestra el código a escribir).
+// que el código aparezca en el cuerpo del correo (si solo trae el enlace,
+// igual funciona tocándolo, pero no muestra el código a escribir).
 
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -29,7 +29,10 @@ function GoogleIcon() {
   );
 }
 
-const CODIGO_LARGO = 6;
+// Supabase envía el código real en 8 dígitos (confirmado en la app, no en la
+// documentación — el valor "6" que aparece en varias guías de Supabase es
+// para el flujo de teléfono/SMS, no coincide con lo que llega por correo).
+const CODIGO_LARGO = 8;
 
 /** Fila de 6 casillas para el código — cada dígito en su propio input, con
  * autoavance al escribir y retroceso con Backspace (patrón estándar de
@@ -58,7 +61,7 @@ function CodigoInput({ valor, onChange }: { valor: string; onChange: (v: string)
   }
 
   return (
-    <div className="flex w-full justify-between gap-2" onPaste={handlePaste}>
+    <div className="flex w-full justify-between gap-1.5" onPaste={handlePaste}>
       {Array.from({ length: CODIGO_LARGO }).map((_, i) => (
         <input
           key={i}
@@ -72,7 +75,7 @@ function CodigoInput({ valor, onChange }: { valor: string; onChange: (v: string)
           onChange={(e) => setDigito(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           aria-label={`Dígito ${i + 1} de ${CODIGO_LARGO}`}
-          className="h-14 w-full rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] text-center text-[22px] font-bold text-[var(--text-primary)] outline-none focus:border-[var(--accent-2)] [font-family:var(--font-display)]"
+          className="h-14 w-full rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] text-center text-[18px] font-bold text-[var(--text-primary)] outline-none focus:border-[var(--accent-2)] [font-family:var(--font-display)]"
         />
       ))}
     </div>
@@ -160,7 +163,7 @@ function EntrarForm() {
             {plan === 'gratis' ? 'Crea tu cuenta gratis' : 'Entra con tu correo'}
           </h1>
           <p className="text-[14px] text-[var(--text-secondary)]">
-            Sin contraseñas que recordar: te mandamos un código de 6 dígitos a tu correo.
+            Sin contraseñas que recordar: te mandamos un código a tu correo.
           </p>
 
           <form onSubmit={handleEnviarCodigo} className="flex w-full flex-col gap-3">
@@ -205,7 +208,7 @@ function EntrarForm() {
             Escribe tu código
           </h1>
           <p className="text-[14px] text-[var(--text-secondary)]">
-            Te enviamos 6 dígitos a <strong className="text-[var(--text-primary)]">{email}</strong>. Sin salir de aquí: solo escríbelos.
+            Te enviamos un código a <strong className="text-[var(--text-primary)]">{email}</strong>. Sin salir de aquí: solo escríbelo.
           </p>
 
           <form onSubmit={handleVerificarCodigo} className="flex w-full flex-col gap-4">
