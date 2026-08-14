@@ -1,14 +1,14 @@
-# VEREDICTO revisor-visual — onboarding (diagnóstico)
-Fecha: 2026-08-12 00:00
+# VEREDICTO revisor-visual — onboarding (Diagnóstico)
+Fecha: 2026-08-13 00:00
 Screenshot: docs/revisiones/onboarding-375.png
 Usabilidad: 38/40
-Craft: 16/20
+Craft: 17/20
 Copy (si vende): N-A
 Fidelidad (si hubo referencia): N-A
 Veredicto: LISTA
 Top defectos:
-1. [Card de pregunta, badges 1-4 + label "ECUACIONES BÁSICAS" + "Consejo"] Tres bloques de texto en 12-13px conviven muy cerca en peso visual (label, número de badge, cuerpo del consejo) → si se afina más, subir el label del tema a 14px o bajar el peso del texto del consejo para separar mejor los niveles 3 y 4 de jerarquía.
-2. [Zona bajo "No lo sé, sigamos"] Queda ~130-150px de aire antes del borde inferior del viewport; no rompe el balance (el flex centra el bloque y hay aire equivalente arriba) pero un ojo entrenado lo nota — mover el link "No lo sé" más abajo o añadir un elemento de apoyo (ej. contador "Pregunta 1 de 3" dentro de la card) llenaría ese resto sin forzar el layout.
-3. [Botón "Entendido, sigamos" dentro del bloque de explicación] Es el único botón sólido rojo visible en el flujo normal (solo aparece si falla) — correcto por diseño, pero al ser un elemento condicional, un usuario que siempre acierta nunca ve un CTA sólido en esta pantalla; no es un defecto de craft, es una nota de flujo, no baja puntaje.
-
-Nota sobre el fix de esta ronda: el cambio de los 4 badges de fill azul sólido a outline (borde 40%, fondo transparente, texto azul) SÍ corrige el desbalance cromático señalado en la ronda anterior — ahora el rojo (--accent) domina como color de acción/dato clave ("15", barra de progreso) y el azul (--accent-2) queda relegado a identidad/navegación (label de tema, hairline, ícono de Consejo), tal como exige la "Justificación de teoría del color" de FICHA-ARTE.md. Esto sube el eje de Identidad Ownable de craft de 2 a 4 (cumple el kit sin desviación, dispositivo block-press visible y consistente, pasa el test anti-clon), cruzando el umbral de 16/20.
+1. [Options list, badges numerados 1-4] El color azul (--accent-2) del borde/número sobre superficie oscura ronda el mínimo AA (~4.5:1) en texto pequeño → medir contraste real y subir 1-2% de luminancia si falla en herramienta automática.
+2. [Card de pregunta] El titular resalta la constante "15" en vez de la incógnita "x" (split por última palabra) → funciona semánticamente pero no es el dato que el estudiante busca; considerar resaltar "x" cuando el enunciado termine en el resultado dado, no en la incógnita.
+3. [Footer / consejo] El bloque "Consejo" y el bloque de error comparten casi el mismo tratamiento visual (misma superficie, mismo radio) → un ojo entrenado los confunde a primera vista entre "tip preventivo" y "feedback post-error"; diferenciar con un tinte de fondo más distintivo en el consejo.
+4. [Movimiento] En esta pantalla no hay conteo animado de número héroe (no aplica al contenido) ni anillo/barra que se dibuje más allá de la barra de progreso superior → aceptable porque el contenido no lo requiere, pero deja el eje de movimiento en 3/4 en vez de 4/4.
+5. [Botones numerados 1-4] El radio del badge cuadrado (8px) es visiblemente menor al radio de las cards/botones (var(--radius-button/card), 14-20px) → familia de radios consistente pero con dos escalas distintas conviviendo; verificar que sea intencional (jerarquía) y no un desvío accidental.
