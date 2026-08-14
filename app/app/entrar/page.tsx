@@ -6,13 +6,16 @@
 // estudiante tenía que salir de la app, abrir el correo y volver — pedido
 // explícito del usuario (2026-08-11): que se sienta más simple y directo.
 // Ahora el correo trae un CÓDIGO DE 6 DÍGITOS que se escribe en la misma
-// pantalla, sin cambiar de pestaña ni copiar/pegar un enlace. Supabase se
-// conecta de verdad en la Sesión 6 — por ahora la UI queda lista y honesta:
-// no finge un login exitoso.
+// pantalla, sin cambiar de pestaña ni copiar/pegar un enlace. Conectado a
+// Supabase Auth real (signInWithOtp/verifyOtp) — requiere que la plantilla de
+// correo "Magic Link" en el dashboard de Supabase incluya {{ .Token }} para
+// que el código de 6 dígitos aparezca en el cuerpo del correo (si solo trae
+// el enlace, igual funciona tocándolo, pero no muestra el código a escribir).
 
 import { Suspense, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { CheckCircle2, KeyRound, Mail } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckCircle2, KeyRound, Loader2, Mail } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 /** El mark oficial de Google (4 colores) — estándar en botones "Continuar con Google". */
 function GoogleIcon() {
@@ -77,23 +80,47 @@ function CodigoInput({ valor, onChange }: { valor: string; onChange: (v: string)
 }
 
 function EntrarForm() {
+  const router = useRouter();
   const params = useSearchParams();
   const plan = params.get('plan');
   const [email, setEmail] = useState('');
   const [paso, setPaso] = useState<'correo' | 'codigo'>('correo');
   const [codigo, setCodigo] = useState('');
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleEnviarCodigo(e: React.FormEvent) {
+  async function handleEnviarCodigo(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.includes('@')) return;
-    // TODO Sesión 6: conectar Supabase Auth (signInWithOtp) cuando exista el proyecto real.
+    if (!email.includes('@') || cargando) return;
+    setCargando(true);
+    setError(null);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
+    setCargando(false);
+    if (err) {
+      setError('No pudimos enviar el código. Revisa tu correo e intenta de nuevo.');
+      return;
+    }
     setPaso('codigo');
   }
 
-  function handleVerificarCodigo(e: React.FormEvent) {
+  async function handleVerificarCodigo(e: React.FormEvent) {
     e.preventDefault();
-    if (codigo.length !== CODIGO_LARGO) return;
-    // TODO Sesión 6: conectar Supabase Auth (verifyOtp) cuando exista el proyecto real.
+    if (codigo.length !== CODIGO_LARGO || cargando) return;
+    setCargando(true);
+    setError(null);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.verifyOtp({ email, token: codigo, type: 'email' });
+    setCargando(false);
+    if (err) {
+      setError('Ese código no es válido o ya venció. Pide uno nuevo.');
+      setCodigo('');
+      return;
+    }
+    router.push('/app');
   }
 
   const codigoCompleto = codigo.length === CODIGO_LARGO;
@@ -126,12 +153,20 @@ function EntrarForm() {
               placeholder="tu@correo.com"
               className="h-12 w-full rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] px-4 text-[16px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-2)]"
             />
+            {error && <p className="text-[13px] text-[var(--gold)]">{error}</p>}
             <button
               type="submit"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+              disabled={cargando}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none disabled:opacity-60 [font-family:var(--font-display)]"
             >
-              Enviarme el código
-              <KeyRound size={16} strokeWidth={2.5} />
+              {cargando ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <>
+                  Enviarme el código
+                  <KeyRound size={16} strokeWidth={2.5} />
+                </>
+              )}
             </button>
             <div className="my-1 flex items-center gap-3 text-[12px] text-[var(--text-secondary)]">
               <span className="h-px flex-1 bg-[var(--surface-2)]" /> o <span className="h-px flex-1 bg-[var(--surface-2)]" />
@@ -156,13 +191,20 @@ function EntrarForm() {
 
           <form onSubmit={handleVerificarCodigo} className="flex w-full flex-col gap-4">
             <CodigoInput valor={codigo} onChange={setCodigo} />
+            {error && <p className="text-[13px] text-[var(--gold)]">{error}</p>}
             <button
               type="submit"
-              disabled={!codigoCompleto}
+              disabled={!codigoCompleto || cargando}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none disabled:opacity-40 [font-family:var(--font-display)]"
             >
-              <CheckCircle2 size={18} strokeWidth={2.5} />
-              Entrar
+              {cargando ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <>
+                  <CheckCircle2 size={18} strokeWidth={2.5} />
+                  Entrar
+                </>
+              )}
             </button>
             <button
               type="button"
@@ -177,10 +219,6 @@ function EntrarForm() {
           </form>
         </>
       )}
-
-      <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]">
-        ⚠️ Cuentas reales: se conectan en la Sesión 6 del proyecto (cuando exista Supabase). Por ahora estás probando el flujo.
-      </p>
     </div>
   );
 }
