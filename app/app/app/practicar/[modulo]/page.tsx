@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, MotionConfig } from 'motion/react';
@@ -10,6 +10,7 @@ import { registrarAcierto, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useExplicacionIA } from '@/lib/useExplicacionIA';
+import { logEvent } from '@/lib/logEvent';
 
 const PREGUNTAS_POR_SESION = 8;
 
@@ -27,6 +28,9 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   const [aciertos, setAciertos] = useState(0);
   const [gemas, setGemas] = useState(0);
   const [terminado, setTerminado] = useState(false);
+  // Ref (no state) porque el evento de cierre se dispara desde un setTimeout
+  // cuyo closure quedaría con el valor de aciertos de un render anterior.
+  const aciertosRef = useRef(0);
 
   // Se genera SOLO en cliente (nunca en el render de servidor) para que cada
   // sesión de práctica traiga ejercicios nuevos, aunque el estudiante ya haya
@@ -54,6 +58,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     if (step + 1 < preguntas.length) {
       setStep((s) => s + 1);
     } else {
+      logEvent('modulo_completado', { modulo: slug, aciertos: aciertosRef.current, total: preguntas.length });
       setTerminado(true);
     }
   }
@@ -63,6 +68,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     setSelected(index);
     const correct = index === pregunta.correctaIndex;
     if (correct) {
+      aciertosRef.current += 1;
       setAciertos((n) => n + 1);
       setGemas((g) => g + GEMAS_POR_ACIERTO);
       registrarAcierto(slug, preguntas!.length);

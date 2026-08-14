@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Diagnostico, PREGUNTAS } from '@/components/onboarding/Diagnostico';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { GEMAS_POR_ACIERTO, guardarGrado, guardarNombre } from '@/lib/progress';
+import { logEvent } from '@/lib/logEvent';
 
 type Fase = 'nombre' | 'grado' | 'dolor' | 'diagnostico' | 'celebracion' | 'plan';
 
@@ -102,6 +103,8 @@ export default function OnboardingPage() {
     if (diagStep + 1 < PREGUNTAS.length) {
       setDiagStep((s) => s + 1);
     } else {
+      const aciertosFinal = correct ? aciertos + 1 : aciertos;
+      logEvent('diagnostico_completado', { tema_debil: temaDebil ?? tema, aciertos: aciertosFinal });
       setFase('celebracion');
     }
   }

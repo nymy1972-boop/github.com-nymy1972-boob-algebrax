@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, NotebookPen, Tro
 import { MODULOS, type PreguntaModulo } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
+import { logEvent } from '@/lib/logEvent';
 
 const DURACION_SEGUNDOS = 4 * 60; // 4 min — simulacro corto, coherente con "10 min/día"
 
@@ -103,8 +104,9 @@ export default function ExamenPage() {
     if (terminado && !gemasAsignadas.current) {
       gemasAsignadas.current = true;
       sumarGemas(reporte.correctas * GEMAS_POR_ACIERTO);
+      logEvent('examen_completado', { correctas: reporte.correctas, total: reporte.total });
     }
-  }, [terminado, reporte.correctas]);
+  }, [terminado, reporte.correctas, reporte.total]);
 
   if (!iniciado) {
     return (

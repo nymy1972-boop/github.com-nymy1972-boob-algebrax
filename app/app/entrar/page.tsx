@@ -12,7 +12,7 @@
 // que el código de 6 dígitos aparezca en el cuerpo del correo (si solo trae
 // el enlace, igual funciona tocándolo, pero no muestra el código a escribir).
 
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, KeyRound, Loader2, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -89,6 +89,19 @@ function EntrarForm() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Camino alterno: si el estudiante toca el enlace del correo en vez de
+  // escribir el código, Supabase redirige aquí con la sesión en el hash de la
+  // URL (#access_token=...). El cliente de Supabase la detecta y la guarda
+  // SOLO si se crea una instancia en esta pantalla al cargar — por eso este
+  // efecto existe aunque no haga nada más: sin él, ese enlace no completaba
+  // el login (quedaba con el hash en la URL, sin sesión real).
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) router.push('/app');
+    });
+  }, [router]);
+
   async function handleEnviarCodigo(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes('@') || cargando) return;
@@ -97,7 +110,13 @@ function EntrarForm() {
     const supabase = createClient();
     const { error: err } = await supabase.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        // Si tocan el enlace del correo en vez de escribir el código, que
+        // vuelvan a /entrar — es la única pantalla que sabe recibir la sesión.
+        emailRedirectTo:
+          typeof window !== 'undefined' ? `${window.location.origin}/entrar` : undefined,
+      },
     });
     setCargando(false);
     if (err) {
