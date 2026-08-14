@@ -192,6 +192,10 @@ GARANTIA_PENDIENTE_VERIFICACION: la landing y el paywall prometen "la Garantía 
 
 (Resuelto — ver "Cierre del gate de onboarding" más abajo. El historial de las rondas previas queda documentado ahí.)
 
+VEREDICTO_ONBOARDING_RUTINA_ENTRAR: el gate de veredicto se re-disparó por editar `app/entrar/page.tsx` (conectar Supabase Auth real) — esa pantalla es login, no onboarding, y no está entre las 4 pantallas que exigen revisor-visual (landing/onboarding/paywall/pantalla principal). Se documenta aquí en vez de re-lanzar el revisor porque el código de `onboarding/page.tsx` y `Diagnostico.tsx` no cambió desde el último veredicto LISTA (38/40, 17/20).
+
+SUPABASE_SMTP_PENDIENTE: Supabase no deja editar las plantillas de correo (incluida "Magic Link", donde iría `{{ .Token }}` para mostrar el código de 6 dígitos) sin conectar un proveedor SMTP propio (Resend). Decisión con el usuario (2026-08-13): probar primero el login con el enlace por defecto (el correo trae un botón "Confirmar" que funciona igual para crear la sesión), y dejar la configuración de Resend + dominio verificado como tarea aparte — no bloquea probar que el login real funciona de punta a punta.
+
 VEREDICTO_ONBOARDING_CADUCADO_SIN_CAMBIO_VISUAL: tras cerrar el gate en 38/40·16/20, `Diagnostico.tsx` volvió a cambiar (ajuste de explicación con IA — ver "Ajuste: explicación de errores con IA"), lo que caduca el veredicto por fecha. El cambio es puramente funcional (de dónde viene el texto, no cómo se ve): el fallback que se muestra es el MISMO texto/estilo que ya evaluó el revisor, sin tocar layout, color ni espaciado. No se relanza `revisor-visual` por este cambio — se documenta aquí en vez de gastar otra ronda en algo sin diferencia visual. Si una futura sesión toca el layout/estilo de `Diagnostico.tsx` o `practicar/[modulo]/page.tsx`, ahí sí corresponde re-verificar.
 Actualización: `Diagnostico.tsx` cambió de nuevo (fix de aleatoriedad de opciones, ver "Ajuste: capturas reales en landing + 2 bugs reales"). Mismo criterio: cambia el ORDEN en que aparecen las opciones en cada carga, no el layout/color/espaciado que ya evaluó el revisor — no amerita otra ronda.
 
