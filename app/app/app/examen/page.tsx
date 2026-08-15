@@ -10,6 +10,9 @@ import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { logEvent } from '@/lib/logEvent';
 import { usePlan } from '@/lib/plan';
+import { useReferralPrompt } from '@/lib/referral';
+import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
+import { ShareSheet } from '@/components/referral/ShareSheet';
 
 const DURACION_SEGUNDOS = 4 * 60; // 4 min — simulacro corto, coherente con "10 min/día"
 
@@ -51,6 +54,21 @@ export default function ExamenPage() {
   const [seleccionado, setSeleccionado] = useState<number | null>(null);
   const gemasAsignadas = useRef(false);
   const { plan, cargando: cargandoPlan } = usePlan();
+  const referido = useReferralPrompt();
+  const flujoReferidoActivo = referido.abierto || referido.abiertoShare;
+  const flujoReferidoActivoAntes = useRef(false);
+
+  useEffect(() => {
+    if (flujoReferidoActivoAntes.current && !flujoReferidoActivo) {
+      router.push('/app');
+    }
+    flujoReferidoActivoAntes.current = flujoReferidoActivo;
+  }, [flujoReferidoActivo, router]);
+
+  function irAInicioTrasCompletar() {
+    const abrioPrompt = referido.intentar({ contexto: '🔥 Mira lo que acabas de hacer' });
+    if (!abrioPrompt) router.push('/app');
+  }
 
   function empezar() {
     const nuevas = armarPreguntas();
@@ -236,7 +254,7 @@ export default function ExamenPage() {
         </div>
 
         <button
-          onClick={() => router.push('/app')}
+          onClick={irAInicioTrasCompletar}
           className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
         >
           <Home size={18} strokeWidth={2.5} />
@@ -252,6 +270,15 @@ export default function ExamenPage() {
           intensity={2}
           autoDismissMs={4000}
         />
+        {referido.copy && (
+          <ReferralPromptOverlay
+            open={referido.abierto}
+            copy={referido.copy}
+            onCompartir={referido.compartir}
+            onDescartar={referido.descartar}
+          />
+        )}
+        <ShareSheet open={referido.abiertoShare} codigo={referido.codigo} variante={referido.variante} onClose={referido.cerrarShare} />
       </div>
     );
   }

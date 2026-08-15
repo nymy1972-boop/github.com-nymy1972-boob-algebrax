@@ -12,6 +12,9 @@ import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useExplicacionIA } from '@/lib/useExplicacionIA';
 import { logEvent } from '@/lib/logEvent';
 import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
+import { useReferralPrompt } from '@/lib/referral';
+import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
+import { ShareSheet } from '@/components/referral/ShareSheet';
 
 const PREGUNTAS_POR_SESION = 8;
 
@@ -40,10 +43,27 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   // cancelaciones. Si ya estaba al tope al abrir la pantalla, se bloquea aquí;
   // si no, la sesión completa (las 8 preguntas) se deja terminar siempre.
   const [restantesAlEntrar, setRestantesAlEntrar] = useState<number | null>(null);
+  const referido = useReferralPrompt();
+  const flujoReferidoActivo = referido.abierto || referido.abiertoShare;
+  const flujoReferidoActivoAntes = useRef(false);
 
   useEffect(() => {
     setRestantesAlEntrar(Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(leerProgreso())));
   }, []);
+
+  // El prompt/share puede pasar por 2 pantallas (mensaje → compartir); solo
+  // navegamos a Inicio cuando TODO el flujo de referido ya se cerró.
+  useEffect(() => {
+    if (flujoReferidoActivoAntes.current && !flujoReferidoActivo && terminado) {
+      router.push('/app');
+    }
+    flujoReferidoActivoAntes.current = flujoReferidoActivo;
+  }, [flujoReferidoActivo, terminado, router]);
+
+  function irAInicioTrasCompletar() {
+    const abrioPrompt = referido.intentar({ contexto: '🔥 Mira lo que acabas de hacer' });
+    if (!abrioPrompt) router.push('/app');
+  }
 
   // Se genera SOLO en cliente (nunca en el render de servidor) para que cada
   // sesión de práctica traiga ejercicios nuevos, aunque el estudiante ya haya
@@ -334,14 +354,24 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
         title="¡Módulo completado!"
         message={mensajeFinal}
         ctaLabel="Volver al inicio"
-        onCta={() => router.push('/app')}
-        onDismiss={() => router.push('/app')}
+        onCta={irAInicioTrasCompletar}
+        onDismiss={irAInicioTrasCompletar}
         intensity={2}
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--gold)_18%,var(--surface))]">
           <Sparkles size={28} className="text-[var(--gold)]" />
         </div>
       </CelebrationOverlay>
+
+      {referido.copy && (
+        <ReferralPromptOverlay
+          open={referido.abierto}
+          copy={referido.copy}
+          onCompartir={referido.compartir}
+          onDescartar={referido.descartar}
+        />
+      )}
+      <ShareSheet open={referido.abiertoShare} codigo={referido.codigo} variante={referido.variante} onClose={referido.cerrarShare} />
     </div>
     </MotionConfig>
   );

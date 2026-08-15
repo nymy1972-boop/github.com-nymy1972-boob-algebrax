@@ -16,6 +16,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, KeyRound, Loader2, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { asociarReferidoSiAplica } from '@/lib/referral';
 
 /** El mark oficial de Google (4 colores) — estándar en botones "Continuar con Google". */
 function GoogleIcon() {
@@ -101,7 +102,10 @@ function EntrarForm() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.push('/app');
+      if (data.session) {
+        asociarReferidoSiAplica();
+        router.push('/app');
+      }
     });
   }, [router]);
 
@@ -142,6 +146,7 @@ function EntrarForm() {
       setCodigo('');
       return;
     }
+    asociarReferidoSiAplica();
     router.push('/app');
   }
 

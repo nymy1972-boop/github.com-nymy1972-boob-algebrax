@@ -8,6 +8,10 @@ import { MODULOS } from '@/lib/modulos';
 import { ejerciciosGratisHoy, registrarVisitaHoy, sincronizarAlAbrir, type ProgresoUsuario } from '@/lib/progress';
 import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
+import { useReferralPrompt } from '@/lib/referral';
+import { ReferralCard } from '@/components/referral/ReferralCard';
+import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
+import { ShareSheet } from '@/components/referral/ShareSheet';
 
 const INICIALES_DIA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // semana empieza lunes
 
@@ -54,14 +58,22 @@ export default function InicioApp() {
   const [progreso, setProgreso] = useState<ProgresoUsuario | null>(null);
   const [milestone, setMilestone] = useState<number | null>(null);
   const { plan } = usePlan();
+  const referido = useReferralPrompt();
 
   useEffect(() => {
     (async () => {
       await sincronizarAlAbrir();
       const { progreso: p, milestone: m } = registrarVisitaHoy();
       setProgreso(p);
-      if (m) setMilestone(m);
+      if (m) {
+        setMilestone(m);
+      } else {
+        // Momento C: ocasional, con cooldown propio — nunca en el primer
+        // segundo de carga, para que no se sienta como una interrupción.
+        window.setTimeout(() => referido.intentar({ requiereVictoriaPrevia: true }), 1400);
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!progreso) return null;
@@ -203,6 +215,10 @@ export default function InicioApp() {
             );
           })}
         </div>
+
+        <div className="mt-6">
+          <ReferralCard onAbrir={referido.compartirDirecto} />
+        </div>
       </div>
 
       <CelebrationOverlay
@@ -218,6 +234,16 @@ export default function InicioApp() {
           <Flame size={30} className="text-[var(--gold)]" />
         </div>
       </CelebrationOverlay>
+
+      {referido.copy && (
+        <ReferralPromptOverlay
+          open={referido.abierto}
+          copy={referido.copy}
+          onCompartir={referido.compartir}
+          onDescartar={referido.descartar}
+        />
+      )}
+      <ShareSheet open={referido.abiertoShare} codigo={referido.codigo} variante={referido.variante} onClose={referido.cerrarShare} />
     </div>
   );
 }

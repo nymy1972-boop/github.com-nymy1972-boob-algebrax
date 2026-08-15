@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Baloo_2, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { ReferralCapture } from "@/components/referral/ReferralCapture";
 
 // Nombres deliberadamente distintos de --font-display/--font-body: esos ya
 // son variables propias de components/landing/tokens.css (el brand kit) —
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${baloo2.variable} ${jakarta.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ReferralCapture />
+        {children}
+      </body>
     </html>
   );
 }

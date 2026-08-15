@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Award, CalendarDays, Flame, Gem, ListChecks, LogOut, Sparkles, Target } from 'lucide-react';
+import { ArrowLeft, Award, CalendarDays, Cloud, Flame, Gem, ListChecks, LogOut, Sparkles, Target } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import {
   cerrarSesionLocal,
   diasDesdeCreacion,
   guardarMetaSemanal,
+  hayCuentaReal,
   sincronizarAlAbrir,
   type ProgresoUsuario,
 } from '@/lib/progress';
@@ -17,9 +18,11 @@ export default function PerfilPage() {
   const router = useRouter();
   const [progreso, setProgreso] = useState<ProgresoUsuario | null>(null);
   const [editandoMeta, setEditandoMeta] = useState(false);
+  const [sincronizado, setSincronizado] = useState(false);
 
   useEffect(() => {
     sincronizarAlAbrir().then(setProgreso);
+    hayCuentaReal().then(setSincronizado);
   }, []);
 
   if (!progreso) return null;
@@ -168,8 +171,14 @@ export default function PerfilPage() {
           <LogOut size={16} strokeWidth={2.5} />
           Cerrar sesión
         </button>
-        <p className="mt-3 text-center text-[11px] leading-relaxed text-[var(--text-secondary)]">
-          ⚠️ Hoy tu progreso vive en este dispositivo. Cerrar sesión lo borra — las cuentas reales (que sincronizan entre dispositivos) llegan en la Sesión 6.
+        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] leading-relaxed text-[var(--text-secondary)]">
+          {sincronizado ? (
+            <>
+              <Cloud size={12} /> Tu racha, gemas e historial están guardados en tu cuenta — abre AlgebraX en cualquier celular y ahí van a estar.
+            </>
+          ) : (
+            'Tu progreso vive en este dispositivo. Crea tu cuenta para no perderlo si cambias de celular.'
+          )}
         </p>
       </div>
     </div>

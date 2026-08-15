@@ -36,18 +36,23 @@ export interface ProgresoUsuario {
   semanaId: string | null; // "YYYY-Www" — cuándo cambia, se resetea ejerciciosSemana
   ejerciciosHoyGratis: number; // intentos de HOY en el módulo gratis, contra LIMITE_DIARIO_GRATIS (lib/plan.ts)
   diaEjerciciosGratis: string | null; // YYYY-MM-DD — cuándo cambia, se resetea ejerciciosHoyGratis
+  referralPromptSeen: boolean; // ya vio el mensaje de recomendación al menos una vez
+  referralDismissedAt: string | null; // YYYY-MM-DD del último "ahora no" — arranca el cooldown
+  lastReferralPrompt: string | null; // YYYY-MM-DD de la última vez que se mostró (cualquier momento)
+  referralSharedCount: number; // veces que tocó compartir de verdad (no solo vio el mensaje)
+  referralVariant: 'A' | 'B' | 'C' | null; // variante de copy asignada una sola vez (A/B testing)
 }
 
 /** Gemas por acierto — la recompensa visible de cada respuesta correcta. */
 export const GEMAS_POR_ACIERTO = 10;
 export const META_SEMANAL_DEFAULT = 30;
 
-function hoyLocal(): string {
+export function hoyLocal(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function diasEntre(a: string, b: string): number {
+export function diasEntre(a: string, b: string): number {
   const ms = new Date(b).getTime() - new Date(a).getTime();
   return Math.round(ms / 86400000);
 }
@@ -78,6 +83,11 @@ const DEFAULT_PROGRESO: ProgresoUsuario = {
   semanaId: null,
   ejerciciosHoyGratis: 0,
   diaEjerciciosGratis: null,
+  referralPromptSeen: false,
+  referralDismissedAt: null,
+  lastReferralPrompt: null,
+  referralSharedCount: 0,
+  referralVariant: null,
 };
 
 export function leerProgreso(): ProgresoUsuario {
@@ -113,6 +123,11 @@ function guardar(p: ProgresoUsuario) {
 
 let idUsuarioCacheado: string | null | undefined; // undefined = sin consultar aún
 
+/** true si hay cuenta real (progreso sincronizado en la nube); false en preview anónimo. */
+export async function hayCuentaReal(): Promise<boolean> {
+  return (await idUsuarioActual()) !== null;
+}
+
 async function idUsuarioActual(): Promise<string | null> {
   if (idUsuarioCacheado !== undefined) return idUsuarioCacheado;
   const supabase = createClient();
@@ -137,6 +152,11 @@ function filaUserProgress(userId: string, p: ProgresoUsuario) {
     semana_id: p.semanaId,
     ejercicios_hoy_gratis: p.ejerciciosHoyGratis,
     dia_ejercicios_gratis: p.diaEjerciciosGratis,
+    referral_prompt_seen: p.referralPromptSeen,
+    referral_dismissed_at: p.referralDismissedAt,
+    last_referral_prompt: p.lastReferralPrompt,
+    referral_shared_count: p.referralSharedCount,
+    referral_variant: p.referralVariant,
     updated_at: new Date().toISOString(),
   };
 }
@@ -205,6 +225,11 @@ export async function sincronizarAlAbrir(): Promise<ProgresoUsuario> {
     semanaId: fila.semana_id,
     ejerciciosHoyGratis: fila.ejercicios_hoy_gratis,
     diaEjerciciosGratis: fila.dia_ejercicios_gratis,
+    referralPromptSeen: fila.referral_prompt_seen,
+    referralDismissedAt: fila.referral_dismissed_at,
+    lastReferralPrompt: fila.last_referral_prompt,
+    referralSharedCount: fila.referral_shared_count,
+    referralVariant: fila.referral_variant,
   };
   window.localStorage.setItem(KEY, JSON.stringify(deNube));
   return deNube;
@@ -304,6 +329,37 @@ export function registrarEjercicioGratisHoy(): ProgresoUsuario {
   const hoy = hoyLocal();
   const previos = p.diaEjerciciosGratis === hoy ? p.ejerciciosHoyGratis : 0;
   const actualizado: ProgresoUsuario = { ...p, ejerciciosHoyGratis: previos + 1, diaEjerciciosGratis: hoy };
+  guardar(actualizado);
+  return actualizado;
+}
+
+// ── Sistema de referidos (lib/referral.ts orquesta CUÁNDO; esto es el CÓMO) ─
+
+export function registrarPromptDeReferidoMostrado(): ProgresoUsuario {
+  const p = leerProgreso();
+  const actualizado: ProgresoUsuario = { ...p, referralPromptSeen: true, lastReferralPrompt: hoyLocal() };
+  guardar(actualizado);
+  return actualizado;
+}
+
+export function registrarPromptDeReferidoDescartado(): ProgresoUsuario {
+  const p = leerProgreso();
+  const actualizado: ProgresoUsuario = { ...p, referralDismissedAt: hoyLocal() };
+  guardar(actualizado);
+  return actualizado;
+}
+
+export function registrarReferidoCompartido(): ProgresoUsuario {
+  const p = leerProgreso();
+  const actualizado: ProgresoUsuario = { ...p, referralSharedCount: p.referralSharedCount + 1 };
+  guardar(actualizado);
+  return actualizado;
+}
+
+export function asignarVarianteReferidoSiFalta(variante: 'A' | 'B' | 'C'): ProgresoUsuario {
+  const p = leerProgreso();
+  if (p.referralVariant) return p;
+  const actualizado: ProgresoUsuario = { ...p, referralVariant: variante };
   guardar(actualizado);
   return actualizado;
 }
