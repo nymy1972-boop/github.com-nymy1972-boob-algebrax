@@ -6,7 +6,16 @@ import { motion } from 'motion/react';
 import { Check, CheckCircle2, Flame, Gem, Lock, Timer } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
 import { ejerciciosGratisHoy, registrarVisitaHoy, sincronizarAlAbrir, type ProgresoUsuario } from '@/lib/progress';
-import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
+import {
+  examenDesbloqueado,
+  gemasQueFaltan,
+  LIMITE_DIARIO_GRATIS,
+  MODULO_GRATIS_SLUG,
+  moduloDesbloqueado,
+  umbralDelModulo,
+  UMBRAL_GEMAS_EXAMEN,
+  usePlan,
+} from '@/lib/plan';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useReferralPrompt } from '@/lib/referral';
 import { ReferralCard } from '@/components/referral/ReferralCard';
@@ -143,19 +152,24 @@ export default function InicioApp() {
           </div>
         </div>
 
-        {/* Card destacada — Modo Examen (Premium) */}
-        <Link href={plan === 'premium' ? '/app/examen' : '/paywall?tema=Modo Examen'}>
+        {/* Card destacada — Modo Examen (Premium O gemas suficientes; siempre hay un mini adelanto gratis) */}
+        <Link href="/app/examen">
           <motion.div
             whileTap={{ scale: 0.98 }}
             className="mb-6 flex items-center justify-between rounded-[var(--radius-card)] border-2 border-[#14161c] bg-gradient-to-br from-[var(--accent)] to-[#c93a3a] p-5 shadow-[0_4px_0_0_#8e2828]"
           >
             <div>
               <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-white/85">
-                Modo examen {plan !== 'premium' && <Lock size={11} />}
+                Modo examen {!examenDesbloqueado(plan, progreso.gemas) && <Lock size={11} />}
               </p>
               <p className="mt-1 text-[17px] font-bold text-white [font-family:var(--font-display)]">
-                {plan === 'premium' ? 'Simulacro cronometrado →' : 'Desbloquea el simulacro →'}
+                {examenDesbloqueado(plan, progreso.gemas) ? 'Simulacro cronometrado →' : 'Prueba un adelanto gratis →'}
               </p>
+              {!examenDesbloqueado(plan, progreso.gemas) && (
+                <p className="mt-1 text-[11px] text-white/75">
+                  Te faltan {gemasQueFaltan(progreso.gemas, UMBRAL_GEMAS_EXAMEN)} gemas para desbloquearlo practicando
+                </p>
+              )}
             </div>
             <Timer size={28} className="text-white/90" />
           </motion.div>
@@ -171,10 +185,11 @@ export default function InicioApp() {
             const completado = p ? p.completadas >= p.total : false;
             const enProgreso = p && !completado;
             const esGratis = m.slug === MODULO_GRATIS_SLUG;
-            const bloqueado = plan !== 'premium' && !esGratis;
+            const bloqueado = !moduloDesbloqueado(m.slug, plan, progreso.gemas);
             const restantesGratis = esGratis && plan !== 'premium' ? Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(progreso)) : null;
+            const umbral = umbralDelModulo(m.slug);
             return (
-              <Link key={m.slug} href={bloqueado ? `/paywall?tema=${encodeURIComponent(m.nombre)}` : `/app/practicar/${m.slug}`}>
+              <Link key={m.slug} href={`/app/practicar/${m.slug}`}>
                 <motion.div
                   whileTap={{ scale: 0.98 }}
                   className={`flex items-center gap-4 rounded-[var(--radius-card)] border-2 p-4 ${
@@ -202,7 +217,7 @@ export default function InicioApp() {
                     <p className="font-bold [font-family:var(--font-display)]">{m.nombre}</p>
                     <p className="text-[12px] text-[var(--text-secondary)]">
                       {bloqueado
-                        ? 'Desbloquea con Premium'
+                        ? `Te faltan ${umbral !== null ? gemasQueFaltan(progreso.gemas, umbral) : '—'} gemas, o hazte Premium`
                         : restantesGratis !== null
                           ? `${restantesGratis} ejercicios gratis hoy`
                           : p

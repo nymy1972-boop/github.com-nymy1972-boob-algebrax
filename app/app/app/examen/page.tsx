@@ -7,9 +7,9 @@ import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, Lock, NotebookPen, Trophy, XCircle } from 'lucide-react';
 import { MODULOS, type PreguntaModulo } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
-import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
+import { leerProgreso, sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { logEvent } from '@/lib/logEvent';
-import { usePlan } from '@/lib/plan';
+import { examenDesbloqueado, gemasQueFaltan, UMBRAL_GEMAS_EXAMEN, usePlan } from '@/lib/plan';
 import { useReferralPrompt } from '@/lib/referral';
 import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
 import { ShareSheet } from '@/components/referral/ShareSheet';
@@ -25,9 +25,9 @@ interface PreguntaExamen {
 }
 
 /** 2 preguntas GENERADAS al azar por módulo — banco prácticamente infinito, cada simulacro es distinto. */
-function armarPreguntas(): PreguntaExamen[] {
+function armarPreguntas(cantidadPorModulo: number): PreguntaExamen[] {
   return MODULOS.flatMap((m) =>
-    m.generarPreguntas(2).map((p: PreguntaModulo) => ({
+    m.generarPreguntas(cantidadPorModulo).map((p: PreguntaModulo) => ({
       moduloNombre: m.nombre,
       enunciado: p.enunciado,
       opciones: p.opciones,
@@ -54,9 +54,16 @@ export default function ExamenPage() {
   const [seleccionado, setSeleccionado] = useState<number | null>(null);
   const gemasAsignadas = useRef(false);
   const { plan, cargando: cargandoPlan } = usePlan();
+  const [gemasAlEntrar, setGemasAlEntrar] = useState(0);
+  const [modoMini, setModoMini] = useState(false);
   const referido = useReferralPrompt();
   const flujoReferidoActivo = referido.abierto || referido.abiertoShare;
   const flujoReferidoActivoAntes = useRef(false);
+  const desbloqueado = examenDesbloqueado(plan, gemasAlEntrar);
+
+  useEffect(() => {
+    setGemasAlEntrar(leerProgreso().gemas);
+  }, []);
 
   useEffect(() => {
     if (flujoReferidoActivoAntes.current && !flujoReferidoActivo) {
@@ -66,26 +73,42 @@ export default function ExamenPage() {
   }, [flujoReferidoActivo, router]);
 
   function irAInicioTrasCompletar() {
-    const abrioPrompt = referido.intentar({ contexto: '🔥 Mira lo que acabas de hacer' });
+    // El modo mini no dispara el prompt de referidos: esa pantalla ya tiene
+    // su propio CTA (desbloquear) y no hay que competirle espacio.
+    const abrioPrompt = !modoMini && referido.intentar({ contexto: '🔥 Mira lo que acabas de hacer' });
     if (!abrioPrompt) router.push('/app');
   }
 
   function empezar() {
-    const nuevas = armarPreguntas();
+    const nuevas = armarPreguntas(2);
     setPreguntas(nuevas);
     setRespuestas(nuevas.map(() => null));
+    setSegundosRestantes(DURACION_SEGUNDOS);
+    setModoMini(false);
+    setIniciado(true);
+  }
+
+  /** El "adelanto" gratis (pedido del usuario, 2026-08-15): 1 pregunta por
+   * módulo, sin cronómetro — deja sentir el formato del simulacro real (mezcla
+   * de temas, no sabes si acertaste hasta el final) sin dar el valor completo,
+   * para que se note la diferencia con el simulacro de verdad. */
+  function empezarMini() {
+    const nuevas = armarPreguntas(1);
+    setPreguntas(nuevas);
+    setRespuestas(nuevas.map(() => null));
+    setModoMini(true);
     setIniciado(true);
   }
 
   useEffect(() => {
-    if (!iniciado || terminado) return;
+    if (!iniciado || terminado || modoMini) return;
     if (segundosRestantes <= 0) {
       setTerminado(true);
       return;
     }
     const t = window.setTimeout(() => setSegundosRestantes((s) => s - 1), 1000);
     return () => window.clearTimeout(t);
-  }, [segundosRestantes, terminado, iniciado]);
+  }, [segundosRestantes, terminado, iniciado, modoMini]);
 
   const pregunta = preguntas[step];
   const progreso = Math.round((step / preguntas.length) * 100);
@@ -123,29 +146,52 @@ export default function ExamenPage() {
   useEffect(() => {
     if (terminado && !gemasAsignadas.current) {
       gemasAsignadas.current = true;
-      sumarGemas(reporte.correctas * GEMAS_POR_ACIERTO);
-      logEvent('examen_completado', { correctas: reporte.correctas, total: reporte.total });
+      const nuevoTotal = sumarGemas(reporte.correctas * GEMAS_POR_ACIERTO).gemas;
+      setGemasAlEntrar(nuevoTotal); // el adelanto mini también suma para desbloquear
+      logEvent(modoMini ? 'examen_mini_completado' : 'examen_completado', {
+        correctas: reporte.correctas,
+        total: reporte.total,
+      });
     }
-  }, [terminado, reporte.correctas, reporte.total]);
+  }, [terminado, reporte.correctas, reporte.total, modoMini]);
 
-  if (!cargandoPlan && plan !== 'premium') {
+  if (!cargandoPlan && !desbloqueado && !iniciado) {
     return (
-      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
+      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-5 px-5 text-center text-[var(--text-primary)]">
         <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface))]">
           <Lock size={28} className="text-[var(--accent)]" />
         </div>
         <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
-          El Modo Examen es Premium
+          El simulacro completo todavía no está desbloqueado
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          Simulacros cronometrados iguales a tu examen real, ilimitados. Desbloquéalo junto con todos
-          los módulos.
+          Simulacros cronometrados iguales a tu examen real, ilimitados. Tienes 2 caminos para
+          desbloquearlo.
         </p>
+
+        <button
+          onClick={empezarMini}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] border-2 border-[var(--accent-2)] bg-[color-mix(in_oklab,var(--accent-2)_10%,var(--surface))] text-[15px] font-bold text-[var(--accent-2)] [font-family:var(--font-display)]"
+        >
+          Probar un adelanto gratis (3 preguntas)
+        </button>
+
+        <div className="w-full rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_6%,var(--surface))] p-4 text-left">
+          <p className="flex items-center gap-1.5 text-[13px] font-bold text-[var(--text-primary)]">
+            <Gem size={14} className="text-[var(--accent-2)]" fill="currentColor" /> Practica y gánatelo
+          </p>
+          <p className="mt-1 text-[12px] leading-relaxed text-[var(--text-secondary)]">
+            Te faltan <strong className="text-[var(--text-primary)]">{gemasQueFaltan(gemasAlEntrar, UMBRAL_GEMAS_EXAMEN)} gemas</strong>.
+            Se ganan practicando — una vez las juntas, el simulacro completo se queda desbloqueado
+            para siempre.
+          </p>
+        </div>
+
         <Link
           href="/paywall?tema=Modo Examen"
           className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
         >
-          Ver planes Premium
+          O desbloquéalo ya con Premium
           <ArrowRight size={18} strokeWidth={2.5} />
         </Link>
         <Link href="/app" className="text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4">
@@ -191,7 +237,9 @@ export default function ExamenPage() {
         <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,var(--surface))]">
           <Trophy size={28} className="text-[var(--gold)]" />
         </div>
-        <h1 className="text-[24px] font-bold [font-family:var(--font-display)]">Simulacro terminado</h1>
+        <h1 className="text-[24px] font-bold [font-family:var(--font-display)]">
+          {modoMini ? 'Ese fue tu adelanto' : 'Simulacro terminado'}
+        </h1>
         <p className="text-[32px] font-bold tabular-nums [font-family:var(--font-display)]">
           {reporte.correctas}/{reporte.total}
         </p>
@@ -200,6 +248,30 @@ export default function ExamenPage() {
             <Gem size={16} fill="currentColor" />
             Ganaste {reporte.correctas * GEMAS_POR_ACIERTO} gemas
           </div>
+        )}
+
+        {modoMini && (
+          <div className="w-full rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_6%,var(--surface))] p-4 text-left">
+            <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+              Esto fue solo <strong className="text-[var(--text-primary)]">3 preguntas sin cronómetro</strong>. El
+              simulacro completo tiene 6, cronometradas, exactamente como tu examen real.
+            </p>
+            {!desbloqueado && (
+              <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                Te faltan <strong className="text-[var(--text-primary)]">{gemasQueFaltan(gemasAlEntrar, UMBRAL_GEMAS_EXAMEN)} gemas</strong> para
+                desbloquearlo practicando, o hazte Premium ahora.
+              </p>
+            )}
+          </div>
+        )}
+        {modoMini && !desbloqueado && (
+          <Link
+            href="/paywall?tema=Modo Examen"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+          >
+            Desbloquear el simulacro completo
+            <ArrowRight size={18} strokeWidth={2.5} />
+          </Link>
         )}
         {reporte.temasAFallar.length > 0 ? (
           <div className="w-full rounded-[var(--radius-card)] bg-[var(--surface)] p-4 text-left text-[14px] text-[var(--text-secondary)]">
@@ -296,11 +368,15 @@ export default function ExamenPage() {
             transition={{ type: 'spring', duration: 0.4 }}
           />
         </div>
-        <span
-          className={`flex items-center gap-1 text-[14px] font-bold tabular-nums ${urgente ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
-        >
-          <Clock size={14} /> {formatTiempo(segundosRestantes)}
-        </span>
+        {modoMini ? (
+          <span className="text-[12px] font-bold uppercase tracking-[0.04em] text-[var(--accent-2)]">Adelanto</span>
+        ) : (
+          <span
+            className={`flex items-center gap-1 text-[14px] font-bold tabular-nums ${urgente ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
+          >
+            <Clock size={14} /> {formatTiempo(segundosRestantes)}
+          </span>
+        )}
       </div>
 
       <div className="flex min-h-[75dvh] items-center justify-center py-10">

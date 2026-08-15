@@ -11,7 +11,7 @@ import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useExplicacionIA } from '@/lib/useExplicacionIA';
 import { logEvent } from '@/lib/logEvent';
-import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
+import { gemasQueFaltan, LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, moduloDesbloqueado, umbralDelModulo, usePlan } from '@/lib/plan';
 import { useReferralPrompt } from '@/lib/referral';
 import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
 import { ShareSheet } from '@/components/referral/ShareSheet';
@@ -43,12 +43,15 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   // cancelaciones. Si ya estaba al tope al abrir la pantalla, se bloquea aquí;
   // si no, la sesión completa (las 8 preguntas) se deja terminar siempre.
   const [restantesAlEntrar, setRestantesAlEntrar] = useState<number | null>(null);
+  const [gemasAlEntrar, setGemasAlEntrar] = useState(0);
   const referido = useReferralPrompt();
   const flujoReferidoActivo = referido.abierto || referido.abiertoShare;
   const flujoReferidoActivoAntes = useRef(false);
 
   useEffect(() => {
-    setRestantesAlEntrar(Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(leerProgreso())));
+    const p = leerProgreso();
+    setRestantesAlEntrar(Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(p)));
+    setGemasAlEntrar(p.gemas);
   }, []);
 
   // El prompt/share puede pasar por 2 pantallas (mensaje → compartir); solo
@@ -137,24 +140,38 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     );
   }
 
-  if (!cargandoPlan && plan !== 'premium' && !esModuloGratis) {
+  if (!cargandoPlan && !moduloDesbloqueado(slug, plan, gemasAlEntrar)) {
+    const umbral = umbralDelModulo(slug) ?? 0;
+    const faltan = gemasQueFaltan(gemasAlEntrar, umbral);
     return (
       <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
         <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface))]">
           <Lock size={28} className="text-[var(--accent)]" />
         </div>
         <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
-          {modulo.nombre} es Premium
+          {modulo.nombre} todavía no está desbloqueado
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          Con el plan gratis practicas {getModulo(MODULO_GRATIS_SLUG)?.nombre}. Desbloquea este y
-          todos los demás módulos con Premium.
+          Con el plan gratis practicas {getModulo(MODULO_GRATIS_SLUG)?.nombre}. Tienes 2 caminos para
+          desbloquear este módulo.
         </p>
+
+        <div className="w-full rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_6%,var(--surface))] p-4 text-left">
+          <p className="flex items-center gap-1.5 text-[13px] font-bold text-[var(--text-primary)]">
+            <Gem size={14} className="text-[var(--accent-2)]" fill="currentColor" /> Practica y gánatelo
+          </p>
+          <p className="mt-1 text-[12px] leading-relaxed text-[var(--text-secondary)]">
+            Te faltan <strong className="text-[var(--text-primary)]">{faltan} gemas</strong>. Se ganan
+            practicando {getModulo(MODULO_GRATIS_SLUG)?.nombre} — una vez las juntas, este módulo se
+            queda desbloqueado para siempre.
+          </p>
+        </div>
+
         <Link
           href={`/paywall?tema=${encodeURIComponent(modulo.nombre)}`}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
         >
-          Ver planes Premium
+          O desbloquéalo ya con Premium
           <ArrowRight size={18} strokeWidth={2.5} />
         </Link>
         <Link href="/app" className="text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4">
