@@ -139,7 +139,9 @@ export function useReveal(stagger = 0.07): { contenedor: Variants; item: Variant
 /* Props estándar para el contenedor con reveal — evita repetir en cada sección. */
 export const VIEWPORT_ONCE = { once: true, amount: 0.2 } as const;
 
-/* ── <CtaButton> — el CTA vivo del kit: ≥52px, whileTap 0.97, sombra tintada.
+/* ── <CtaButton> — el CTA vivo del kit: ≥52px, dispositivo "block-press" de
+   FICHA-ARTE (borde 2px sólido + sombra dura offset que se hunde al presionar
+   vía translate, NUNCA scale — misma firma que los botones de /app y /entrar).
    El texto sobre acento usa --bg: si tu FICHA-ARTE rompe el contraste AA ahí,
    ajusta los tokens, no el componente. ── */
 export function CtaButton({
@@ -155,9 +157,9 @@ export function CtaButton({
 }) {
   return (
     <motion.a
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ y: 3 }}
       href={href}
-      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] px-8 text-[17px] font-semibold text-[var(--bg)] shadow-[0_8px_30px_color-mix(in_oklab,var(--accent)_25%,transparent)] transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--text-primary))] [touch-action:manipulation] ${
+      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] border-2 border-[var(--bg)] bg-[var(--accent)] px-8 text-[17px] font-semibold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-[background-color,box-shadow] duration-150 hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--text-primary))] active:shadow-none [touch-action:manipulation] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] ${
         alto === 56 ? 'h-14' : 'h-[52px]'
       } ${fullMobile ? 'w-full sm:w-auto' : ''}`}
     >
@@ -233,9 +235,9 @@ export function StickyCtaMobile({
           className="fixed inset-x-0 bottom-0 z-40 border-t border-[color-mix(in_oklab,var(--text-tertiary)_25%,transparent)] bg-[var(--surface)] px-4 pt-2 pb-[max(12px,env(safe-area-inset-bottom))] md:hidden"
         >
           <motion.a
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ y: 3 }}
             href={ofertaVista ? href : `#${ofertaId}`}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-semibold text-[var(--bg)] [touch-action:manipulation]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] border-2 border-[var(--bg)] bg-[var(--accent)] text-[16px] font-semibold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] transition-[box-shadow] duration-150 active:shadow-none [touch-action:manipulation] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
           >
             {ofertaVista ? labelComercial : labelPre}
             <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />

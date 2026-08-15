@@ -54,5 +54,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)'],
+  // /api/* queda fuera: cada ruta hace su PROPIA autorización (hottok del
+  // webhook, CRON_SECRET del cron, nada en la de IA que ya es server-only) —
+  // dejarlas pasar por este guard de sesión-de-navegador las redirigía a
+  // /entrar con 307 en vez de ejecutarlas (bug real, encontrado al probar
+  // el cron de recordatorios: Hotmart nunca habría podido llegar al webhook).
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)'],
 };

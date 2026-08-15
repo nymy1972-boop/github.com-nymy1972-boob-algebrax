@@ -1,12 +1,37 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { enviarCorreoBienvenida } from '@/lib/email';
 
 // Las 4 defensas de 18-VENTA-HOTMART.md: (1) autenticidad del hottok en tiempo
 // constante, (2) evento esperado, (3) idempotencia, (4) datos mínimos válidos.
 // NUNCA confiar en el payload sin validar — es input de internet, no de Hotmart.
 
 const HOTTOK = process.env.HOTMART_HOTTOK;
+
+function sitioUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+/** Genera el enlace de acceso real (Supabase) y dispara el correo — nunca lanza: si falla, se loguea y sigue. */
+async function enviarAccesoPorCorreo(supabase: ReturnType<typeof createAdminClient>, email: string) {
+  try {
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${sitioUrl()}/entrar` },
+    });
+    if (error || !data?.properties?.action_link) {
+      console.error('[hotmart webhook] no se pudo generar el enlace de acceso:', error);
+      return;
+    }
+    await enviarCorreoBienvenida(email, data.properties.action_link);
+  } catch (err) {
+    console.error('[hotmart webhook] error inesperado enviando el acceso por correo:', err);
+  }
+}
 
 function hottokValido(recibido: string | undefined): boolean {
   if (!HOTTOK || !recibido) return false;
@@ -78,8 +103,10 @@ export async function POST(request: NextRequest) {
           .from('profiles')
           .update({ plan: 'premium', hotmart_subscriber_code: subscriberCode ?? null })
           .eq('id', created.user.id);
-        // TODO Sesión 6: disparar email de bienvenida con Resend (magic link).
       }
+      // Best-effort: si el correo falla, la cuenta/plan ya quedaron correctos
+      // igual — el estudiante puede entrar más tarde con su correo en /entrar.
+      await enviarAccesoPorCorreo(supabase, email);
       break;
     }
 

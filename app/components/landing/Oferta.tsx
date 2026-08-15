@@ -9,7 +9,7 @@
 // El destino de los CTAs sigue al MODELO de 02C (checkout vs /onboarding).
 
 import { motion } from 'motion/react';
-import { ArrowRight, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { CheckCustom, CtaButton, Hairline, Kicker, SectionShell, useReveal, VIEWPORT_ONCE } from './ui';
 import { MarkedCopy, warnCopy, warnRango } from './MarkedCopy';
 
@@ -41,6 +41,8 @@ export interface OfertaProps {
     badge?: string;
   };
   mensual: PlanOferta;
+  /** Línea corta de garantía repetida junto a CADA CTA de pago (no solo en el hero) — sub-check de copy de venta. */
+  garantiaCorta?: string;
   /** Stack de valor Hormozi opcional — total TACHADO del stack, jamás precio falso. */
   stack?: {
     lineas: { resultado: string; valor: string }[];
@@ -98,6 +100,7 @@ export function Oferta({
   anual,
   mensual,
   stack,
+  garantiaCorta,
   id = 'oferta',
 }: OfertaProps) {
   warnCopy('Oferta → título', tituloMarked, 8);
@@ -118,7 +121,7 @@ export function Oferta({
         {stack && (
           <motion.div
             variants={item}
-            className="mx-auto mt-8 max-w-[560px] rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--text-tertiary)_25%,transparent)] bg-[var(--surface)] p-6"
+            className="mx-auto mt-8 max-w-[560px] rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--text-tertiary)_25%,transparent)] bg-[var(--surface-2)] p-6"
           >
             <ul className="flex flex-col gap-3">
               {stack.lineas.map((l, i) => (
@@ -168,6 +171,9 @@ export function Oferta({
                   <CtaButton href={anual.ctaHref} fullMobile>
                     {anual.ctaLabel}
                   </CtaButton>
+                  {garantiaCorta && (
+                    <p className="mt-2 text-center text-[12px] text-[var(--text-secondary)]">{garantiaCorta}</p>
+                  )}
                 </div>
               </div>
             </Hairline>
@@ -176,7 +182,7 @@ export function Oferta({
           {/* ── MENSUAL: card base, CTA outline — menos peso visual ── */}
           <motion.div
             variants={item}
-            className="rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--text-tertiary)_28%,transparent)] bg-[var(--surface)] p-6 shadow-[var(--shadow-1)] md:p-7"
+            className="rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--text-tertiary)_28%,transparent)] bg-[var(--surface)] p-6 md:p-7"
           >
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-[18px] font-semibold text-[var(--text-primary)]">{mensual.nombre}</h3>
@@ -186,14 +192,12 @@ export function Oferta({
               <Precio plan={mensual} />
             </div>
             <Features items={mensual.features} origen="Oferta → mensual" />
-            <motion.a
-              whileTap={{ scale: 0.97 }}
+            <a
               href={mensual.ctaHref}
-              className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] border border-[color-mix(in_oklab,var(--accent)_45%,transparent)] text-[16px] font-semibold text-[var(--accent)] transition-colors duration-150 hover:bg-[var(--chip-bg)] [touch-action:manipulation]"
+              className="mt-6 flex h-11 w-full items-center justify-center gap-1.5 rounded-[var(--radius-button)] text-[14px] font-semibold text-[var(--text-secondary)] underline decoration-[color-mix(in_oklab,var(--text-secondary)_40%,transparent)] underline-offset-4 transition-colors duration-150 hover:text-[var(--text-primary)] [touch-action:manipulation] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
             >
               {mensual.ctaLabel}
-              <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
-            </motion.a>
+            </a>
           </motion.div>
         </div>
       </motion.div>

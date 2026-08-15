@@ -4,11 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, NotebookPen, Trophy, XCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Home, Lock, NotebookPen, Trophy, XCircle } from 'lucide-react';
 import { MODULOS, type PreguntaModulo } from '@/lib/modulos';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { sumarGemas, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { logEvent } from '@/lib/logEvent';
+import { usePlan } from '@/lib/plan';
 
 const DURACION_SEGUNDOS = 4 * 60; // 4 min — simulacro corto, coherente con "10 min/día"
 
@@ -49,6 +50,7 @@ export default function ExamenPage() {
   const [terminado, setTerminado] = useState(false);
   const [seleccionado, setSeleccionado] = useState<number | null>(null);
   const gemasAsignadas = useRef(false);
+  const { plan, cargando: cargandoPlan } = usePlan();
 
   function empezar() {
     const nuevas = armarPreguntas();
@@ -107,6 +109,33 @@ export default function ExamenPage() {
       logEvent('examen_completado', { correctas: reporte.correctas, total: reporte.total });
     }
   }, [terminado, reporte.correctas, reporte.total]);
+
+  if (!cargandoPlan && plan !== 'premium') {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface))]">
+          <Lock size={28} className="text-[var(--accent)]" />
+        </div>
+        <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+          El Modo Examen es Premium
+        </h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Simulacros cronometrados iguales a tu examen real, ilimitados. Desbloquéalo junto con todos
+          los módulos.
+        </p>
+        <Link
+          href="/paywall?tema=Modo Examen"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+        >
+          Ver planes Premium
+          <ArrowRight size={18} strokeWidth={2.5} />
+        </Link>
+        <Link href="/app" className="text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4">
+          Volver a Inicio
+        </Link>
+      </div>
+    );
+  }
 
   if (!iniciado) {
     return (

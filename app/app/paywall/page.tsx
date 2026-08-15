@@ -3,9 +3,10 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Oferta } from '@/components/landing/Oferta';
-import { CheckCustom } from '@/components/landing/ui';
+import { CheckCustom, StickyCtaMobile } from '@/components/landing/ui';
 
 // Paywall in-app — aparece DESPUÉS de la primera victoria (diagnóstico), nunca
 // antes. Freemium (02C nicho Educación): siempre existe un camino gratis visible
@@ -44,6 +45,7 @@ function PaywallContent() {
   const params = useSearchParams();
   const temaRaw = params.get('tema');
   const tema = temaRaw ? (TEMA_LABELS[temaRaw] ?? temaRaw) : null;
+  const reduce = useReducedMotion();
 
   return (
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
@@ -54,7 +56,12 @@ function PaywallContent() {
       </div>
 
       {/* Hero orientado a RESULTADO — personalizado con el tema débil del diagnóstico si existe */}
-      <div className="mx-auto max-w-[620px] px-5 pb-8 pt-6 text-center">
+      <motion.div
+        id="hero"
+        initial={{ opacity: 0, y: reduce ? 0 : 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduce ? 0.2 : 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto max-w-[620px] px-5 pb-8 pt-6 text-center">
         <h1 className="text-balance text-[28px] font-bold leading-[1.15] [font-family:var(--font-display)] md:text-[36px]">
           {tema ? (
             <>
@@ -67,17 +74,19 @@ function PaywallContent() {
           )}
         </h1>
         <p className="mx-auto mt-3 max-w-[440px] text-[15px] text-[var(--text-secondary)]">
-          Entiende el porqué de cada paso — sin quedarte en blanco el día de la prueba.
+          Ese hueco en el estómago cuando dicen "examen sorpresa" — se va cuando entiendes el porqué de cada paso, no solo la respuesta.
         </p>
 
         <ul className="mx-auto mt-6 flex max-w-[400px] flex-col gap-3 text-left">
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
-            <span>Explicación interactiva del porqué de cada paso, no solo la respuesta</span>
+            <span>
+              <strong className="font-semibold">El Descifrador de Pasos:</strong> explicación interactiva del porqué de cada paso, no solo la respuesta
+            </span>
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
-            <span>Simulacros de examen reales, sin límite de vidas ni castigos</span>
+            <span>Simulacros como el examen real: sin cámara, sin copiar — practicas sin ese vacío de quedarte en blanco</span>
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
@@ -88,13 +97,14 @@ function PaywallContent() {
         {/* Prueba social honesta — nunca un rating o testimonio inventado (19-PAGINA-DE-VENTAS) */}
         <div className="mx-auto mt-6 flex max-w-[400px] items-center justify-center gap-2 rounded-full border border-[color-mix(in_oklab,var(--success)_30%,transparent)] bg-[color-mix(in_oklab,var(--success)_8%,var(--surface))] px-4 py-2 text-[13px] font-semibold text-[var(--success)]">
           <ShieldCheck size={16} />
-          Garantía del Primer Paso Entendido — respaldada por Hotmart
+          Garantía del Primer Paso Entendido (7 días) — respaldada por Hotmart
         </div>
-      </div>
+      </motion.div>
 
       <Oferta
         kicker="TU PLAN"
         tituloMarked="Domina álgebra por [acento]$0.14 al día[/acento]"
+        garantiaCorta="Garantía de 7 días — respaldada por Hotmart"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
@@ -133,7 +143,7 @@ function PaywallContent() {
         }}
       />
 
-      <div className="mx-auto max-w-[620px] px-5 pb-16 text-center">
+      <div id="cta-final" className="mx-auto max-w-[620px] px-5 pb-16 text-center">
         <Link
           href="/app"
           className="text-[15px] font-semibold text-[var(--text-secondary)] underline decoration-[var(--surface-2)] underline-offset-4 hover:text-[var(--text-primary)]"
@@ -141,6 +151,8 @@ function PaywallContent() {
           Seguir gratis por ahora
         </Link>
       </div>
+
+      <StickyCtaMobile labelComercial="Quiero Premium" href="/entrar?plan=anual" labelPre="Ver plan y precios" />
     </div>
   );
 }

@@ -4,13 +4,14 @@ import { use, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, MotionConfig } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Gem, Lightbulb, NotebookPen, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Gem, Lightbulb, Lock, NotebookPen, Sparkles } from 'lucide-react';
 import { getModulo, type PreguntaModulo } from '@/lib/modulos';
-import { registrarAcierto, GEMAS_POR_ACIERTO } from '@/lib/progress';
+import { registrarAcierto, ejerciciosGratisHoy, leerProgreso, registrarEjercicioGratisHoy, GEMAS_POR_ACIERTO } from '@/lib/progress';
 import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useExplicacionIA } from '@/lib/useExplicacionIA';
 import { logEvent } from '@/lib/logEvent';
+import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
 
 const PREGUNTAS_POR_SESION = 8;
 
@@ -31,6 +32,18 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   // Ref (no state) porque el evento de cierre se dispara desde un setTimeout
   // cuyo closure quedaría con el valor de aciertos de un render anterior.
   const aciertosRef = useRef(0);
+  const { plan, cargando: cargandoPlan } = usePlan();
+  const esModuloGratis = slug === MODULO_GRATIS_SLUG;
+  // Se congela AL ENTRAR (no se recalcula mientras se practica): el límite
+  // gratis se avisa ANTES de empezar, nunca corta una sesión ya en marcha —
+  // interrumpir a alguien que ya invirtió esfuerzo genera frustración y
+  // cancelaciones. Si ya estaba al tope al abrir la pantalla, se bloquea aquí;
+  // si no, la sesión completa (las 8 preguntas) se deja terminar siempre.
+  const [restantesAlEntrar, setRestantesAlEntrar] = useState<number | null>(null);
+
+  useEffect(() => {
+    setRestantesAlEntrar(Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(leerProgreso())));
+  }, []);
 
   // Se genera SOLO en cliente (nunca en el render de servidor) para que cada
   // sesión de práctica traiga ejercicios nuevos, aunque el estudiante ya haya
@@ -72,6 +85,9 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
       setAciertos((n) => n + 1);
       setGemas((g) => g + GEMAS_POR_ACIERTO);
       registrarAcierto(slug, preguntas!.length);
+      if (plan !== 'premium' && esModuloGratis) {
+        registrarEjercicioGratisHoy();
+      }
       setShowAcierto(true);
       setShowGemas(true);
       window.setTimeout(() => {
@@ -96,6 +112,59 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
         <p>No encontramos ese módulo.</p>
         <Link href="/app" className="font-semibold text-[var(--accent-2)]">
           Volver al inicio
+        </Link>
+      </div>
+    );
+  }
+
+  if (!cargandoPlan && plan !== 'premium' && !esModuloGratis) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface))]">
+          <Lock size={28} className="text-[var(--accent)]" />
+        </div>
+        <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+          {modulo.nombre} es Premium
+        </h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Con el plan gratis practicas {getModulo(MODULO_GRATIS_SLUG)?.nombre}. Desbloquea este y
+          todos los demás módulos con Premium.
+        </p>
+        <Link
+          href={`/paywall?tema=${encodeURIComponent(modulo.nombre)}`}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+        >
+          Ver planes Premium
+          <ArrowRight size={18} strokeWidth={2.5} />
+        </Link>
+        <Link href="/app" className="text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4">
+          Volver a Inicio
+        </Link>
+      </div>
+    );
+  }
+
+  if (!cargandoPlan && plan !== 'premium' && esModuloGratis && restantesAlEntrar === 0) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col items-center justify-center gap-6 px-5 text-center text-[var(--text-primary)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-card)] border-2 border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,var(--surface))]">
+          <Clock size={28} className="text-[var(--gold)]" />
+        </div>
+        <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
+          Ya practicaste tus {LIMITE_DIARIO_GRATIS} ejercicios de hoy
+        </h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Vuelve mañana para seguir gratis, o pasa a Premium para practicar sin límite todos los días.
+        </p>
+        <Link
+          href="/paywall?tema=práctica ilimitada"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"
+        >
+          Practicar sin límite
+          <ArrowRight size={18} strokeWidth={2.5} />
+        </Link>
+        <Link href="/app" className="text-[13px] font-semibold text-[var(--text-secondary)] underline decoration-dotted underline-offset-4">
+          Volver a Inicio
         </Link>
       </div>
     );
@@ -156,6 +225,15 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
                 resuélvelo primero en tu hoja, así llegas listo al examen real.
               </p>
             </div>
+            {plan !== 'premium' && esModuloGratis && restantesAlEntrar !== null && restantesAlEntrar > 0 && restantesAlEntrar <= PREGUNTAS_POR_SESION && (
+              <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--gold)_30%,transparent)] bg-[color-mix(in_oklab,var(--gold)_8%,var(--surface))] p-3.5">
+                <Clock size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--gold)]" />
+                <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">Te quedan {restantesAlEntrar} ejercicios gratis hoy: </span>
+                  esta sesión te los usa. Vuelve mañana o pasa a Premium para practicar sin límite.
+                </p>
+              </div>
+            )}
             <button
               onClick={() => setVerEjemplo(false)}
               className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--accent)] text-[16px] font-bold text-[var(--bg)] shadow-[0_4px_0_0_color-mix(in_oklab,var(--accent)_65%,black)] active:translate-y-[2px] active:shadow-none [font-family:var(--font-display)]"

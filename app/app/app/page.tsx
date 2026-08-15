@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Check, CheckCircle2, Flame, Gem, Timer } from 'lucide-react';
+import { Check, CheckCircle2, Flame, Gem, Lock, Timer } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
-import { leerProgreso, registrarVisitaHoy, type ProgresoUsuario } from '@/lib/progress';
+import { ejerciciosGratisHoy, registrarVisitaHoy, sincronizarAlAbrir, type ProgresoUsuario } from '@/lib/progress';
+import { LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, usePlan } from '@/lib/plan';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 
 const INICIALES_DIA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // semana empieza lunes
@@ -52,11 +53,15 @@ function calcularSemana(progreso: ProgresoUsuario) {
 export default function InicioApp() {
   const [progreso, setProgreso] = useState<ProgresoUsuario | null>(null);
   const [milestone, setMilestone] = useState<number | null>(null);
+  const { plan } = usePlan();
 
   useEffect(() => {
-    const { progreso: p, milestone: m } = registrarVisitaHoy();
-    setProgreso(p);
-    if (m) setMilestone(m);
+    (async () => {
+      await sincronizarAlAbrir();
+      const { progreso: p, milestone: m } = registrarVisitaHoy();
+      setProgreso(p);
+      if (m) setMilestone(m);
+    })();
   }, []);
 
   if (!progreso) return null;
@@ -126,23 +131,25 @@ export default function InicioApp() {
           </div>
         </div>
 
-        {/* Card destacada — Modo Examen */}
-        <Link href="/app/examen">
+        {/* Card destacada — Modo Examen (Premium) */}
+        <Link href={plan === 'premium' ? '/app/examen' : '/paywall?tema=Modo Examen'}>
           <motion.div
             whileTap={{ scale: 0.98 }}
             className="mb-6 flex items-center justify-between rounded-[var(--radius-card)] border-2 border-[#14161c] bg-gradient-to-br from-[var(--accent)] to-[#c93a3a] p-5 shadow-[0_4px_0_0_#8e2828]"
           >
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-white/85">Modo examen</p>
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-white/85">
+                Modo examen {plan !== 'premium' && <Lock size={11} />}
+              </p>
               <p className="mt-1 text-[17px] font-bold text-white [font-family:var(--font-display)]">
-                Simulacro cronometrado →
+                {plan === 'premium' ? 'Simulacro cronometrado →' : 'Desbloquea el simulacro →'}
               </p>
             </div>
             <Timer size={28} className="text-white/90" />
           </motion.div>
         </Link>
 
-        {/* Camino de módulos — todos accesibles siempre, nunca bloqueados */}
+        {/* Camino de módulos — el básico es gratis; el resto pide Premium (candado visible, nunca oculto) */}
         <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
           Tus módulos
         </p>
@@ -151,8 +158,11 @@ export default function InicioApp() {
             const p = progreso.modulos[m.slug];
             const completado = p ? p.completadas >= p.total : false;
             const enProgreso = p && !completado;
+            const esGratis = m.slug === MODULO_GRATIS_SLUG;
+            const bloqueado = plan !== 'premium' && !esGratis;
+            const restantesGratis = esGratis && plan !== 'premium' ? Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(progreso)) : null;
             return (
-              <Link key={m.slug} href={`/app/practicar/${m.slug}`}>
+              <Link key={m.slug} href={bloqueado ? `/paywall?tema=${encodeURIComponent(m.nombre)}` : `/app/practicar/${m.slug}`}>
                 <motion.div
                   whileTap={{ scale: 0.98 }}
                   className={`flex items-center gap-4 rounded-[var(--radius-card)] border-2 p-4 ${
@@ -168,6 +178,8 @@ export default function InicioApp() {
                   >
                     {completado ? (
                       <CheckCircle2 size={20} className="text-[#14161c]" />
+                    ) : bloqueado ? (
+                      <Lock size={18} className="text-white" />
                     ) : (
                       <span className="font-bold text-white [font-family:var(--font-display)]">
                         {m.nombre.charAt(0)}
@@ -177,7 +189,13 @@ export default function InicioApp() {
                   <div className="flex-1">
                     <p className="font-bold [font-family:var(--font-display)]">{m.nombre}</p>
                     <p className="text-[12px] text-[var(--text-secondary)]">
-                      {p ? `${p.completadas}/${p.total} correctas` : m.descripcion}
+                      {bloqueado
+                        ? 'Desbloquea con Premium'
+                        : restantesGratis !== null
+                          ? `${restantesGratis} ejercicios gratis hoy`
+                          : p
+                            ? `${p.completadas}/${p.total} correctas`
+                            : m.descripcion}
                     </p>
                   </div>
                 </motion.div>

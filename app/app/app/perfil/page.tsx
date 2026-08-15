@@ -3,16 +3,23 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Flame, Gem, LogOut, Sparkles } from 'lucide-react';
+import { ArrowLeft, Award, CalendarDays, Flame, Gem, ListChecks, LogOut, Sparkles, Target } from 'lucide-react';
 import { MODULOS } from '@/lib/modulos';
-import { cerrarSesionLocal, leerProgreso, type ProgresoUsuario } from '@/lib/progress';
+import {
+  cerrarSesionLocal,
+  diasDesdeCreacion,
+  guardarMetaSemanal,
+  sincronizarAlAbrir,
+  type ProgresoUsuario,
+} from '@/lib/progress';
 
 export default function PerfilPage() {
   const router = useRouter();
   const [progreso, setProgreso] = useState<ProgresoUsuario | null>(null);
+  const [editandoMeta, setEditandoMeta] = useState(false);
 
   useEffect(() => {
-    setProgreso(leerProgreso());
+    sincronizarAlAbrir().then(setProgreso);
   }, []);
 
   if (!progreso) return null;
@@ -21,6 +28,14 @@ export default function PerfilPage() {
     cerrarSesionLocal();
     router.push('/');
   }
+
+  function cambiarMeta(delta: number) {
+    if (!progreso) return;
+    setProgreso(guardarMetaSemanal(progreso.metaSemanal + delta));
+  }
+
+  const dias = diasDesdeCreacion(progreso);
+  const metaProgreso = Math.min(100, Math.round((progreso.ejerciciosSemana / progreso.metaSemanal) * 100));
 
   return (
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
@@ -38,9 +53,14 @@ export default function PerfilPage() {
           <span className="rounded-full border border-[var(--surface-2)] bg-[var(--surface)] px-3 py-1 text-[12px] font-semibold text-[var(--text-secondary)]">
             Plan Free
           </span>
+          {dias > 0 && (
+            <p className="flex items-center gap-1 text-[12px] text-[var(--text-secondary)]">
+              <CalendarDays size={13} /> Llevas {dias} {dias === 1 ? 'día' : 'días'} con AlgebraX
+            </p>
+          )}
         </div>
 
-        <div className="mb-6 grid grid-cols-2 gap-3">
+        <div className="mb-3 grid grid-cols-2 gap-3">
           <div className="flex items-center gap-3 rounded-[var(--radius-card)] border border-[#3a2a22] bg-gradient-to-br from-[#2a1e1b] to-[var(--surface)] p-4">
             <Flame size={24} className="text-[var(--gold)]" />
             <div>
@@ -59,6 +79,69 @@ export default function PerfilPage() {
               <p className="mt-1 text-[11px] text-[var(--text-secondary)]">gemas ganadas</p>
             </div>
           </div>
+        </div>
+
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-3 rounded-[var(--radius-card)] border-2 border-[var(--surface-2)] bg-[var(--surface)] p-4">
+            <Award size={22} className="text-[var(--text-secondary)]" />
+            <div>
+              <p className="text-[16px] font-extrabold leading-none text-[var(--text-primary)] [font-family:var(--font-display)]">
+                {progreso.mejorRacha}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--text-secondary)]">récord de racha</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-[var(--radius-card)] border-2 border-[var(--surface-2)] bg-[var(--surface)] p-4">
+            <ListChecks size={22} className="text-[var(--text-secondary)]" />
+            <div>
+              <p className="text-[16px] font-extrabold leading-none text-[var(--text-primary)] [font-family:var(--font-display)]">
+                {progreso.totalEjercicios}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--text-secondary)]">ejercicios resueltos en total</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 rounded-[var(--radius-card)] border-2 border-[var(--surface-2)] bg-[var(--surface)] p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
+              <Target size={14} /> Tu desafío de la semana
+            </p>
+            <button
+              onClick={() => setEditandoMeta((v) => !v)}
+              className="text-[11px] font-semibold text-[var(--accent-2)] underline decoration-dotted underline-offset-4"
+            >
+              {editandoMeta ? 'Listo' : 'Ajustar'}
+            </button>
+          </div>
+          <p className="mb-2 text-[13px] text-[var(--text-secondary)]">
+            {progreso.ejerciciosSemana} de {progreso.metaSemanal} ejercicios esta semana
+          </p>
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+            <div
+              className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
+              style={{ width: `${metaProgreso}%` }}
+            />
+          </div>
+          {editandoMeta && (
+            <div className="mt-3 flex items-center justify-center gap-4">
+              <button
+                onClick={() => cambiarMeta(-5)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--surface-2)] text-[16px] font-bold text-[var(--text-primary)]"
+              >
+                −
+              </button>
+              <span className="text-[15px] font-bold text-[var(--text-primary)] [font-family:var(--font-display)]">
+                {progreso.metaSemanal}
+              </span>
+              <button
+                onClick={() => cambiarMeta(5)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--surface-2)] text-[16px] font-bold text-[var(--text-primary)]"
+              >
+                +
+              </button>
+            </div>
+          )}
         </div>
 
         <p className="mb-3 flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)]">

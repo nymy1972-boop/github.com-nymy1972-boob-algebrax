@@ -128,6 +128,13 @@
   html {
     @apply font-sans;
   }
+  /* Anillo de foco visible por defecto (teclado) en todo enlace/botón que no
+     traiga su propio focus-visible: — sin esto, navegar con Tab es invisible. */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
 }
 
 /* El scaffold de shadcn define --accent genérico en :root (colisiona con el

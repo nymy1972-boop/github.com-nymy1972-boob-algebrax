@@ -119,6 +119,7 @@ export default function Home() {
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
         tituloMarked="Empieza gratis. Domina álgebra por [acento]$0.14 al día[/acento]"
+        garantiaCorta="Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
