@@ -286,6 +286,23 @@ Pedido explícito del usuario: además de pagar, que se pueda desbloquear practi
 Primera ronda de `revisor-visual` en landing y paywall dio **NO LISTA** en ambas (18/40·5/20 y 15/40·6/20) por un falso positivo: el script de captura (`page.screenshot({fullPage:true})` justo tras `networkidle`, sin scroll) nunca hace que el navegador recorra la página, así que las secciones con `whileInView`/IntersectionObserver (`useReveal` en `components/landing/ui.tsx`) se capturan en su estado inicial `opacity:0` — casi toda la landing y el pricing del paywall salían invisibles en la imagen. Verificado con un script que hace scroll incremental real antes de capturar: `getComputedStyle(...).opacity` de esas secciones da `1` — el contenido SÍ se ve para un usuario real. Se volvió a capturar con scroll real y se relanzó el revisor. **Lección para el futuro**: cualquier captura de una pantalla con animaciones `whileInView` (landing, cualquier pantalla larga) debe hacer scroll incremental antes del screenshot — un `fullPage:true` directo no dispara esas animaciones y produce veredictos inválidos.
 Segundo hallazgo de metodología (misma causa raíz, elemento distinto): al agregar `StickyCtaMobile` al paywall, la 4ª ronda de captura mostró la barra fija "horneada" a mitad de una transición, solapando texto de la card de precios — verificado manualmente (`docs/revisiones/paywall-375.png` de esa ronda) que es un artefacto del stitching de `fullPage:true` sobre un elemento `position:fixed` durante el scroll sintético, no un bug real (un usuario real ve la barra siempre pegada al fondo, sin solape). **Lección adicional**: al capturar pantallas con `StickyCtaMobile` u otro elemento `fixed`, ocultarlo (`display:none` temporal o esperar a que termine su transición) antes del `screenshot({fullPage:true})`.
 
+### Sesión 6 — Dominio propio comprado y verificado en Resend — 2026-08-15
+El correo real (fuera de la cuenta del dueño) estaba fallando: Resend rechazaba el envío a cualquier
+correo que no fuera `nymy1972@gmail.com` (confirmado con `query_logs` de Supabase — error 550,
+"You can only send testing emails to your own email address... verify a domain"). Causa raíz: sin
+dominio propio verificado, Resend queda en modo sandbox de por vida — bloqueaba tanto el código de
+acceso por correo como el correo de bienvenida tras la compra. Resuelto:
+- Dominio comprado por el usuario: **`nymystudio.com`** (elegido como marca genérica reutilizable
+  para futuras apps, no solo AlgebraX — verificado disponible con RDAP antes de comprar).
+- Dominio verificado en Resend (registros DNS agregados en Namecheap).
+- `EMAIL_FROM` actualizado de `hola@algebrax.app` (nunca fue real) a `hola@nymystudio.com` en
+  `.env` local y `.env.example`.
+- ⚠️ **Pendiente del usuario, en curso**: (1) actualizar `EMAIL_FROM` en Vercel → Environment
+  Variables → Redeploy; (2) cambiar el "Sender email" en Supabase → Authentication → SMTP Settings
+  de `onboarding@resend.dev` a `hola@nymystudio.com`. Sin esto, el código de acceso real (que sale
+  vía SMTP de Supabase, no vía `lib/email.ts`) sigue usando el remitente de sandbox. Falta probar
+  con un correo real que NO sea el del dueño para confirmar que ya llega.
+
 ### CIERRE_REVISOR_LANDING_PAYWALL (2026-08-14) — 4 rondas, ambas quedan NO LISTA, cierro el ciclo aquí
 Tras 4 rondas de `revisor-visual` (real, con scroll correcto) sobre landing y paywall, aplicando en cada una los defectos reportados (block-press en todos los CTAs incluido el sticky, `focus-visible` global, nivel de profundidad `--surface-2`, garantía junto al CTA de compra, mecanismo bautizado nombrado, escenas literales de FICHA-AVATAR en el copy, jerarquía Anual vs Mensual, hero animado, sticky CTA en el paywall):
 - **Paywall**: 15/40·6/20(falso, ver metodología) → 31/40·16/20·17/20 → 34/40·15/20·16/20 → 27/40·13/20·17/20 (esta última con el glitch de captura del sticky ya documentado arriba, que infló a la baja "Encaje"/craft artificialmente). Copy YA pasa el umbral (17/20, sin ejes ≤2) desde la 3ª ronda. Usabilidad/craft quedan cerca pero no cruzan el gate ≥36/40·≥16/20 de forma consistente.
