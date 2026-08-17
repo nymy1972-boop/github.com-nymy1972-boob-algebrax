@@ -18,10 +18,17 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
+// Copy sin promesa de resultado académico (revisión 2026-08-17): "aprueba tu
+// examen" / "domina" / "a la primera" prometían un resultado que la app no
+// puede garantizar — Google Ads y TikTok Ads prohíben afirmaciones de
+// resultados improbables presentados como esperables, y el público de
+// AlgebraX incluye menores de edad (mayor cuidado exigido). El copy ahora
+// describe la HERRAMIENTA (entender el paso a paso, practicar) en vez de
+// prometer el resultado (aprobar).
 export const metadata: Metadata = {
-  title: "AlgebraX — Aprueba tu examen de álgebra sin quedarte en blanco",
+  title: "AlgebraX — Entiende álgebra paso a paso, sin quedarte en blanco",
   description:
-    "Entiende el porqué de cada paso y aprueba tu examen de álgebra a la primera. Sin castigos por equivocarte, sin videos de 40 minutos.",
+    "Practica álgebra entendiendo el porqué de cada paso. Sin castigos por equivocarte, sin videos de 40 minutos.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -165,8 +165,8 @@ export default function ExamenPage() {
           El simulacro completo todavía no está desbloqueado
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          Simulacros cronometrados iguales a tu examen real, ilimitados. Tienes 2 caminos para
-          desbloquearlo.
+          Simulacros cronometrados, con el mismo formato de tiempo y mezcla de temas, ilimitados.
+          Tienes 2 caminos para desbloquearlo.
         </p>
 
         <button
@@ -211,7 +211,7 @@ export default function ExamenPage() {
           Simulacro cronometrado: {Math.round(DURACION_SEGUNDOS / 60)} minutos
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          {MODULOS.length * 2} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final — igual que en tu examen real.
+          {MODULOS.length * 2} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final, para que practiques sin esa muleta.
         </p>
         <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5 text-left">
           <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
@@ -254,7 +254,7 @@ export default function ExamenPage() {
           <div className="w-full rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_6%,var(--surface))] p-4 text-left">
             <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
               Esto fue solo <strong className="text-[var(--text-primary)]">3 preguntas sin cronómetro</strong>. El
-              simulacro completo tiene 6, cronometradas, exactamente como tu examen real.
+              simulacro completo tiene 6, cronometradas, con el mismo formato de tiempo limitado.
             </p>
             {!desbloqueado && (
               <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
@@ -335,7 +335,7 @@ export default function ExamenPage() {
         <CelebrationOverlay
           open={reporte.correctas === reporte.total}
           title="¡Simulacro perfecto!"
-          message="Respondiste todo bien y contra el reloj. Así se va a sentir tu examen real."
+          message="Respondiste todo bien y contra el reloj. Sigue practicando así."
           ctaLabel="Genial"
           onCta={() => {}}
           onDismiss={() => {}}
@@ -409,7 +409,7 @@ export default function ExamenPage() {
             })}
           </div>
           <p className="text-center text-[12px] text-[var(--text-secondary)]">
-            Como en tu examen real: no te decimos si acertaste hasta el final.
+            No te decimos si acertaste hasta el final — practica sin esa muleta.
           </p>
         </div>
       </div>

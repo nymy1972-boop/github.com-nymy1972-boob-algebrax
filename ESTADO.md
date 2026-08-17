@@ -297,11 +297,34 @@ acceso por correo como el correo de bienvenida tras la compra. Resuelto:
 - Dominio verificado en Resend (registros DNS agregados en Namecheap).
 - `EMAIL_FROM` actualizado de `hola@algebrax.app` (nunca fue real) a `hola@nymystudio.com` en
   `.env` local y `.env.example`.
-- ⚠️ **Pendiente del usuario, en curso**: (1) actualizar `EMAIL_FROM` en Vercel → Environment
-  Variables → Redeploy; (2) cambiar el "Sender email" en Supabase → Authentication → SMTP Settings
-  de `onboarding@resend.dev` a `hola@nymystudio.com`. Sin esto, el código de acceso real (que sale
-  vía SMTP de Supabase, no vía `lib/email.ts`) sigue usando el remitente de sandbox. Falta probar
-  con un correo real que NO sea el del dueño para confirmar que ya llega.
+- **RESUELTO (2026-08-17)**: `EMAIL_FROM` actualizado en Vercel + Redeploy hecho; "Sender email" cambiado en
+  Supabase → Authentication → SMTP Settings de `onboarding@resend.dev` a `hola@nymystudio.com`.
+  Verificado con un envío de prueba real a un correo que NO es el del dueño
+  (`prueba-envio-real@algebrax-test.com`) vía `query_logs` de Supabase: `status 200`, sin error
+  (antes daba 550 "solo puedes enviar a tu propio correo"). El login por código ya funciona para
+  cualquier estudiante, no solo para la cuenta del dueño — bloqueante real resuelto.
+
+### Sesión 6 — Copy sin promesa de resultado académico (cumplimiento publicitario) — 2026-08-17
+El usuario señaló 6 frases ("aprueba tu examen", "domina álgebra", "en 6 meses vas a estar en el
+mismo lugar", "mismo miedo al examen", "simulacros iguales a tu examen real", "abre la hoja de
+examen y sabe exactamente qué hacer") y explicó el motivo real: Google Ads y TikTok Ads prohíben
+afirmaciones de resultados improbables presentados como esperables ("aprueba"/"domina" prometen un
+resultado académico que la app no puede garantizar), y el público de AlgebraX incluye MENORES DE
+EDAD — mayor cuidado exigido contra presión comercial/explotación de vulnerabilidad. Regla nueva
+para todo copy futuro: describir la HERRAMIENTA (entender el paso a paso, practicar, el formato del
+simulacro) en vez de prometer el RESULTADO (aprobar, dominar, garantizar equivalencia con "tu examen
+real" que la app nunca vio).
+- Cambiado en: `app/layout.tsx` (title/description), `app/page.tsx` (h1 del hero, agitación x2,
+  título de la oferta, línea del stack, futurePacing del CTA final, label del carrusel),
+  `app/paywall/page.tsx` (hero x2, título de la oferta, línea del stack, bullet de simulacros),
+  `app/app/examen/page.tsx` (intro bloqueado, intro del simulacro completo, aviso del adelanto,
+  celebración de simulacro perfecto, aviso durante las preguntas) — 4 más de las que el usuario
+  señaló directamente, mismo patrón ("igual/exactamente como tu examen real"), encontradas al
+  revisar el resto de la app por consistencia.
+- NO cambiado (revisado y descartado): "Dominas {módulo}" en `practicar/[modulo]/page.tsx` — es
+  feedback DENTRO de la app tras acertar el 100% de una sesión real, no una promesa publicitaria a
+  un prospecto; categoría distinta a la que señaló el usuario. Si se quiere más conservador, avisar.
+- Verificado: `tsc` ✓ `build` ✓ (18 rutas, sin cambios estructurales, solo copy).
 
 ### CIERRE_REVISOR_LANDING_PAYWALL (2026-08-14) — 4 rondas, ambas quedan NO LISTA, cierro el ciclo aquí
 Tras 4 rondas de `revisor-visual` (real, con scroll correcto) sobre landing y paywall, aplicando en cada una los defectos reportados (block-press en todos los CTAs incluido el sticky, `focus-visible` global, nivel de profundidad `--surface-2`, garantía junto al CTA de compra, mecanismo bautizado nombrado, escenas literales de FICHA-AVATAR en el copy, jerarquía Anual vs Mensual, hero animado, sticky CTA en el paywall):

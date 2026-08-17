@@ -65,11 +65,11 @@ function PaywallContent() {
         <h1 className="text-balance text-[28px] font-bold leading-[1.15] [font-family:var(--font-display)] md:text-[36px]">
           {tema ? (
             <>
-              Tu plan para dominar <span className="text-[var(--accent)]">{tema}</span> está listo
+              Tu plan para practicar <span className="text-[var(--accent)]">{tema}</span> está listo
             </>
           ) : (
             <>
-              Pasa tu examen entrenando <span className="text-[var(--accent)]">10 min al día</span>
+              Practica álgebra entrenando <span className="text-[var(--accent)]">10 min al día</span>
             </>
           )}
         </h1>
@@ -86,7 +86,7 @@ function PaywallContent() {
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
-            <span>Simulacros como el examen real: sin cámara, sin copiar — practicas sin ese vacío de quedarte en blanco</span>
+            <span>Simulacros cronometrados: sin cámara, sin copiar — practicas sin ese vacío de quedarte en blanco</span>
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
@@ -103,13 +103,13 @@ function PaywallContent() {
 
       <Oferta
         kicker="TU PLAN"
-        tituloMarked="Domina álgebra por [acento]$0.14 al día[/acento]"
+        tituloMarked="Practica álgebra por [acento]$0.14 al día[/acento]"
         garantiaCorta="Garantía de 7 días — respaldada por Hotmart"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
             { resultado: 'Reporte de errores comunes para repasar solo lo que fallas', valor: '$25' },
-            { resultado: 'Simulacros cronometrados iguales a tu examen real', valor: '$19' },
+            { resultado: 'Simulacros cronometrados con el mismo formato de tiempo y mezcla de temas', valor: '$19' },
           ],
           totalTachado: '$164',
           nota: 'Hoy: $3.33/mes (se cobra $39.99/año)',

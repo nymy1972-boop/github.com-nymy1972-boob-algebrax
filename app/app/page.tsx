@@ -31,7 +31,7 @@ export default function Home() {
         appName="AlgebraX"
         logo={LOGO}
         loginHref="/entrar"
-        h1Marked="[acento]Entiende el porqué[/acento] y aprueba tu examen de álgebra"
+        h1Marked="[acento]Entiende el porqué[/acento] de cada paso de álgebra"
         subtitleMarked="El Descifrador de Pasos te muestra [b]dónde te pierdes[/b], no solo la respuesta."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
@@ -70,18 +70,19 @@ export default function Home() {
         ]}
       />
 
-      {/* 3. AGITACIÓN */}
+      {/* 3. AGITACIÓN — describe la sensación de hoy, sin predecir un resultado
+          académico futuro (revisión 2026-08-17, ver nota en app/layout.tsx) */}
       <Agitacion
         frases={[
           'Cada semana que pasa sin entender, [b]se acumula más miedo[/b] al examen final.',
-          'En 6 meses vas a estar en el mismo lugar — pero con [acento]6 meses menos[/acento] para prepararte.',
+          'Postergarlo no hace que el tema se entienda solo — sigue esperando el día del examen.',
           'Copiar la tarea no te salva en el examen: ahí no hay cámara que te dé la respuesta.',
         ]}
         contraste={{
           labelHoy: 'Hoy',
           hoy: 'Copias la tarea a las 10 PM y sigues sin entender nada.',
           labelFuturo: 'Si nada cambia',
-          futuro: 'Mismo miedo al examen — con menos tiempo para arreglarlo.',
+          futuro: 'El mismo vacío en la cabeza, solo que más cerca del examen.',
         }}
       />
 
@@ -110,7 +111,7 @@ export default function Home() {
           { label: 'Tu diagnóstico en 3 preguntas', nombrePantalla: 'Diagnóstico', src: '/landing/diagnostico.png' },
           { label: 'El paso exacto donde te confundiste', nombrePantalla: 'Descifrador de Pasos', src: '/landing/descifrador.png' },
           { label: 'Tu racha y tus módulos del día', nombrePantalla: 'Inicio', src: '/landing/inicio.png' },
-          { label: 'Practica contrarreloj como en el examen real', nombrePantalla: 'Modo Examen', src: '/landing/examen.png' },
+          { label: 'Practica contrarreloj, con el mismo formato de tiempo limitado', nombrePantalla: 'Modo Examen', src: '/landing/examen.png' },
         ]}
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
@@ -118,13 +119,13 @@ export default function Home() {
 
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
-        tituloMarked="Empieza gratis. Domina álgebra por [acento]$0.14 al día[/acento]"
+        tituloMarked="Empieza gratis. Practica álgebra por [acento]$0.14 al día[/acento]"
         garantiaCorta="Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
             { resultado: 'Reporte de errores comunes para repasar solo lo que fallas', valor: '$25' },
-            { resultado: 'Simulacros cronometrados iguales a tu examen real', valor: '$19' },
+            { resultado: 'Simulacros cronometrados con el mismo formato de tiempo y mezcla de temas', valor: '$19' },
           ],
           totalTachado: '$164',
           nota: 'Hoy: $3.33/mes (se cobra $39.99/año)',
@@ -199,7 +200,7 @@ export default function Home() {
       {/* 9. CTA FINAL */}
       <CtaFinal
         h2Marked="Entra a tu examen [acento]sin miedo[/acento]"
-        futurePacingMarked="Imagina abrir la hoja de examen y saber exactamente qué hacer en cada ejercicio, sin buscar tu teléfono."
+        futurePacingMarked="Imagina llegar a tu examen habiendo practicado cada tipo de ejercicio, sin depender de tu teléfono para resolverlo."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
         recap="Garantía del Primer Paso Entendido · Empieza gratis, sin tarjeta"
