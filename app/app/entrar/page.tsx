@@ -210,11 +210,19 @@ function EntrarForm() {
       ) : (
         <>
           <h1 className="text-[24px] font-bold leading-tight text-[var(--text-primary)] [font-family:var(--font-display)]">
-            Escribe tu código
+            Revisa tu correo
           </h1>
           <p className="text-[14px] text-[var(--text-secondary)]">
-            Te enviamos un código a <strong className="text-[var(--text-primary)]">{email}</strong>. Sin salir de aquí: solo escríbelo.
+            Te enviamos un mensaje a <strong className="text-[var(--text-primary)]">{email}</strong>.
           </p>
+
+          <div className="flex w-full items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5 text-left">
+            <Mail size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
+            <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+              <span className="font-semibold text-[var(--text-primary)]">La forma más rápida: </span>
+              abre ese correo y toca el botón para entrar — no hace falta escribir nada. Si prefieres, también puedes escribir el código de abajo.
+            </p>
+          </div>
 
           <form onSubmit={handleVerificarCodigo} className="flex w-full flex-col gap-4">
             <CodigoInput valor={codigo} onChange={setCodigo} />
