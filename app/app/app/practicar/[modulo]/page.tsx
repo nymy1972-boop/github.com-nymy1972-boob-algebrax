@@ -11,7 +11,17 @@ import { AciertoLottie } from '@/components/onboarding/AciertoLottie';
 import { CelebrationOverlay } from '@/components/onboarding/CelebrationOverlay';
 import { useExplicacionIA } from '@/lib/useExplicacionIA';
 import { logEvent } from '@/lib/logEvent';
-import { gemasQueFaltan, LIMITE_DIARIO_GRATIS, MODULO_GRATIS_SLUG, moduloDesbloqueado, umbralDelModulo, usePlan } from '@/lib/plan';
+import {
+  gemasQueFaltan,
+  gratisUsadosDelModulo,
+  LIMITE_DIARIO_GRATIS,
+  LIMITE_GRATIS_POR_MODULO,
+  MODULO_GRATIS_SLUG,
+  moduloAccesible,
+  moduloDesbloqueado,
+  umbralDelModulo,
+  usePlan,
+} from '@/lib/plan';
 import { useReferralPrompt } from '@/lib/referral';
 import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
 import { ShareSheet } from '@/components/referral/ShareSheet';
@@ -44,6 +54,9 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
   // si no, la sesión completa (las 8 preguntas) se deja terminar siempre.
   const [restantesAlEntrar, setRestantesAlEntrar] = useState<number | null>(null);
   const [gemasAlEntrar, setGemasAlEntrar] = useState(0);
+  // Adelanto gratis por módulo (2026-08-17): igual criterio que el cupo diario
+  // del módulo gratis — se congela AL ENTRAR, nunca corta una sesión en marcha.
+  const [restantesGratisModuloAlEntrar, setRestantesGratisModuloAlEntrar] = useState<number | null>(null);
   const referido = useReferralPrompt();
   const flujoReferidoActivo = referido.abierto || referido.abiertoShare;
   const flujoReferidoActivoAntes = useRef(false);
@@ -52,7 +65,8 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     const p = leerProgreso();
     setRestantesAlEntrar(Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(p)));
     setGemasAlEntrar(p.gemas);
-  }, []);
+    setRestantesGratisModuloAlEntrar(Math.max(0, LIMITE_GRATIS_POR_MODULO - gratisUsadosDelModulo(p.modulos, slug)));
+  }, [slug]);
 
   // El prompt/share puede pasar por 2 pantallas (mensaje → compartir); solo
   // navegamos a Inicio cuando TODO el flujo de referido ya se cerró.
@@ -70,10 +84,15 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
 
   // Se genera SOLO en cliente (nunca en el render de servidor) para que cada
   // sesión de práctica traiga ejercicios nuevos, aunque el estudiante ya haya
-  // completado este módulo antes.
+  // completado este módulo antes. Si el módulo todavía no está desbloqueado
+  // (ni Premium ni gemas suficientes), la sesión se topa al adelanto gratis
+  // que le queda — nunca más de LIMITE_GRATIS_POR_MODULO en total.
   useEffect(() => {
-    if (modulo) setPreguntas(modulo.generarPreguntas(PREGUNTAS_POR_SESION));
-  }, [modulo]);
+    if (!modulo || cargandoPlan || restantesGratisModuloAlEntrar === null) return;
+    const ilimitado = moduloDesbloqueado(slug, plan, gemasAlEntrar);
+    const cantidad = ilimitado ? PREGUNTAS_POR_SESION : Math.min(PREGUNTAS_POR_SESION, restantesGratisModuloAlEntrar);
+    if (cantidad > 0) setPreguntas(modulo.generarPreguntas(cantidad));
+  }, [modulo, slug, cargandoPlan, plan, gemasAlEntrar, restantesGratisModuloAlEntrar]);
 
   const pregunta = preguntas?.[step];
   const progreso = preguntas ? Math.round((step / preguntas.length) * 100) : 0;
@@ -140,7 +159,7 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
     );
   }
 
-  if (!cargandoPlan && !moduloDesbloqueado(slug, plan, gemasAlEntrar)) {
+  if (!cargandoPlan && !moduloDesbloqueado(slug, plan, gemasAlEntrar) && restantesGratisModuloAlEntrar === 0) {
     const umbral = umbralDelModulo(slug) ?? 0;
     const faltan = gemasQueFaltan(gemasAlEntrar, umbral);
     return (
@@ -149,11 +168,10 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
           <Lock size={28} className="text-[var(--accent)]" />
         </div>
         <h1 className="text-[24px] font-bold leading-tight [font-family:var(--font-display)]">
-          {modulo.nombre} todavía no está desbloqueado
+          Ya usaste tus {LIMITE_GRATIS_POR_MODULO} gratis de {modulo.nombre}
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          Con el plan gratis practicas {getModulo(MODULO_GRATIS_SLUG)?.nombre}. Tienes 2 caminos para
-          desbloquear este módulo.
+          Tienes 2 caminos para seguir practicando este módulo sin límite.
         </p>
 
         <div className="w-full rounded-[var(--radius-card)] border-2 border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_6%,var(--surface))] p-4 text-left">
@@ -268,6 +286,15 @@ export default function PracticarPage({ params }: { params: Promise<{ modulo: st
                 <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
                   <span className="font-semibold text-[var(--text-primary)]">Te quedan {restantesAlEntrar} ejercicios gratis hoy: </span>
                   esta sesión te los usa. Vuelve mañana o pasa a Premium para practicar sin límite.
+                </p>
+              </div>
+            )}
+            {!esModuloGratis && !moduloDesbloqueado(slug, plan, gemasAlEntrar) && restantesGratisModuloAlEntrar !== null && restantesGratisModuloAlEntrar > 0 && (
+              <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--gold)_30%,transparent)] bg-[color-mix(in_oklab,var(--gold)_8%,var(--surface))] p-3.5">
+                <Gem size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--gold)]" />
+                <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">Adelanto gratis: te quedan {restantesGratisModuloAlEntrar} de {LIMITE_GRATIS_POR_MODULO} ejercicios. </span>
+                  Después, desbloqueas el resto con gemas o Premium.
                 </p>
               </div>
             )}

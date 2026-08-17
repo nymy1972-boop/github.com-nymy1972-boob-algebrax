@@ -9,7 +9,9 @@ import { ejerciciosGratisHoy, registrarVisitaHoy, sincronizarAlAbrir, type Progr
 import {
   examenDesbloqueado,
   gemasQueFaltan,
+  gratisUsadosDelModulo,
   LIMITE_DIARIO_GRATIS,
+  LIMITE_GRATIS_POR_MODULO,
   MODULO_GRATIS_SLUG,
   moduloDesbloqueado,
   umbralDelModulo,
@@ -185,8 +187,14 @@ export default function InicioApp() {
             const completado = p ? p.completadas >= p.total : false;
             const enProgreso = p && !completado;
             const esGratis = m.slug === MODULO_GRATIS_SLUG;
-            const bloqueado = !moduloDesbloqueado(m.slug, plan, progreso.gemas);
+            const desbloqueado = moduloDesbloqueado(m.slug, plan, progreso.gemas);
             const restantesGratis = esGratis && plan !== 'premium' ? Math.max(0, LIMITE_DIARIO_GRATIS - ejerciciosGratisHoy(progreso)) : null;
+            const restantesGratisModulo = !esGratis && !desbloqueado
+              ? Math.max(0, LIMITE_GRATIS_POR_MODULO - gratisUsadosDelModulo(progreso.modulos, m.slug))
+              : null;
+            // "bloqueado" (candado, sin poder entrar) solo cuando ya no queda NADA
+            // gratis de ese módulo — mientras tenga adelanto, se puede entrar.
+            const bloqueado = !desbloqueado && restantesGratisModulo === 0;
             const umbral = umbralDelModulo(m.slug);
             return (
               <Link key={m.slug} href={`/app/practicar/${m.slug}`}>
@@ -218,7 +226,9 @@ export default function InicioApp() {
                     <p className="text-[12px] text-[var(--text-secondary)]">
                       {bloqueado
                         ? `Te faltan ${umbral !== null ? gemasQueFaltan(progreso.gemas, umbral) : '—'} gemas, o hazte Premium`
-                        : restantesGratis !== null
+                        : restantesGratisModulo !== null
+                          ? `${restantesGratisModulo} de ${LIMITE_GRATIS_POR_MODULO} ejercicios gratis para probar`
+                          : restantesGratis !== null
                           ? `${restantesGratis} ejercicios gratis hoy`
                           : p
                             ? `${p.completadas}/${p.total} correctas`

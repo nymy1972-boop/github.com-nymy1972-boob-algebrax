@@ -56,6 +56,33 @@ export function moduloDesbloqueado(slug: string, plan: Plan, gemas: number): boo
   return umbral !== null && gemas >= umbral;
 }
 
+// Adelanto gratis por módulo (pedido explícito del usuario, 2026-08-17): antes
+// de desbloquear un módulo con gemas o Premium, cualquiera puede probar 5
+// ejercicios de ese módulo — así se siente el contenido antes de decidir
+// invertir gemas o pagar. Se cuenta reutilizando `modulos[slug].completadas`
+// (ya existía para el badge "Dominas X"): son los aciertos acumulados en ese
+// módulo mientras seguía bloqueado — mismo criterio que ya usa el cupo diario
+// del módulo gratis (solo cuenta aciertos, no intentos fallidos).
+export const LIMITE_GRATIS_POR_MODULO = 5;
+
+export function gratisUsadosDelModulo(
+  modulos: Record<string, { completadas: number; total: number }>,
+  slug: string,
+): number {
+  return modulos[slug]?.completadas ?? 0;
+}
+
+/** true si puede seguir practicando AHORA (desbloqueado del todo, o todavía le quedan de sus 5 gratis). */
+export function moduloAccesible(
+  slug: string,
+  plan: Plan,
+  gemas: number,
+  gratisUsados: number,
+): boolean {
+  if (moduloDesbloqueado(slug, plan, gemas)) return true;
+  return gratisUsados < LIMITE_GRATIS_POR_MODULO;
+}
+
 export function examenDesbloqueado(plan: Plan, gemas: number): boolean {
   return plan === 'premium' || gemas >= UMBRAL_GEMAS_EXAMEN;
 }
