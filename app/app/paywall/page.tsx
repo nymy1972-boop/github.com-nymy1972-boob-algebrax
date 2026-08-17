@@ -35,6 +35,10 @@ import { CheckCustom, StickyCtaMobile } from '@/components/landing/ui';
 //     de esa salida ya-generosa se sentiría como un dark pattern, algo que la
 //     Constitución de la app prohíbe explícitamente.
 
+// Links reales de checkout de Hotmart (producto creado por el usuario, 2026-08-17).
+const HOTMART_MENSUAL = 'https://pay.hotmart.com/W107207244C?off=4eu1gd19';
+const HOTMART_ANUAL = 'https://pay.hotmart.com/W107207244C?off=8mh56rl1';
+
 const TEMA_LABELS: Record<string, string> = {
   'Ecuaciones básicas': 'las ecuaciones básicas',
   'Despejes con signos': 'los despejes con signos',
@@ -116,7 +120,7 @@ function PaywallContent() {
           ahorro: 'El equivalente a 4 meses gratis vs. mensual',
           descomposicionDia: 'menos de $0.14 al día',
           ctaLabel: 'Quiero Premium',
-          ctaHref: '/entrar?plan=anual',
+          ctaHref: HOTMART_ANUAL,
           features: [
             'Todos los módulos de álgebra desbloqueados',
             'Modo Examen ilimitado con temporizador',
@@ -128,7 +132,7 @@ function PaywallContent() {
           nombre: 'Mensual',
           precioMes: '$4.99',
           ctaLabel: 'Quiero Premium mensual',
-          ctaHref: '/entrar?plan=mensual',
+          ctaHref: HOTMART_MENSUAL,
           features: [
             'Todos los módulos de álgebra desbloqueados',
             'Modo Examen ilimitado con temporizador',
@@ -146,7 +150,7 @@ function PaywallContent() {
         </Link>
       </div>
 
-      <StickyCtaMobile labelComercial="Quiero Premium" href="/entrar?plan=anual" labelPre="Ver plan y precios" />
+      <StickyCtaMobile labelComercial="Quiero Premium" href={HOTMART_ANUAL} labelPre="Ver plan y precios" />
     </div>
   );
 }
