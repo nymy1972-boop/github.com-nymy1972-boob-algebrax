@@ -564,7 +564,8 @@ Pedido explícito del usuario (competencia ofrece más temas): construido el cam
 - Verificado: `tsc --noEmit` ✓, `npm run build` ✓ (18 rutas, sin nuevas). No se verificó con render real en navegador porque `/app` exige sesión real de Supabase en este entorno (middleware activo, ya no hay preview anónimo local) — verificación visual queda pendiente de que el usuario lo pruebe en producción o se genere una sesión de prueba.
 - Commit local hecho (`feat: amplía el temario de 3 a 12 módulos con camino de progreso completo`); falta el push del usuario vía GitHub Desktop.
 
-⚠️ Pendientes de sesiones anteriores, todavía sin decisión del usuario: (1) qué correo real reemplaza `soporte@algebrax.app` (muerto — el dominio `algebrax.app` nunca se registró) en 9 lugares; (2) el botón "Continuar con Google" en `/entrar` no tiene `onClick` real.
+⚠️ Pendiente de sesiones anteriores: el botón "Continuar con Google" en `/entrar` no tiene `onClick` real.
+(Resuelto 2026-08-17 — ver "Ajuste: correo de soporte real" más abajo: `soporte@algebrax.app` reemplazado por `nymy1972@gmail.com` en los 9 lugares, y usado también como contacto en Hotmart.)
 
 VEREDICTO_ONBOARDING_RUTINA_TEMARIO_12 (2026-08-17): el gate se re-disparó por `app/app/app/examen/page.tsx` (12 preguntas del simulacro + duración 8 min, ver arriba) y por los archivos ya documentados de `admin/`. Ninguno es la pantalla de onboarding. `onboarding/page.tsx` cambió solo el texto de reconocimiento (mismo layout/color/espaciado ya evaluado — ver diff de esta sesión, ronda de cumplimiento de anuncios) y `Diagnostico.tsx` no cambió en absoluto. Sigue sin ameritar nueva ronda de `revisor-visual`: veredicto LISTA (38/40, 16/20) se mantiene válido en contenido visual.
 Landing y paywall siguen documentadas como NO LISTA a propósito (ver `VEREDICTO_LANDING_NO_LISTA`/`VEREDICTO_PAYWALL_NO_LISTA` arriba, "CIERRE_REVISOR_LANDING_PAYWALL") — ningún archivo de esta sesión (temario, examen, plan de gemas) tocó `app/app/page.tsx` layout/color ni `paywall/page.tsx` (solo el copy de FAQ de la landing, texto plano, sin cambio visual) — no corresponde nueva ronda tampoco ahí.
@@ -591,5 +592,8 @@ El usuario pegó un nuevo diseño de isotipo (monograma "A/X" con anillo, símbo
 
 VEREDICTO_LANDING_RUTINA_LOGO (2026-08-17): este cambio tocó `isotipo.png` (usado en el header de la landing, ya NO LISTA a propósito por otros motivos — ver `VEREDICTO_LANDING_NO_LISTA`) — es un reemplazo de asset (mismo tamaño/posición ya evaluados), no un cambio de layout/color/espaciado. No amerita nueva ronda de `revisor-visual` solo por esto.
 
+## Ajuste: correo de soporte real (2026-08-17)
+`soporte@algebrax.app` nunca funcionó (dominio no registrado). El usuario eligió `nymy1972@gmail.com` como contacto oficial — reemplazado en los 9 lugares (`privacidad`, `terminos`, `reembolsos`, `aviso-ia`, FAQ de la landing) y es el que se puso también como correo de contacto en la configuración del producto en Hotmart. `tsc`/`build` ✓.
+
 ## Próximo paso
-Verificar en el navegador real (con una cuenta) que el adelanto de 5 gratis por módulo se ve y se comporta bien de punta a punta. Después: confirmar con el usuario el resultado de la prueba real del webhook en Hotmart ("Testar webhook"); conectar `nymystudio.com` a Vercel si se quiere un link corto para Hotmart; y los pendientes de sesiones anteriores (dominio propio en Resend, migrar `lib/progress.ts` a Supabase, tabla `ai_calls`, correo de soporte muerto, botón de Google sin función).
+Verificar en el navegador real (con una cuenta) que el adelanto de 5 gratis por módulo se ve y se comporta bien de punta a punta. Después: confirmar con el usuario el resultado de la prueba real del webhook en Hotmart ("Testar webhook"); conectar `nymystudio.com` a Vercel si se quiere un link corto para Hotmart; y los pendientes de sesiones anteriores (dominio propio en Resend, migrar `lib/progress.ts` a Supabase, tabla `ai_calls`, botón de Google sin función).
