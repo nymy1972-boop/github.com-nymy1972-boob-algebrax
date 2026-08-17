@@ -47,7 +47,7 @@ export default function Page() {
       <p className="mt-3 text-[14px] leading-relaxed text-[var(--text-secondary)]">
         Puedes pedirnos en cualquier momento: acceder a tus datos, corregirlos, o eliminar tu cuenta
         y todo tu historial de forma permanente. Escríbenos a{' '}
-        <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a> y lo
+        <a href="mailto:nymy1972@gmail.com" className="underline">nymy1972@gmail.com</a> y lo
         resolvemos en un plazo razonable (máximo 30 días).
       </p>
 
@@ -69,7 +69,7 @@ export default function Page() {
       <h2 className="mt-8 text-[18px] font-bold [font-family:var(--font-display)]">8. Contacto</h2>
       <p className="mt-3 text-[14px] leading-relaxed text-[var(--text-secondary)]">
         Para cualquier pregunta sobre privacidad, escribe a{' '}
-        <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a>.
+        <a href="mailto:nymy1972@gmail.com" className="underline">nymy1972@gmail.com</a>.
       </p>
     </div>
   );

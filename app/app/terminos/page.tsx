@@ -60,7 +60,7 @@ export default function Page() {
 
       <h2 className="mt-8 text-[18px] font-bold [font-family:var(--font-display)]">8. Contacto</h2>
       <p className="mt-3 text-[14px] leading-relaxed text-[var(--text-secondary)]">
-        Preguntas sobre estos términos: <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a>.
+        Preguntas sobre estos términos: <a href="mailto:nymy1972@gmail.com" className="underline">nymy1972@gmail.com</a>.
       </p>
     </div>
   );

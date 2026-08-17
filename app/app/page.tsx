@@ -175,7 +175,7 @@ export default function Home() {
           {
             pregunta: '¿Qué pasa si no me sirve?',
             respuestaMarked:
-              'Revisa nuestra [b]Política de Reembolsos[/b] (enlace al final de esta página) para conocer las condiciones exactas — o escríbenos a soporte@algebrax.app.',
+              'Revisa nuestra [b]Política de Reembolsos[/b] (enlace al final de esta página) para conocer las condiciones exactas — o escríbenos a nymy1972@gmail.com.',
           },
         ]}
       />
@@ -194,7 +194,7 @@ export default function Home() {
       <FooterLegal
         appName="AlgebraX"
         logo={LOGO}
-        soporteEmail="soporte@algebrax.app"
+        soporteEmail="nymy1972@gmail.com"
         enlaces={[
           { label: 'Privacidad', href: '/privacidad' },
           { label: 'Términos y Condiciones', href: '/terminos' },

@@ -12,7 +12,7 @@ export default function Page() {
 
       <h2 className="mt-8 text-[18px] font-bold [font-family:var(--font-display)]">Cómo pedir tu reembolso</h2>
       <ol className="mt-3 list-decimal space-y-2 pl-5 text-[14px] leading-relaxed text-[var(--text-secondary)]">
-        <li>Escríbenos a soporte@algebrax.app con el correo que usaste para comprar.</li>
+        <li>Escríbenos a nymy1972@gmail.com con el correo que usaste para comprar.</li>
         <li>Confirmamos tu compra y procesamos la devolución por el mismo medio de pago, a través de Hotmart.</li>
         <li>El dinero puede tardar unos días hábiles en reflejarse, según tu banco o método de pago.</li>
       </ol>
@@ -26,7 +26,7 @@ export default function Page() {
 
       <p className="mt-8 text-[13px] leading-relaxed text-[var(--text-secondary)]">
         Si tienes dudas sobre el plazo o las condiciones exactas de tu compra, escríbenos a{' '}
-        <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a> y te
+        <a href="mailto:nymy1972@gmail.com" className="underline">nymy1972@gmail.com</a> y te
         confirmamos con la información real de tu transacción.
       </p>
     </div>

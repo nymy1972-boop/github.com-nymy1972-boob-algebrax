@@ -27,7 +27,7 @@ export default function Page() {
         La explicación es una ayuda de estudio generada automáticamente. Aunque revisamos que el
         contenido matemático sea correcto en nuestros ejercicios, una explicación de IA puede
         ocasionalmente redactarse de forma imperfecta. Si ves algo que no tiene sentido, repórtalo a{' '}
-        <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a>.
+        <a href="mailto:nymy1972@gmail.com" className="underline">nymy1972@gmail.com</a>.
       </p>
 
       <p className="mt-8 text-[13px] leading-relaxed text-[var(--text-secondary)]">
