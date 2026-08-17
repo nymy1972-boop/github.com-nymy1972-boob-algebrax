@@ -114,7 +114,7 @@ export default function OnboardingPage() {
     if (!temaDebil) {
       return 'Respondiste las 3 sin fallar — tienes buena base. Tu reto real está en los simulacros de examen, donde el tiempo aprieta.';
     }
-    return `No es que seas malo para los números — es que nadie te mostró bien "${temaDebil}". Eso es exactamente lo que vamos a arreglar primero.`;
+    return `Tuviste dificultades con "${temaDebil}" — el Descifrador te va a ayudar a identificar en qué paso te confundes. Eso es exactamente lo que vamos a practicar primero.`;
   }, [dolores, temaDebil]);
 
   const temaDelPlan = temaDebil ?? 'Simulacro de examen';

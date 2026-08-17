@@ -80,7 +80,7 @@ export default function Home() {
       <Solucion
         tituloMarked="El método que sí te enseña [acento]a pensar[/acento]"
         mecanismo="el Descifrador de Pasos"
-        bigIdeaMarked="No es que seas malo para los números — es que nadie te mostró [b]en qué paso te perdiste[/b]. El Descifrador te lo señala, y te explica el porqué."
+        bigIdeaMarked="Si tienes dificultades con un ejercicio, el Descifrador te ayuda a identificar [b]en qué paso pudiste confundirte[/b] y revisar el procedimiento."
         pasos={[
           { titulo: 'Eliges el ejercicio', detalle: 'El que te bloqueó en la tarea o en clase.' },
           { titulo: 'El Descifrador señala tu error', detalle: 'Te muestra en qué paso exacto y por qué.' },
@@ -165,7 +165,7 @@ export default function Home() {
           {
             pregunta: '¿Los ejercicios se parecen a los de mi colegio?',
             respuestaMarked:
-              'Sí: álgebra básica, incluyendo ecuaciones, despejes y factorización, para practicar conceptos frecuentes de este nivel.',
+              'Sí: cubre desde expresiones y operaciones básicas hasta factorización, ecuaciones, sistemas y funciones, para practicar conceptos frecuentes de este nivel.',
           },
           {
             pregunta: '¿Qué pasa si no tengo tarjeta propia para pagar?',

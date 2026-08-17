@@ -22,12 +22,24 @@ export const LIMITE_DIARIO_GRATIS = 15;
 // Segunda vía de desbloqueo (pedido explícito del usuario, 2026-08-15): además
 // de Premium, practicar mucho el módulo gratis (que es lo único que da gemas
 // sin pagar) también desbloquea, PARA SIEMPRE, el resto del contenido — un
-// camino de esfuerzo real, no un descuento disfrazado. Umbrales crecientes:
-// lo más barato de desbloquear es el siguiente módulo, lo más caro es el
-// simulacro completo (el ítem de mayor valor).
-export const UMBRAL_GEMAS_DESPEJES = 300; // ≈ 30 aciertos, ~2 días de práctica gratis
-export const UMBRAL_GEMAS_FACTORIZACION = 700; // ≈ 70 aciertos, ~5 días
-export const UMBRAL_GEMAS_EXAMEN = 1200; // ≈ 120 aciertos, ~8 días — el más valioso, el más caro
+// camino de esfuerzo real, no un descuento disfrazado. Umbrales crecientes que
+// siguen el mismo camino de progreso del temario (lib/modulos.ts, 2026-08-17):
+// cada módulo nuevo cuesta más gemas que el anterior, y el simulacro completo
+// es lo más caro de todos (el ítem de mayor valor).
+export const UMBRALES_GEMAS_MODULO: Record<string, number> = {
+  operaciones: 150,
+  exponentes: 300,
+  'productos-notables': 450,
+  factorizacion: 600,
+  ecuaciones: 750,
+  despejes: 900,
+  inecuaciones: 1050,
+  sistemas: 1200,
+  polinomios: 1350,
+  cuadraticas: 1500,
+  funciones: 1650,
+};
+export const UMBRAL_GEMAS_EXAMEN = 2000; // ≈ 200 aciertos — el más valioso, el más caro
 
 /** Gemas que le faltan a un umbral (nunca negativo). */
 export function gemasQueFaltan(gemas: number, umbral: number): number {
@@ -35,9 +47,7 @@ export function gemasQueFaltan(gemas: number, umbral: number): number {
 }
 
 export function umbralDelModulo(slug: string): number | null {
-  if (slug === 'despejes') return UMBRAL_GEMAS_DESPEJES;
-  if (slug === 'factorizacion') return UMBRAL_GEMAS_FACTORIZACION;
-  return null; // el módulo gratis no tiene umbral — ya está abierto
+  return UMBRALES_GEMAS_MODULO[slug] ?? null; // el módulo gratis no tiene umbral — ya está abierto
 }
 
 export function moduloDesbloqueado(slug: string, plan: Plan, gemas: number): boolean {

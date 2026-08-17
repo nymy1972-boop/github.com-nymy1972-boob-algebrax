@@ -14,7 +14,7 @@ import { useReferralPrompt } from '@/lib/referral';
 import { ReferralPromptOverlay } from '@/components/referral/ReferralPromptOverlay';
 import { ShareSheet } from '@/components/referral/ShareSheet';
 
-const DURACION_SEGUNDOS = 4 * 60; // 4 min — simulacro corto, coherente con "10 min/día"
+const DURACION_SEGUNDOS = 8 * 60; // 8 min — mismo ritmo que el original (40s/pregunta), escalado a 12 módulos
 
 interface PreguntaExamen {
   moduloNombre: string;
@@ -24,17 +24,27 @@ interface PreguntaExamen {
   pasoClave: string;
 }
 
-/** 2 preguntas GENERADAS al azar por módulo — banco prácticamente infinito, cada simulacro es distinto. */
-function armarPreguntas(cantidadPorModulo: number): PreguntaExamen[] {
-  return MODULOS.flatMap((m) =>
-    m.generarPreguntas(cantidadPorModulo).map((p: PreguntaModulo) => ({
-      moduloNombre: m.nombre,
-      enunciado: p.enunciado,
-      opciones: p.opciones,
-      correctaIndex: p.correctaIndex,
-      pasoClave: p.pasoClave,
-    })),
-  );
+function preguntaDe(m: (typeof MODULOS)[number], p: PreguntaModulo): PreguntaExamen {
+  return {
+    moduloNombre: m.nombre,
+    enunciado: p.enunciado,
+    opciones: p.opciones,
+    correctaIndex: p.correctaIndex,
+    pasoClave: p.pasoClave,
+  };
+}
+
+/** 1 pregunta GENERADA al azar por cada módulo del temario — el simulacro completo, mezclado. */
+function armarPreguntas(): PreguntaExamen[] {
+  return MODULOS.flatMap((m) => m.generarPreguntas(1).map((p) => preguntaDe(m, p)));
+}
+
+/** El "adelanto" gratis: 1 pregunta de solo `cantidad` módulos al azar — deja sentir el
+ * formato del simulacro (mezcla de temas, no sabes si acertaste hasta el final) sin dar
+ * el valor completo. */
+function armarPreguntasMini(cantidad: number): PreguntaExamen[] {
+  const modulos = [...MODULOS].sort(() => Math.random() - 0.5).slice(0, cantidad);
+  return modulos.flatMap((m) => m.generarPreguntas(1).map((p) => preguntaDe(m, p)));
 }
 
 function formatTiempo(s: number): string {
@@ -80,7 +90,7 @@ export default function ExamenPage() {
   }
 
   function empezar() {
-    const nuevas = armarPreguntas(2);
+    const nuevas = armarPreguntas();
     setPreguntas(nuevas);
     setRespuestas(nuevas.map(() => null));
     setSegundosRestantes(DURACION_SEGUNDOS);
@@ -88,12 +98,12 @@ export default function ExamenPage() {
     setIniciado(true);
   }
 
-  /** El "adelanto" gratis (pedido del usuario, 2026-08-15): 1 pregunta por
-   * módulo, sin cronómetro — deja sentir el formato del simulacro real (mezcla
-   * de temas, no sabes si acertaste hasta el final) sin dar el valor completo,
-   * para que se note la diferencia con el simulacro de verdad. */
+  /** El "adelanto" gratis (pedido del usuario, 2026-08-15): 3 preguntas de 3
+   * módulos al azar, sin cronómetro — deja sentir el formato del simulacro real
+   * (mezcla de temas, no sabes si acertaste hasta el final) sin dar el valor
+   * completo, para que se note la diferencia con el simulacro de verdad. */
   function empezarMini() {
-    const nuevas = armarPreguntas(1);
+    const nuevas = armarPreguntasMini(3);
     setPreguntas(nuevas);
     setRespuestas(nuevas.map(() => null));
     setModoMini(true);
@@ -211,7 +221,7 @@ export default function ExamenPage() {
           Simulacro cronometrado: {Math.round(DURACION_SEGUNDOS / 60)} minutos
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
-          {MODULOS.length * 2} preguntas mezcladas de tus 3 módulos. No sabrás si acertaste hasta el final, para que practiques sin esa muleta.
+          {MODULOS.length} preguntas mezcladas de tus {MODULOS.length} módulos. No sabrás si acertaste hasta el final, para que practiques sin esa muleta.
         </p>
         <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[color-mix(in_oklab,var(--accent-2)_30%,transparent)] bg-[color-mix(in_oklab,var(--accent-2)_8%,var(--surface))] p-3.5 text-left">
           <NotebookPen size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--accent-2)]" />
