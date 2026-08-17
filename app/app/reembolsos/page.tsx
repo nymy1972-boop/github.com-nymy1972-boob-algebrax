@@ -5,10 +5,10 @@ export default function Page() {
       <p className="mt-2 text-[13px] text-[var(--text-secondary)]">Última actualización: agosto de 2026</p>
 
       <p className="mt-6 text-[14px] leading-relaxed text-[var(--text-secondary)]">
-        Tienes la <strong>Garantía del Primer Paso Entendido</strong>: si dentro de 7 días desde tu
-        compra sientes que AlgebraX no te ayudó a entender al menos un paso que antes te bloqueaba,
-        escribes a <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a>{' '}
-        y te devolvemos el 100% de tu dinero, sin preguntas.
+        Tienes la <strong>Garantía de satisfacción de 7 días</strong>: si dentro de los primeros 7
+        días desde tu compra sientes que AlgebraX no es para ti, escribes a{' '}
+        <a href="mailto:soporte@algebrax.app" className="underline">soporte@algebrax.app</a> y te
+        devolvemos el 100% de tu dinero.
       </p>
 
       <h2 className="mt-8 text-[18px] font-bold [font-family:var(--font-display)]">Cómo pedir tu reembolso</h2>
@@ -26,8 +26,9 @@ export default function Page() {
       </p>
 
       <p className="mt-8 text-[13px] leading-relaxed text-[var(--text-secondary)]">
-        Esta garantía está respaldada por la plataforma de pagos Hotmart, cuya política de garantía
-        vigente puedes consultar también directamente en tu recibo de compra.
+        Esta garantía la ofrece AlgebraX (no Hotmart) — Hotmart es únicamente la plataforma que
+        procesa el pago y la devolución. El plazo y las condiciones exactas de este documento son
+        las que aplican; cualquier mensaje distinto en tu recibo de compra no las reemplaza.
       </p>
     </div>
   );

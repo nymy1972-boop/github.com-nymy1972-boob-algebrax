@@ -360,6 +360,30 @@ especialmente a menores de presión comercial). Ajustes adicionales sobre la pri
   de IA. Las 4 páginas legales ya existen (Sesión 6, con datos reales de Nymy/Canadá) pero no han
   sido auditadas específicamente contra este ángulo de menores + plataformas de ads.
 
+**Tercera pasada (mismo día)** — el usuario reportó que las frases seguían visibles; verificado con
+`curl` contra el sitio publicado que 9 de 10 ya estaban corregidas (probablemente vio una versión en
+caché de su navegador) — solo faltó "¿Sientes un nudo en el estómago...?" (`Problema`, no se había
+tocado en la primera pasada). Corregido, reemplazada por una pregunta neutra ("¿Sientes que
+necesitas repetir el mismo tipo de ejercicio varias veces...?") para mantener las 3 preguntas
+mínimas que exige `warnRango` del componente.
+- **Garantía reescrita de fondo** (esta vez sí, con dirección explícita del usuario: "una garantía
+  de satisfacción/reembolso" en vez de "una promesa de que el usuario comprenderá un concepto", y
+  sin confundirla con la garantía propia de Hotmart): renombrada de "la Garantía del Primer Paso
+  Entendido" a **"la Garantía de satisfacción de 7 días"** en TODOS los lugares donde aparecía (hero
+  de landing y paywall, sección Garantía, FAQ, recap y PS del CTA final, `/reembolsos`). La condición
+  ya no promete comprensión ("si no entiendes un paso") sino satisfacción ("si sientes que AlgebraX
+  no es para ti"). Se quitó la afirmación no verificada "respaldada por la garantía Hotmart de 7
+  días" — reemplazada por "Procesada a través de Hotmart" (solo nombra la plataforma de pago, sin
+  atribuirle a Hotmart una garantía propia que no está confirmada). `/reembolsos` ahora aclara
+  explícitamente **quién ofrece la garantía** ("la ofrece AlgebraX, no Hotmart — Hotmart es
+  únicamente la plataforma que procesa el pago y la devolución"), resolviendo la confusión de dos
+  garantías distintas que señaló el usuario.
+- ⚠️ Sigue pendiente lo mismo de fondo (no cambia con esta reescritura): confirmar con la cuenta real
+  de Hotmart si el plazo/condiciones que ofrece la plataforma coinciden con estos 7 días, y si aplica
+  igual a mensual y anual — ver `GARANTIA_PENDIENTE_VERIFICACION` más arriba en este archivo.
+- Verificado con Playwright headless (scroll real) contra `/`, `/paywall` y `/reembolsos`: cero
+  coincidencias de las 7 frases prohibidas en ninguna de las 3. `tsc` ✓ `build` ✓ (18 rutas).
+
 ### CIERRE_REVISOR_LANDING_PAYWALL (2026-08-14) — 4 rondas, ambas quedan NO LISTA, cierro el ciclo aquí
 Tras 4 rondas de `revisor-visual` (real, con scroll correcto) sobre landing y paywall, aplicando en cada una los defectos reportados (block-press en todos los CTAs incluido el sticky, `focus-visible` global, nivel de profundidad `--surface-2`, garantía junto al CTA de compra, mecanismo bautizado nombrado, escenas literales de FICHA-AVATAR en el copy, jerarquía Anual vs Mensual, hero animado, sticky CTA en el paywall):
 - **Paywall**: 15/40·6/20(falso, ver metodología) → 31/40·16/20·17/20 → 34/40·15/20·16/20 → 27/40·13/20·17/20 (esta última con el glitch de captura del sticky ya documentado arriba, que infló a la baja "Encaje"/craft artificialmente). Copy YA pasa el umbral (17/20, sin ejes ≤2) desde la 3ª ronda. Usabilidad/craft quedan cerca pero no cruzan el gate ≥36/40·≥16/20 de forma consistente.

@@ -97,14 +97,14 @@ function PaywallContent() {
         {/* Prueba social honesta — nunca un rating o testimonio inventado (19-PAGINA-DE-VENTAS) */}
         <div className="mx-auto mt-6 flex max-w-[400px] items-center justify-center gap-2 rounded-full border border-[color-mix(in_oklab,var(--success)_30%,transparent)] bg-[color-mix(in_oklab,var(--success)_8%,var(--surface))] px-4 py-2 text-[13px] font-semibold text-[var(--success)]">
           <ShieldCheck size={16} />
-          Garantía del Primer Paso Entendido (7 días) — respaldada por Hotmart
+          Garantía de satisfacción de 7 días
         </div>
       </motion.div>
 
       <Oferta
         kicker="TU PLAN"
         tituloMarked="Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
-        garantiaCorta="Garantía de 7 días — respaldada por Hotmart"
+        garantiaCorta="Garantía de satisfacción de 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },

@@ -35,7 +35,7 @@ export default function Home() {
         subtitleMarked="El Descifrador de Pasos te muestra [b]dónde te pierdes[/b], no solo la respuesta."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
-        socialProof={<span>Garantía Hotmart de 7 días — sin preguntas</span>}
+        socialProof={<span>Garantía de satisfacción de 7 días</span>}
         visualPlaceholderSugerencia="captura del diagnóstico exprés mostrando en qué paso se equivocó el estudiante"
         visual={
           <div
@@ -64,7 +64,7 @@ export default function Home() {
         titulo="¿Te suena?"
         preguntas={[
           { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta porque te resulta difícil resolverlo por tu cuenta?' },
-          { icon: AlarmClock, textoMarked: '¿Sientes un nudo en el estómago cuando anuncian examen sorpresa?' },
+          { icon: AlarmClock, textoMarked: '¿Sientes que necesitas repetir el mismo tipo de ejercicio varias veces para que te quede claro?' },
           { icon: Ban, textoMarked: '¿Odias que las apps te bloqueen justo cuando más necesitas practicar?' },
         ]}
       />
@@ -112,7 +112,7 @@ export default function Home() {
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
         tituloMarked="Empieza gratis. Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
-        garantiaCorta="Garantía del Primer Paso Entendido — 7 días"
+        garantiaCorta="Garantía de satisfacción de 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
@@ -153,9 +153,9 @@ export default function Home() {
 
       {/* 7. GARANTÍA */}
       <Garantia
-        nombre="la Garantía del Primer Paso Entendido"
-        condicionMarked="Si en 7 días no entiendes [b]al menos un paso[/b] que antes te bloqueaba, escribes un correo y te devolvemos todo."
-        pisoLegal="Respaldada por la garantía Hotmart de 7 días"
+        nombre="la Garantía de satisfacción de 7 días"
+        condicionMarked="Si dentro de los primeros [b]7 días[/b] sientes que AlgebraX no es para ti, nos escribes y te devolvemos tu dinero."
+        pisoLegal="Procesada a través de Hotmart"
       />
 
       {/* 8. FAQ */}
@@ -184,7 +184,7 @@ export default function Home() {
           {
             pregunta: '¿Qué pasa si no me sirve?',
             respuestaMarked:
-              'Tienes la Garantía del Primer Paso Entendido: [b]un correo y te devolvemos todo[/b].',
+              'Tienes la Garantía de satisfacción de 7 días: [b]nos escribes y te devolvemos tu dinero[/b].',
           },
         ]}
       />
@@ -195,8 +195,8 @@ export default function Home() {
         futurePacingMarked="Imagina llegar a tu examen y sentirte mejor preparado para abordar los ejercicios, sin depender de tu teléfono."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
-        recap="Garantía del Primer Paso Entendido · Empieza gratis, sin tarjeta"
-        psMarked="PS: el Descifrador de Pasos te muestra dónde te pierdes, no solo la respuesta. Empieza gratis, sin tarjeta — y con la Garantía del Primer Paso Entendido."
+        recap="Garantía de satisfacción de 7 días · Empieza gratis, sin tarjeta"
+        psMarked="PS: el Descifrador de Pasos te muestra dónde te pierdes, no solo la respuesta. Empieza gratis, sin tarjeta — y con la Garantía de satisfacción de 7 días."
       />
 
       {/* 10. FOOTER LEGAL — páginas legales reales: Sesión 6 (47-LEGAL-FISCAL) */}
