@@ -103,13 +103,13 @@ function PaywallContent() {
 
       <Oferta
         kicker="TU PLAN"
-        tituloMarked="Practica álgebra por [acento]$0.14 al día[/acento]"
+        tituloMarked="Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
         garantiaCorta="Garantía de 7 días — respaldada por Hotmart"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
             { resultado: 'Reporte de errores comunes para repasar solo lo que fallas', valor: '$25' },
-            { resultado: 'Simulacros cronometrados con el mismo formato de tiempo y mezcla de temas', valor: '$19' },
+            { resultado: 'Simulacros cronometrados para practicar como en una evaluación', valor: '$19' },
           ],
           totalTachado: '$164',
           nota: 'Hoy: $3.33/mes (se cobra $39.99/año)',

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Camera, CircleHelp, AlarmClock, Ban } from 'lucide-react';
+import { Camera, AlarmClock, Ban } from 'lucide-react';
 import { Hero } from '@/components/landing/Hero';
 import { Problema } from '@/components/landing/Problema';
 import { Agitacion } from '@/components/landing/Agitacion';
@@ -31,7 +31,7 @@ export default function Home() {
         appName="AlgebraX"
         logo={LOGO}
         loginHref="/entrar"
-        h1Marked="[acento]Entiende el porqué[/acento] de cada paso de álgebra"
+        h1Marked="[acento]Entiende el álgebra[/acento] y practica paso a paso"
         subtitleMarked="El Descifrador de Pasos te muestra [b]dónde te pierdes[/b], no solo la respuesta."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
@@ -63,8 +63,7 @@ export default function Home() {
       <Problema
         titulo="¿Te suena?"
         preguntas={[
-          { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta y te quedas en blanco en el examen?' },
-          { icon: CircleHelp, textoMarked: '¿Te da vergüenza preguntar en clase y quedar como el tonto?' },
+          { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta porque te resulta difícil resolverlo por tu cuenta?' },
           { icon: AlarmClock, textoMarked: '¿Sientes un nudo en el estómago cuando anuncian examen sorpresa?' },
           { icon: Ban, textoMarked: '¿Odias que las apps te bloqueen justo cuando más necesitas practicar?' },
         ]}
@@ -74,16 +73,9 @@ export default function Home() {
           académico futuro (revisión 2026-08-17, ver nota en app/layout.tsx) */}
       <Agitacion
         frases={[
-          'Cada semana que pasa sin entender, [b]se acumula más miedo[/b] al examen final.',
-          'Postergarlo no hace que el tema se entienda solo — sigue esperando el día del examen.',
+          'Practicar con regularidad puede ayudarte a reforzar los conceptos que todavía estás aprendiendo.',
           'Copiar la tarea no te salva en el examen: ahí no hay cámara que te dé la respuesta.',
         ]}
-        contraste={{
-          labelHoy: 'Hoy',
-          hoy: 'Copias la tarea a las 10 PM y sigues sin entender nada.',
-          labelFuturo: 'Si nada cambia',
-          futuro: 'El mismo vacío en la cabeza, solo que más cerca del examen.',
-        }}
       />
 
       {/* 4. SOLUCIÓN */}
@@ -94,13 +86,13 @@ export default function Home() {
         pasos={[
           { titulo: 'Eliges el ejercicio', detalle: 'El que te bloqueó en la tarea o en clase.' },
           { titulo: 'El Descifrador señala tu error', detalle: 'Te muestra en qué paso exacto y por qué.' },
-          { titulo: 'Practicas sin miedo', detalle: 'Resuelves uno parecido tú solo, sin castigos.' },
+          { titulo: 'Practicas a tu propio ritmo', detalle: 'Resuelves uno parecido tú solo, sin castigos.' },
         ]}
         antesDespues={{
           labelAntes: 'Antes',
-          antes: 'Copiabas la respuesta y llegabas al examen en blanco.',
+          antes: 'Copiabas la respuesta y llegabas a la evaluación con dudas sobre cómo resolver algunos ejercicios.',
           labelDespues: 'Después',
-          despues: 'Entiendes la lógica y resuelves el ejercicio tú mismo.',
+          despues: 'Entiendes la lógica y puedes volver a practicar el procedimiento.',
         }}
       />
 
@@ -119,13 +111,13 @@ export default function Home() {
 
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
-        tituloMarked="Empieza gratis. Practica álgebra por [acento]$0.14 al día[/acento]"
+        tituloMarked="Empieza gratis. Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
         garantiaCorta="Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
             { resultado: 'Reporte de errores comunes para repasar solo lo que fallas', valor: '$25' },
-            { resultado: 'Simulacros cronometrados con el mismo formato de tiempo y mezcla de temas', valor: '$19' },
+            { resultado: 'Simulacros cronometrados para practicar como en una evaluación', valor: '$19' },
           ],
           totalTachado: '$164',
           nota: 'Hoy: $3.33/mes (se cobra $39.99/año)',
@@ -182,12 +174,12 @@ export default function Home() {
           {
             pregunta: '¿Los ejercicios se parecen a los de mi colegio?',
             respuestaMarked:
-              'Sí: álgebra básica (ecuaciones, despejes, factorización), el temario que realmente te toman en examen.',
+              'Sí: álgebra básica, incluyendo ecuaciones, despejes y factorización, para practicar conceptos frecuentes de este nivel.',
           },
           {
             pregunta: '¿Qué pasa si no tengo tarjeta propia para pagar?',
             respuestaMarked:
-              'Puedes [b]empezar gratis sin tarjeta[/b]; cuando quieras más práctica, tus papás activan Premium en un clic.',
+              'Puedes [b]empezar gratis sin tarjeta[/b]. Si eres menor de edad, la compra de Premium puede ser gestionada por tu padre, madre o tutor, según las condiciones aplicables.',
           },
           {
             pregunta: '¿Qué pasa si no me sirve?',
@@ -199,8 +191,8 @@ export default function Home() {
 
       {/* 9. CTA FINAL */}
       <CtaFinal
-        h2Marked="Entra a tu examen [acento]sin miedo[/acento]"
-        futurePacingMarked="Imagina llegar a tu examen habiendo practicado cada tipo de ejercicio, sin depender de tu teléfono para resolverlo."
+        h2Marked="[acento]Prepárate[/acento] para tus evaluaciones con práctica estructurada"
+        futurePacingMarked="Imagina llegar a tu examen y sentirte mejor preparado para abordar los ejercicios, sin depender de tu teléfono."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
         recap="Garantía del Primer Paso Entendido · Empieza gratis, sin tarjeta"

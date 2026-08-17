@@ -326,6 +326,40 @@ real" que la app nunca vio).
   un prospecto; categoría distinta a la que señaló el usuario. Si se quiere más conservador, avisar.
 - Verificado: `tsc` ✓ `build` ✓ (18 rutas, sin cambios estructurales, solo copy).
 
+**Segunda pasada, más precisa (mismo día)** — el usuario dio una tabla exacta "actual → reemplazo"
+con la razón legal completa (Google Ads prohíbe afirmaciones engañosas/resultados improbables y
+exige coherencia anuncio↔landing; TikTok Ads prohíbe prometer/exagerar resultados y protege
+especialmente a menores de presión comercial). Ajustes adicionales sobre la primera pasada:
+- Eliminado (no solo suavizado) el bloque `contraste` de `<Agitacion>` en `app/page.tsx` (la
+  comparación "Hoy vs. Si nada cambia" — predicción de resultado futuro, prop opcional en el
+  componente, se quitó por completo en vez de reescribirla).
+- `¿Te da vergüenza preguntar en clase?` eliminado del todo (`Problema`, ya no 4 sino 3 preguntas —
+  dentro del rango 3-5 que exige `warnRango`).
+- Bullet "te quedas en blanco en el examen" → "te resulta difícil resolverlo por tu cuenta".
+- "Antes" del antes/después ya no menciona el examen directamente; "Después" → "puedes volver a
+  practicar el procedimiento" (ya no "resuelves el ejercicio tú mismo", que sonaba a resultado).
+- CTA final: "Entra a tu examen sin miedo" → "Prepárate para tus evaluaciones con práctica
+  estructurada"; futurePacing → "sentirte mejor preparado para abordar los ejercicios".
+- FAQ del temario → "álgebra básica, incluyendo ecuaciones, despejes y factorización, para
+  practicar conceptos frecuentes de este nivel" (ya no afirma conocer el examen de cada colegio).
+- Precio de la oferta: "desde $0.14 al día" (ya no "domina"/"por").
+- La Garantía (`Garantia` component, "Si en 7 días no entiendes...") y el mensaje de padres/tutores
+  se dejaron tal como quedaron en la primera pasada — el usuario pidió explícitamente NO tocar la
+  garantía hasta definir con Hotmart cómo se gestiona realmente el reembolso (quién procesa el pago,
+  condiciones exactas, si aplica a mensual/anual/ambos, cómo se solicita, qué pasa con una
+  suscripción activa). **Pendiente real, no técnico** — requiere respuesta del usuario o de Hotmart,
+  no una decisión de copy que se pueda tomar sola.
+- Verificado en navegador con scroll real (mismo método ya documentado para `whileInView`): landing
+  completa se ve bien sin el bloque de contraste, todo el copy nuevo aparece correcto. `tsc` ✓
+  `build` ✓ (18 rutas).
+- **Próximo pendiente identificado por el usuario, NO ejecutado todavía** (pidió hacer primero los
+  cambios de copy): auditoría de privacidad y protección de menores antes de gastar en publicidad
+  paga (Meta/Google/TikTok) — 10 puntos: datos que recoge la app, uso de IA y qué se envía a
+  terceros, manejo de cuentas de menores, correo electrónico, cookies/analytics/píxeles, pagos y
+  suscripciones, y una revisión real (no solo que existan) de privacidad/términos/reembolsos/aviso
+  de IA. Las 4 páginas legales ya existen (Sesión 6, con datos reales de Nymy/Canadá) pero no han
+  sido auditadas específicamente contra este ángulo de menores + plataformas de ads.
+
 ### CIERRE_REVISOR_LANDING_PAYWALL (2026-08-14) — 4 rondas, ambas quedan NO LISTA, cierro el ciclo aquí
 Tras 4 rondas de `revisor-visual` (real, con scroll correcto) sobre landing y paywall, aplicando en cada una los defectos reportados (block-press en todos los CTAs incluido el sticky, `focus-visible` global, nivel de profundidad `--surface-2`, garantía junto al CTA de compra, mecanismo bautizado nombrado, escenas literales de FICHA-AVATAR en el copy, jerarquía Anual vs Mensual, hero animado, sticky CTA en el paywall):
 - **Paywall**: 15/40·6/20(falso, ver metodología) → 31/40·16/20·17/20 → 34/40·15/20·16/20 → 27/40·13/20·17/20 (esta última con el glitch de captura del sticky ya documentado arriba, que infló a la baja "Encaje"/craft artificialmente). Copy YA pasa el umbral (17/20, sin ejes ≤2) desde la 3ª ronda. Usabilidad/craft quedan cerca pero no cruzan el gate ≥36/40·≥16/20 de forma consistente.
