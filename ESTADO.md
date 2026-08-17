@@ -384,6 +384,29 @@ mínimas que exige `warnRango` del componente.
 - Verificado con Playwright headless (scroll real) contra `/`, `/paywall` y `/reembolsos`: cero
   coincidencias de las 7 frases prohibidas en ninguna de las 3. `tsc` ✓ `build` ✓ (18 rutas).
 
+**Cuarta pasada (mismo día) — la garantía se ELIMINÓ, no se renombró más.** El usuario fue explícito:
+"Si no existe una política comercial independiente formalmente definida, elimina esa garantía" — y
+hoy no existe (`HOTMART_HOTTOK` sigue vacío, Hotmart nunca se conectó de verdad, el plazo de 7 días
+siempre fue un número PROVISIONAL sin verificar — ver `GARANTIA_PENDIENTE_VERIFICACION`). En vez de
+seguir renombrando una garantía inventada, se quitó por completo de la superficie de venta:
+- `app/page.tsx`: quitada la sección `<Garantia>` completa (componente sigue existiendo, sin uso —
+  reutilizable el día que exista una política real), el badge del Hero, `garantiaCorta` de la
+  Oferta, y las menciones en FAQ/recap/PS del CTA final. La FAQ "¿Qué pasa si no me sirve?" ahora
+  apunta a la Política de Reembolsos real en vez de prometer un plazo/condición inventados.
+- `app/paywall/page.tsx`: mismo quite (badge, `garantiaCorta`) + corregido un "vacío de quedarte en
+  blanco" que había quedado suelto en un bullet (mismo patrón de miedo/blanco que pidió eliminar).
+- `app/reembolsos/page.tsx`: reescrita para NO inventar una garantía propia — ahora dice, con
+  honestidad, que las condiciones de reembolso son las que Hotmart tenga vigentes en el momento de
+  la compra (consultables en el recibo), sin fijar un plazo propio de AlgebraX no confirmado.
+- Verificado con Playwright (scroll real) contra `/`, `/paywall`, `/reembolsos`: cero coincidencias
+  de "garantía de satisfacción", "Primer Paso Entendido", "Garantía Hotmart", "respaldada por", ni
+  de ningún término de miedo/vergüenza/blanco. `tsc` ✓ `build` ✓ (18 rutas, mismo conteo — no se
+  quitó ninguna ruta, solo contenido).
+- **Cuándo SÍ volver a poner una garantía en la landing**: cuando Hotmart esté conectado de verdad
+  (`HOTMART_HOTTOK` con valor real) y se haya confirmado en el panel de Hotmart el plazo/condiciones
+  reales de reembolso que aplican al producto — recién ahí construir el copy sobre un dato real, no
+  antes. `components/landing/Garantia.tsx` queda listo para ese momento, no se borró.
+
 ### CIERRE_REVISOR_LANDING_PAYWALL (2026-08-14) — 4 rondas, ambas quedan NO LISTA, cierro el ciclo aquí
 Tras 4 rondas de `revisor-visual` (real, con scroll correcto) sobre landing y paywall, aplicando en cada una los defectos reportados (block-press en todos los CTAs incluido el sticky, `focus-visible` global, nivel de profundidad `--surface-2`, garantía junto al CTA de compra, mecanismo bautizado nombrado, escenas literales de FICHA-AVATAR en el copy, jerarquía Anual vs Mensual, hero animado, sticky CTA en el paywall):
 - **Paywall**: 15/40·6/20(falso, ver metodología) → 31/40·16/20·17/20 → 34/40·15/20·16/20 → 27/40·13/20·17/20 (esta última con el glitch de captura del sticky ya documentado arriba, que infló a la baja "Encaje"/craft artificialmente). Copy YA pasa el umbral (17/20, sin ejes ≤2) desde la 3ª ronda. Usabilidad/craft quedan cerca pero no cruzan el gate ≥36/40·≥16/20 de forma consistente.

@@ -8,7 +8,6 @@ import { Agitacion } from '@/components/landing/Agitacion';
 import { Solucion } from '@/components/landing/Solucion';
 import { AppPorDentro } from '@/components/landing/AppPorDentro';
 import { Oferta } from '@/components/landing/Oferta';
-import { Garantia } from '@/components/landing/Garantia';
 import { Faq } from '@/components/landing/Faq';
 import { CtaFinal } from '@/components/landing/CtaFinal';
 import { FooterLegal } from '@/components/landing/FooterLegal';
@@ -35,7 +34,6 @@ export default function Home() {
         subtitleMarked="El Descifrador de Pasos te muestra [b]dónde te pierdes[/b], no solo la respuesta."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
-        socialProof={<span>Garantía de satisfacción de 7 días</span>}
         visualPlaceholderSugerencia="captura del diagnóstico exprés mostrando en qué paso se equivocó el estudiante"
         visual={
           <div
@@ -112,7 +110,6 @@ export default function Home() {
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
         tituloMarked="Empieza gratis. Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
-        garantiaCorta="Garantía de satisfacción de 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
@@ -151,12 +148,6 @@ export default function Home() {
         }}
       />
 
-      {/* 7. GARANTÍA */}
-      <Garantia
-        nombre="la Garantía de satisfacción de 7 días"
-        condicionMarked="Si dentro de los primeros [b]7 días[/b] sientes que AlgebraX no es para ti, nos escribes y te devolvemos tu dinero."
-        pisoLegal="Procesada a través de Hotmart"
-      />
 
       {/* 8. FAQ */}
       <Faq
@@ -184,7 +175,7 @@ export default function Home() {
           {
             pregunta: '¿Qué pasa si no me sirve?',
             respuestaMarked:
-              'Tienes la Garantía de satisfacción de 7 días: [b]nos escribes y te devolvemos tu dinero[/b].',
+              'Revisa nuestra [b]Política de Reembolsos[/b] (enlace al final de esta página) para conocer las condiciones exactas — o escríbenos a soporte@algebrax.app.',
           },
         ]}
       />
@@ -195,8 +186,8 @@ export default function Home() {
         futurePacingMarked="Imagina llegar a tu examen y sentirte mejor preparado para abordar los ejercicios, sin depender de tu teléfono."
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
-        recap="Garantía de satisfacción de 7 días · Empieza gratis, sin tarjeta"
-        psMarked="PS: el Descifrador de Pasos te muestra dónde te pierdes, no solo la respuesta. Empieza gratis, sin tarjeta — y con la Garantía de satisfacción de 7 días."
+        recap="Empieza gratis, sin tarjeta"
+        psMarked="PS: el Descifrador de Pasos te muestra dónde te pierdes, no solo la respuesta. Empieza gratis, sin tarjeta."
       />
 
       {/* 10. FOOTER LEGAL — páginas legales reales: Sesión 6 (47-LEGAL-FISCAL) */}

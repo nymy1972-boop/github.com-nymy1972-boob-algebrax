@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Oferta } from '@/components/landing/Oferta';
 import { CheckCustom, StickyCtaMobile } from '@/components/landing/ui';
 
@@ -86,7 +86,7 @@ function PaywallContent() {
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
-            <span>Simulacros cronometrados: sin cámara, sin copiar — practicas sin ese vacío de quedarte en blanco</span>
+            <span>Simulacros cronometrados: sin cámara, sin copiar — practicas por tu cuenta</span>
           </li>
           <li className="flex items-start gap-3 text-[15px]">
             <CheckCustom />
@@ -94,17 +94,11 @@ function PaywallContent() {
           </li>
         </ul>
 
-        {/* Prueba social honesta — nunca un rating o testimonio inventado (19-PAGINA-DE-VENTAS) */}
-        <div className="mx-auto mt-6 flex max-w-[400px] items-center justify-center gap-2 rounded-full border border-[color-mix(in_oklab,var(--success)_30%,transparent)] bg-[color-mix(in_oklab,var(--success)_8%,var(--surface))] px-4 py-2 text-[13px] font-semibold text-[var(--success)]">
-          <ShieldCheck size={16} />
-          Garantía de satisfacción de 7 días
-        </div>
       </motion.div>
 
       <Oferta
         kicker="TU PLAN"
         tituloMarked="Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
-        garantiaCorta="Garantía de satisfacción de 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
