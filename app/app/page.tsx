@@ -201,6 +201,10 @@ export default function Home() {
           { label: 'Reembolsos', href: '/reembolsos' },
           { label: 'Aviso de IA', href: '/aviso-ia' },
         ]}
+        estudioNombre="NYMY LABS"
+        estudioLogo={
+          <Image src="/nymy-labs-icon.png" alt="" width={16} height={16} className="h-4 w-4 object-contain" />
+        }
       />
 
       <StickyCtaMobile labelComercial={CTA_LABEL} href={CTA_HREF} />

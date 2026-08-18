@@ -23,9 +23,12 @@ export interface FooterLegalProps {
   /** Email REAL que alguien lee. */
   soporteEmail: string;
   anio?: number;
+  /** Crédito del estudio (opcional) — jerarquía terciaria, nunca compite con la marca del producto. */
+  estudioNombre?: string;
+  estudioLogo?: ReactNode;
 }
 
-export function FooterLegal({ appName, logo, enlaces, soporteEmail, anio }: FooterLegalProps) {
+export function FooterLegal({ appName, logo, enlaces, soporteEmail, anio, estudioNombre, estudioLogo }: FooterLegalProps) {
   const year = anio ?? new Date().getFullYear();
   return (
     <footer className="py-8 md:py-12">
@@ -65,6 +68,14 @@ export function FooterLegal({ appName, logo, enlaces, soporteEmail, anio }: Foot
             {soporteEmail}
           </a>
         </p>
+
+        {/* Fila 3: crédito del estudio (opcional) — mismo tamaño/peso terciario que el resto del footer */}
+        {estudioNombre && (
+          <p className="mt-2 flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)]">
+            {estudioLogo}
+            Un producto de {estudioNombre}
+          </p>
+        )}
       </div>
     </footer>
   );
