@@ -18,18 +18,6 @@ import { CheckCircle2, KeyRound, Loader2, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { asociarReferidoSiAplica } from '@/lib/referral';
 
-/** El mark oficial de Google (4 colores) — estándar en botones "Continuar con Google". */
-function GoogleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z" />
-      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.96v2.33A9 9 0 0 0 9 18z" />
-      <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.03z" />
-      <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z" />
-    </svg>
-  );
-}
-
 // Supabase envía el código real en 8 dígitos (confirmado en la app, no en la
 // documentación — el valor "6" que aparece en varias guías de Supabase es
 // para el flujo de teléfono/SMS, no coincide con lo que llega por correo).
@@ -194,16 +182,6 @@ function EntrarForm() {
                   <KeyRound size={16} strokeWidth={2.5} />
                 </>
               )}
-            </button>
-            <div className="my-1 flex items-center gap-3 text-[12px] text-[var(--text-secondary)]">
-              <span className="h-px flex-1 bg-[var(--surface-2)]" /> o <span className="h-px flex-1 bg-[var(--surface-2)]" />
-            </div>
-            <button
-              type="button"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-button)] border-2 border-[var(--surface-2)] bg-[var(--surface)] text-[15px] font-semibold text-[var(--text-primary)]"
-            >
-              <GoogleIcon />
-              Continuar con Google
             </button>
           </form>
         </>
