@@ -2,16 +2,21 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Modelo Freemium/onboarding-first (ESTADO.md → Sesión 1): el funnel completo
-// (/, /onboarding, /paywall, /entrar, /privacidad, etc.) es público. Solo /app
-// exige sesión — y hoy /app todavía corre con progreso local (Sesión 5); este
-// middleware queda listo para cuando /app pase a depender de la cuenta real.
-
-const PUBLIC_PATHS = ['/', '/onboarding', '/paywall', '/entrar', '/privacidad', '/terminos', '/reembolsos', '/aviso-ia'];
+// es público, INCLUIDO /app — "Seguir gratis por ahora" nunca debe pedir
+// cuenta (regla dura de la Constitución del Producto: "la app nunca bloquea
+// el acceso"). Sin sesión, /app sigue funcionando con progreso 100% local
+// (lib/progress.ts) y `usePlan()` devuelve 'free' por defecto — el gate real
+// de qué se puede practicar ya lo hacen las propias pantallas (moduloAccesible/
+// examenDesbloqueado), no este middleware. Este archivo solo protege lo que
+// de verdad REQUIERE una cuenta (hoy: nada fuera de auth misma).
+//
+// Auditoría 2026-08-17: se encontró que /app había quedado FUERA de esta
+// lista (bug real, no intencional) — cualquier visitante sin cuenta era
+// redirigido a /entrar al tocar "Seguir gratis por ahora", rompiendo la
+// promesa freemium. Corregido agregando /app de vuelta.
+const PUBLIC_PATHS = ['/', '/onboarding', '/paywall', '/entrar', '/privacidad', '/terminos', '/reembolsos', '/aviso-ia', '/app'];
 
 export async function middleware(request: NextRequest) {
-  // Mientras Supabase no esté conectado (Sesión 6 en curso), no bloquear nada:
-  // /app sigue funcionando con progreso local (lib/progress.ts). En cuanto las
-  // env vars existan, este guard deja de aplicar y el flujo real entra en vigor.
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return NextResponse.next();
   }

@@ -136,12 +136,18 @@ async function idUsuarioActual(): Promise<string | null> {
   return idUsuarioCacheado;
 }
 
+// Las gemas NUNCA van en este objeto: desde la auditoría 2026-08-17, la
+// columna `gemas` de `user_progress` tiene el UPDATE revocado para el rol
+// `authenticated` (migración `proteger_gemas_server_side`) — solo se puede
+// sumar mediante la función `sumar_gemas_seguro()` (ver
+// `empujarGemasEnSegundoPlano`). Incluir `gemas` en un upsert normal hace que
+// Postgres rechace el UPDATE completo (no solo esa columna), así que se
+// omite aquí a propósito.
 function filaUserProgress(userId: string, p: ProgresoUsuario) {
   return {
     user_id: userId,
     nombre: p.nombre,
     grado: p.grado,
-    gemas: p.gemas,
     current_streak: p.currentStreak,
     mejor_racha: p.mejorRacha,
     last_active_on: p.lastActiveOn,
@@ -185,6 +191,22 @@ function empujarANubeEnSegundoPlano(p: ProgresoUsuario) {
     .catch(() => {});
 }
 
+/** Única vía para sumar gemas después de creada la cuenta — llama a la
+ * función `sumar_gemas_seguro()` de Supabase (SECURITY DEFINER, valida el
+ * rango y suma sobre el valor REAL en la base, no sobre lo que mande el
+ * cliente). Best-effort: la UI ya avanzó de forma optimista con el cálculo
+ * local: si esto falla, se reintenta solo en el próximo `sincronizarAlAbrir`. */
+function empujarGemasEnSegundoPlano(delta: number) {
+  if (typeof window === 'undefined') return;
+  idUsuarioActual()
+    .then(async (userId) => {
+      if (!userId) return;
+      const supabase = createClient();
+      await supabase.rpc('sumar_gemas_seguro', { cantidad: delta });
+    })
+    .catch(() => {});
+}
+
 /** Llamar UNA vez al entrar a /app (pantalla de llegada tras login). Si hay
  * progreso en la nube, GANA sobre el caché local (protege a quien cambió de
  * dispositivo); si no hay nube, sube el local (ej. lo que trajo del onboarding
@@ -201,7 +223,21 @@ export async function sincronizarAlAbrir(): Promise<ProgresoUsuario> {
   ]);
 
   if (!fila) {
-    empujarANubeEnSegundoPlano(local);
+    // Primera sincronización de esta cuenta: INSERT plano (no upsert), único
+    // momento en que el cliente SÍ puede escribir `gemas` directamente — así
+    // no se pierden las que se ganaron en el diagnóstico del onboarding,
+    // antes de tener sesión. De aquí en adelante, solo `sumar_gemas_seguro()`
+    // puede moverlas (ver `empujarGemasEnSegundoPlano`). No se combina con
+    // `empujarANubeEnSegundoPlano` (evita una carrera: si el upsert normal
+    // llegara primero, crearía la fila sin gemas y este insert fallaría por
+    // choque de clave, perdiéndolas).
+    supabase
+      .from('user_progress')
+      .insert({ ...filaUserProgress(userId, local), gemas: local.gemas })
+      .then(
+        () => {},
+        () => {},
+      );
     return local;
   }
 
@@ -293,14 +329,16 @@ export function registrarAcierto(moduloSlug: string, totalPreguntas: number): Pr
     },
   };
   guardar(actualizado);
+  empujarGemasEnSegundoPlano(GEMAS_POR_ACIERTO);
   return actualizado;
 }
 
-/** Para el diagnóstico del onboarding (todavía sin cuenta): suma gemas sin tocar módulos. */
+/** Suma gemas (diagnóstico del onboarding sin cuenta, o reporte del examen con cuenta). */
 export function sumarGemas(cantidad: number): ProgresoUsuario {
   const p = leerProgreso();
   const actualizado: ProgresoUsuario = { ...p, gemas: p.gemas + cantidad };
   guardar(actualizado);
+  empujarGemasEnSegundoPlano(cantidad);
   return actualizado;
 }
 
