@@ -634,5 +634,22 @@ Verificado en las 3 capas: `tsc --noEmit` ✓, `npm run build` ✓ (18 rutas, si
 
 **Punto 2 — `/admin` ya estaba protegido correctamente** (hallazgo de la auditoría anterior era una suposición sin verificar el código — corregido aquí): `app/admin/layout.tsx` compara el email de la sesión (firmado por Supabase, no editable por el cliente) contra `ADMIN_EMAIL` en el servidor, y redirige a `/entrar` si no coincide — es la forma correcta de hacerlo, no un simple "ocultar el menú". Se intentó una prueba adicional con una cuenta real no-admin contra producción pero no fue concluyente por una limitación del navegador automatizado de esta sesión (no es un problema de la app) — el código ya es una garantía suficiente por sí solo.
 
+## Ruta a 10/10 — puntos 3 a 8 (2026-08-17)
+
+**Punto 3 — Landing y paywall pulidos**: los veredictos de `docs/revisiones/` eran del 2026-08-14, muy anteriores a los 4 rounds de cumplimiento de anuncios y a la conexión de Hotmart — la mayoría de sus defectos ya no aplicaban (algunos, como el tap-target de 44px del CTA mensual, ya estaban resueltos sin documentarlo). Se midió cada sección con `getBoundingClientRect()` en vez de confiar en capturas de scroll (que llevaron a 2 falsas alarmas mías, descartadas tras medir). Defectos reales encontrados y corregidos:
+- Landing: faltaba skip-link de teclado (agregado, apunta a `id="main"` en la sección Problema) y los precios no tenían el conteo animado 0→valor exigido por la baseline de movimiento #2 (agregado con `motion/react` `animate()` + `useInView`, respeta `prefers-reduced-motion`) — ambos verificados con scroll real en el navegador.
+- Paywall: el hero no tenía CTA propio (dependía de bajar hasta la oferta o de la barra fija) — se agregó un botón "Quiero Premium" en el hero, verificado que apunta al link real de Hotmart anual.
+`tsc`/`build` ✓ en ambos commits.
+
+**Punto 4 — Leaked Password Protection**: requiere el panel de Supabase (Authentication → Password/Security), no hay API/SQL para activarlo — instrucciones dadas al usuario, pendiente de que él lo haga.
+
+**Punto 5 — Backups**: no se puede "probar restaurar" sin arriesgar los datos reales de producción (acción destructiva, requiere confirmación explícita y no se ejecuta solo para verificar) — se le explicó al usuario la diferencia entre plan gratis (copias diarias, 7 días) y Pro (PITR continuo) para que revise cuál tiene y decida si vale la pena subir de plan.
+
+**Punto 6 — Dominio de correo calentándose**: pasivo, sin acción — mejora solo con el tiempo y el uso real.
+
+**Punto 7 — Onboarding, 6 pantallas**: revisado a fondo por código (nombre → grado → dolor → 3 preguntas de diagnóstico → plan final) — lógica sólida, sin bugs encontrados. No se pudo re-verificar interactuando con la app en vivo: se descubrió que en esta sesión el navegador automatizado queda con `document.hidden = true` incluso al "seleccionar" la pestaña, lo que congela las animaciones de salida de Framer Motion (`AnimatePresence`) a mitad de camino — esto generó una falsa alarma (parecía que el paso 2 mostraba el contenido del paso 1) que se descartó al confirmar la causa real. El veredicto LISTA (38/40, 16/20) de sesiones anteriores sigue vigente porque el código de las transiciones no cambió.
+
+**Punto 8 — Dominio raíz `nymystudio.com`**: el usuario no tenía clara la respuesta, así que se le dio una recomendación directa (no tocarlo — dejarlo reservado para la futura landing de NYMY LABS, seguir usando `algebrax.nymystudio.com` para AlgebraX) y quedó aceptada. **No se ejecutó ningún cambio de DNS** — decisión es "dejarlo como está", que no requiere acción.
+
 ## Próximo paso
-Puntos 3-8 de la ruta a 10/10 pedidos por el usuario, en orden: (3) pulir landing y paywall hasta pasar el veredicto de `revisor-visual`, (4) activar "Leaked Password Protection" en Supabase Auth, (5) verificar backups/restore, (6) esperar a que el dominio de correo termine de calentarse (pasivo, sin acción), (7) recorrer las 6 pantallas del onboarding paso a paso, (8) decidir y conectar `nymystudio.com` (dominio raíz — ojo: ya reservado para la landing de NYMY LABS, no para AlgebraX, hay que resolver ese choque antes de conectar nada ahí).
+Confirmar con el usuario el resultado real del botón "Testar webhook" de Hotmart. Después, lo que más impacto tiene para vender: conseguir 2-3 testimonios reales (la landing hoy no tiene ninguno, a propósito — nunca se inventan) y empezar a publicar contenido con los hashtags ya sugeridos. SEO técnico (metadatos, sitemap) queda como tarea aparte, no urgente. Sigue pendiente que el usuario active "Leaked Password Protection" en Supabase y revise su plan de backups.
