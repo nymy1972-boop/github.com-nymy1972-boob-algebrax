@@ -25,6 +25,12 @@ const LOGO = (
 export default function Home() {
   return (
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[var(--radius-button)] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-[14px] focus:font-bold focus:text-[var(--bg)]"
+      >
+        Saltar al contenido
+      </a>
       {/* 1. HERO */}
       <Hero
         appName="AlgebraX"
@@ -59,6 +65,7 @@ export default function Home() {
 
       {/* 2. PROBLEMA */}
       <Problema
+        id="main"
         titulo="¿Te suena?"
         preguntas={[
           { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta porque te resulta difícil resolverlo por tu cuenta?' },

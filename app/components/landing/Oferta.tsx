@@ -8,7 +8,8 @@
 // la card recomendada (el uso canónico de la técnica) · checkmarks custom.
 // El destino de los CTAs sigue al MODELO de 02C (checkout vs /onboarding).
 
-import { motion } from 'motion/react';
+import { animate, motion, useInView, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import { Star } from 'lucide-react';
 import { CheckCustom, CtaButton, Hairline, Kicker, SectionShell, useReveal, VIEWPORT_ONCE } from './ui';
 import { MarkedCopy, warnCopy, warnRango } from './MarkedCopy';
@@ -62,12 +63,51 @@ function TrialBadge({ dias }: { dias: number }) {
   );
 }
 
+/** "$4.99" → prefijo "$" + número 4.99 (2 decimales) — separa el símbolo de la cifra a animar. */
+function parsePrecio(precioMes: string): { prefijo: string; valor: number; decimales: number } {
+  const match = precioMes.match(/^(\D*)(\d+(?:\.\d+)?)$/);
+  if (!match) return { prefijo: '', valor: 0, decimales: 0 };
+  const [, prefijo, numStr] = match;
+  const decimales = numStr.includes('.') ? numStr.split('.')[1].length : 0;
+  return { prefijo, valor: parseFloat(numStr), decimales };
+}
+
+/** Baseline de movimiento #2 (14-LEYES-DE-DISENO): números héroe cuentan de 0 al valor final al entrar en viewport. */
+function PrecioAnimado({ precioMes }: { precioMes: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const enVista = useInView(ref, { once: true, margin: '-40px' });
+  const reduce = useReducedMotion();
+  const { prefijo, valor, decimales } = parsePrecio(precioMes);
+  const [valorMostrado, setValorMostrado] = useState(reduce ? valor : 0);
+
+  useEffect(() => {
+    if (!enVista) return;
+    if (reduce) {
+      setValorMostrado(valor);
+      return;
+    }
+    const controls = animate(0, valor, {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: setValorMostrado,
+    });
+    return () => controls.stop();
+  }, [enVista, reduce, valor]);
+
+  return (
+    <span ref={ref}>
+      {prefijo}
+      {valorMostrado.toFixed(decimales)}
+    </span>
+  );
+}
+
 function Precio({ plan }: { plan: PlanOferta }) {
   return (
     <div>
       <p className="flex items-baseline gap-1">
         <span className="text-[36px] font-bold leading-none tabular-nums text-[var(--text-primary)] [font-family:var(--font-display)]">
-          {plan.precioMes}
+          <PrecioAnimado precioMes={plan.precioMes} />
         </span>
         <span className="text-[14px] text-[var(--text-secondary)]">{plan.sufijo ?? '/mes'}</span>
       </p>
