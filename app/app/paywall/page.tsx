@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { Oferta } from '@/components/landing/Oferta';
-import { CheckCustom, StickyCtaMobile } from '@/components/landing/ui';
+import { CheckCustom, CtaButton, StickyCtaMobile } from '@/components/landing/ui';
 
 // Paywall in-app — aparece DESPUÉS de la primera victoria (diagnóstico), nunca
 // antes. Freemium (02C nicho Educación): siempre existe un camino gratis visible
@@ -98,6 +98,9 @@ function PaywallContent() {
           </li>
         </ul>
 
+        <div className="mt-6 flex justify-center">
+          <CtaButton href={HOTMART_ANUAL}>Quiero Premium</CtaButton>
+        </div>
       </motion.div>
 
       <Oferta
