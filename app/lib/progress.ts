@@ -136,28 +136,22 @@ async function idUsuarioActual(): Promise<string | null> {
   return idUsuarioCacheado;
 }
 
-// Las gemas NUNCA van en este objeto: desde la auditoría 2026-08-17, la
-// columna `gemas` de `user_progress` tiene el UPDATE revocado para el rol
-// `authenticated` (migración `proteger_gemas_server_side`) — solo se puede
-// sumar mediante la función `sumar_gemas_seguro()` (ver
-// `empujarGemasEnSegundoPlano`). Incluir `gemas` en un upsert normal hace que
-// Postgres rechace el UPDATE completo (no solo esa columna), así que se
-// omite aquí a propósito.
+// Auditoría 2026-08-17 (segunda ronda): el mismo patrón de `gemas` se extendió
+// a racha/total de ejercicios/cupo diario gratis/progreso por módulo — esas
+// columnas ya NO aceptan UPDATE directo del cliente (migración
+// `proteger_progreso_server_side`), solo se mueven a través de los RPC
+// `registrar_acierto_seguro` / `registrar_visita_segura` /
+// `registrar_ejercicio_gratis_seguro`. Este objeto solo lleva las columnas
+// que el cliente SÍ puede seguir escribiendo directo (perfil, meta propia,
+// atribución de referidos) — incluir cualquier columna protegida aquí haría
+// fallar el UPDATE completo, no solo esa columna.
 function filaUserProgress(userId: string, p: ProgresoUsuario) {
   return {
     user_id: userId,
     nombre: p.nombre,
     grado: p.grado,
-    current_streak: p.currentStreak,
-    mejor_racha: p.mejorRacha,
-    last_active_on: p.lastActiveOn,
-    total_ejercicios: p.totalEjercicios,
     creado_en: p.creadoEn,
     meta_semanal: p.metaSemanal,
-    ejercicios_semana: p.ejerciciosSemana,
-    semana_id: p.semanaId,
-    ejercicios_hoy_gratis: p.ejerciciosHoyGratis,
-    dia_ejercicios_gratis: p.diaEjerciciosGratis,
     referral_prompt_seen: p.referralPromptSeen,
     referral_dismissed_at: p.referralDismissedAt,
     last_referral_prompt: p.lastReferralPrompt,
@@ -175,18 +169,6 @@ function empujarANubeEnSegundoPlano(p: ProgresoUsuario) {
       if (!userId) return;
       const supabase = createClient();
       await supabase.from('user_progress').upsert(filaUserProgress(userId, p));
-      const modulos = Object.entries(p.modulos);
-      if (modulos.length > 0) {
-        await supabase.from('module_progress').upsert(
-          modulos.map(([slug, m]) => ({
-            user_id: userId,
-            modulo_slug: slug,
-            completadas: m.completadas,
-            total: m.total,
-            updated_at: new Date().toISOString(),
-          })),
-        );
-      }
     })
     .catch(() => {});
 }
@@ -203,6 +185,43 @@ function empujarGemasEnSegundoPlano(delta: number) {
       if (!userId) return;
       const supabase = createClient();
       await supabase.rpc('sumar_gemas_seguro', { cantidad: delta });
+    })
+    .catch(() => {});
+}
+
+/** Registra un acierto server-side: total de ejercicios, semana y progreso
+ * del módulo — misma idea que `empujarGemasEnSegundoPlano`, best-effort. */
+function empujarAciertoEnSegundoPlano(moduloSlug: string, totalPreguntas: number) {
+  if (typeof window === 'undefined') return;
+  idUsuarioActual()
+    .then(async (userId) => {
+      if (!userId) return;
+      const supabase = createClient();
+      await supabase.rpc('registrar_acierto_seguro', { p_modulo_slug: moduloSlug, p_total_preguntas: totalPreguntas });
+    })
+    .catch(() => {});
+}
+
+/** Registra la visita del día (racha) server-side. */
+function empujarVisitaEnSegundoPlano() {
+  if (typeof window === 'undefined') return;
+  idUsuarioActual()
+    .then(async (userId) => {
+      if (!userId) return;
+      const supabase = createClient();
+      await supabase.rpc('registrar_visita_segura');
+    })
+    .catch(() => {});
+}
+
+/** Registra un ejercicio contra el cupo diario del módulo gratis, server-side. */
+function empujarEjercicioGratisEnSegundoPlano() {
+  if (typeof window === 'undefined') return;
+  idUsuarioActual()
+    .then(async (userId) => {
+      if (!userId) return;
+      const supabase = createClient();
+      await supabase.rpc('registrar_ejercicio_gratis_seguro');
     })
     .catch(() => {});
 }
@@ -224,20 +243,41 @@ export async function sincronizarAlAbrir(): Promise<ProgresoUsuario> {
 
   if (!fila) {
     // Primera sincronización de esta cuenta: INSERT plano (no upsert), único
-    // momento en que el cliente SÍ puede escribir `gemas` directamente — así
-    // no se pierden las que se ganaron en el diagnóstico del onboarding,
-    // antes de tener sesión. De aquí en adelante, solo `sumar_gemas_seguro()`
-    // puede moverlas (ver `empujarGemasEnSegundoPlano`). No se combina con
-    // `empujarANubeEnSegundoPlano` (evita una carrera: si el upsert normal
-    // llegara primero, crearía la fila sin gemas y este insert fallaría por
-    // choque de clave, perdiéndolas).
+    // momento en que el cliente SÍ puede escribir las columnas protegidas
+    // directamente — así no se pierde lo ganado ANTES de tener sesión
+    // (onboarding sin cuenta). De aquí en adelante, solo los RPC seguros
+    // pueden moverlas. No se combina con `empujarANubeEnSegundoPlano` (evita
+    // una carrera: si el upsert normal llegara primero, crearía la fila sin
+    // estos valores y este insert fallaría por choque de clave, perdiéndolos).
     supabase
       .from('user_progress')
-      .insert({ ...filaUserProgress(userId, local), gemas: local.gemas })
+      .insert({
+        ...filaUserProgress(userId, local),
+        gemas: local.gemas,
+        current_streak: local.currentStreak,
+        mejor_racha: local.mejorRacha,
+        last_active_on: local.lastActiveOn,
+        total_ejercicios: local.totalEjercicios,
+        ejercicios_semana: local.ejerciciosSemana,
+        semana_id: local.semanaId,
+        ejercicios_hoy_gratis: local.ejerciciosHoyGratis,
+        dia_ejercicios_gratis: local.diaEjerciciosGratis,
+      })
       .then(
         () => {},
         () => {},
       );
+    // module_progress sí acepta INSERT (solo no UPDATE) — transfiere lo local igual.
+    const modulos = Object.entries(local.modulos);
+    if (modulos.length > 0) {
+      supabase
+        .from('module_progress')
+        .insert(modulos.map(([slug, m]) => ({ user_id: userId, modulo_slug: slug, completadas: m.completadas, total: m.total })))
+        .then(
+          () => {},
+          () => {},
+        );
+    }
     return local;
   }
 
@@ -288,6 +328,7 @@ export function registrarVisitaHoy(): { progreso: ProgresoUsuario; milestone: nu
     lastActiveOn: hoy,
   };
   guardar(actualizado);
+  empujarVisitaEnSegundoPlano();
 
   const milestone = [7, 30, 100, 365].includes(nuevaRacha) ? nuevaRacha : null;
   return { progreso: actualizado, milestone };
@@ -330,6 +371,7 @@ export function registrarAcierto(moduloSlug: string, totalPreguntas: number): Pr
   };
   guardar(actualizado);
   empujarGemasEnSegundoPlano(GEMAS_POR_ACIERTO);
+  empujarAciertoEnSegundoPlano(moduloSlug, totalPreguntas);
   return actualizado;
 }
 
@@ -368,6 +410,7 @@ export function registrarEjercicioGratisHoy(): ProgresoUsuario {
   const previos = p.diaEjerciciosGratis === hoy ? p.ejerciciosHoyGratis : 0;
   const actualizado: ProgresoUsuario = { ...p, ejerciciosHoyGratis: previos + 1, diaEjerciciosGratis: hoy };
   guardar(actualizado);
+  empujarEjercicioGratisEnSegundoPlano();
   return actualizado;
 }
 
