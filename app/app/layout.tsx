@@ -25,10 +25,40 @@ const jakarta = Plus_Jakarta_Sans({
 // AlgebraX incluye menores de edad (mayor cuidado exigido). El copy ahora
 // describe la HERRAMIENTA (entender el paso a paso, practicar) en vez de
 // prometer el resultado (aprobar).
+const SITE_URL = "https://algebrax.nymystudio.com";
+const TITULO = "AlgebraX — Entiende álgebra paso a paso, sin quedarte en blanco";
+const DESCRIPCION =
+  "Practica álgebra entendiendo el porqué de cada paso. Sin castigos por equivocarte, sin videos de 40 minutos.";
+
 export const metadata: Metadata = {
-  title: "AlgebraX — Entiende álgebra paso a paso, sin quedarte en blanco",
-  description:
-    "Practica álgebra entendiendo el porqué de cada paso. Sin castigos por equivocarte, sin videos de 40 minutos.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: TITULO,
+    template: "%s — AlgebraX",
+  },
+  description: DESCRIPCION,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_LA",
+    url: SITE_URL,
+    siteName: "AlgebraX",
+    title: TITULO,
+    description: DESCRIPCION,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AlgebraX" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO,
+    description: DESCRIPCION,
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

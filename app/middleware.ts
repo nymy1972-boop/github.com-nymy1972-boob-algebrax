@@ -64,5 +64,10 @@ export const config = {
   // dejarlas pasar por este guard de sesión-de-navegador las redirigía a
   // /entrar con 307 en vez de ejecutarlas (bug real, encontrado al probar
   // el cron de recordatorios: Hotmart nunca habría podido llegar al webhook).
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)'],
+  //
+  // Auditoría SEO 2026-08-17: robots.txt y sitemap.xml (generados por Next)
+  // tenían el MISMO problema — un buscador sin sesión los recibía como
+  // redirect 307 a /entrar en vez del contenido real, dejándolos inútiles
+  // para Google. Excluidos igual que favicon.ico.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api/|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)'],
 };
