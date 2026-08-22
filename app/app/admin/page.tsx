@@ -94,6 +94,19 @@ export default async function AdminPage() {
 
   const hotmartConectado = Boolean(process.env.HOTMART_HOTTOK);
 
+  // ── Costo de IA (DeepSeek) — tabla ai_calls, agregada 2026-08-17 ───────
+  const { data: llamadasIA } = await supabase
+    .from('ai_calls')
+    .select('exito, fallback, tokens_prompt, tokens_completado, duracion_ms, created_at')
+    .order('created_at', { ascending: false })
+    .limit(5000);
+  const totalLlamadasIA = llamadasIA?.length ?? 0;
+  const llamadasReales = (llamadasIA ?? []).filter((c) => c.exito).length;
+  const tokensPromptTotal = (llamadasIA ?? []).reduce((acc, c) => acc + (c.tokens_prompt ?? 0), 0);
+  const tokensCompletadoTotal = (llamadasIA ?? []).reduce((acc, c) => acc + (c.tokens_completado ?? 0), 0);
+  const duraciones = (llamadasIA ?? []).filter((c) => c.exito).map((c) => c.duracion_ms ?? 0);
+  const duracionPromedio = duraciones.length > 0 ? Math.round(duraciones.reduce((a, b) => a + b, 0) / duraciones.length) : 0;
+
   // ── Recomendaciones (referidos) — mismo event_log, sin tabla nueva ──────
   const { data: eventosReferido } = await supabase
     .from('event_log')
@@ -203,10 +216,32 @@ export default async function AdminPage() {
       </Seccion>
 
       <Seccion icono={<Sparkles size={18} className="text-[var(--gold)]" />} titulo="Costo de IA (DeepSeek)">
-        <SinMedir
-          titulo="Costo de IA"
-          motivo="Falta una tabla ai_calls que registre cada llamada a DeepSeek con su costo — se agrega cuando el volumen de uso lo justifique (31-EVALS-OBSERVABILIDAD)."
-        />
+        {totalLlamadasIA === 0 ? (
+          <SinMedir titulo="Costo de IA" motivo="Todavía no se registró ninguna llamada — aparecerá aquí en cuanto un estudiante pida una explicación." />
+        ) : (
+          <>
+            <StatRow
+              stats={[
+                { label: 'Llamadas totales', value: String(totalLlamadasIA) },
+                {
+                  label: 'Respuesta real de IA',
+                  value: `${Math.round((llamadasReales / totalLlamadasIA) * 100)}%`,
+                  nota: `${totalLlamadasIA - llamadasReales} cayeron al texto de respaldo`,
+                },
+                { label: 'Tiempo de respuesta', value: `${duracionPromedio}ms`, nota: 'promedio, solo las que sí llamaron a DeepSeek' },
+              ]}
+            />
+            <Card>
+              <p className="text-[13px] font-semibold text-[var(--text-secondary)]">Tokens consumidos (acumulado)</p>
+              <p className="mt-1 text-[13px] text-[var(--text-primary)]">
+                {tokensPromptTotal.toLocaleString('es-CO')} de entrada · {tokensCompletadoTotal.toLocaleString('es-CO')} de salida
+              </p>
+              <p className="mt-2 text-[12px] text-[var(--text-secondary)]">
+                No calculamos el costo en dólares aquí porque el precio por token de DeepSeek cambia — revisa la tarifa vigente en platform.deepseek.com/pricing y multiplícala por estos totales.
+              </p>
+            </Card>
+          </>
+        )}
       </Seccion>
 
       <Seccion icono={<HeartHandshake size={18} className="text-[var(--accent-2)]" />} titulo="Recomendaciones (referidos)">

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // BFF: la clave de DeepSeek vive SOLO aquí (variable de entorno de servidor,
 // nunca NEXT_PUBLIC_). El cliente nunca la ve ni la toca — le pasamos el
@@ -59,7 +60,37 @@ interface BodyEsperado {
   fallback: string;
 }
 
+/** Registro best-effort para medir costo/uso real de IA (DIM 6 de la auditoría) — nunca bloquea ni lanza. */
+function registrarLlamadaIA(datos: {
+  exito: boolean;
+  fallback: boolean;
+  tokensPrompt?: number;
+  tokensCompletado?: number;
+  duracionMs: number;
+}) {
+  try {
+    createAdminClient()
+      .from('ai_calls')
+      .insert({
+        ruta: 'ia/explicar',
+        modelo: MODEL,
+        exito: datos.exito,
+        fallback: datos.fallback,
+        tokens_prompt: datos.tokensPrompt ?? null,
+        tokens_completado: datos.tokensCompletado ?? null,
+        duracion_ms: datos.duracionMs,
+      })
+      .then(
+        () => {},
+        () => {},
+      );
+  } catch {
+    // best-effort — nunca debe afectar la respuesta real al estudiante
+  }
+}
+
 export async function POST(request: Request) {
+  const inicio = Date.now();
   const body = (await request.json().catch(() => null)) as BodyEsperado | null;
   if (!body?.enunciado || !body?.correctaTexto || typeof body.fallback !== 'string') {
     return NextResponse.json({ error: 'Datos incompletos' }, { status: 400 });
@@ -69,11 +100,13 @@ export async function POST(request: Request) {
   // esto bloquea, cae al mismo fallback honesto que ya usa la ruta — nunca
   // un error técnico, solo se le niega el "extra" de la IA.
   if (!origenValido(request) || !dentroDelLimite(request)) {
+    registrarLlamadaIA({ exito: false, fallback: true, duracionMs: Date.now() - inicio });
     return NextResponse.json({ explicacion: body.fallback });
   }
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
+    registrarLlamadaIA({ exito: false, fallback: true, duracionMs: Date.now() - inicio });
     return NextResponse.json({ explicacion: body.fallback });
   }
 
@@ -113,8 +146,16 @@ export async function POST(request: Request) {
     const explicacion: string | undefined = data?.choices?.[0]?.message?.content?.trim();
     if (!explicacion) throw new Error('Respuesta vacía');
 
+    registrarLlamadaIA({
+      exito: true,
+      fallback: false,
+      tokensPrompt: data?.usage?.prompt_tokens,
+      tokensCompletado: data?.usage?.completion_tokens,
+      duracionMs: Date.now() - inicio,
+    });
     return NextResponse.json({ explicacion });
   } catch {
+    registrarLlamadaIA({ exito: false, fallback: true, duracionMs: Date.now() - inicio });
     return NextResponse.json({ explicacion: body.fallback });
   } finally {
     clearTimeout(timeout);
