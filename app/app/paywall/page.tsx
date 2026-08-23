@@ -106,6 +106,7 @@ function PaywallContent() {
       <Oferta
         kicker="TU PLAN"
         tituloMarked="Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
+        garantiaCorta="Respaldado por la Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },

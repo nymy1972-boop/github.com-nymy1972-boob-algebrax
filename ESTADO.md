@@ -702,3 +702,12 @@ Sin poder ver la pantalla, sí se pudo verificar y corregir por CÓDIGO (lectura
 - La garantía cerca del CTA (defecto #1 del veredicto de landing) sigue sin resolverse a propósito: la sección de Garantía se retiró de toda la landing hace varias rondas porque el plazo de "7 días" nunca se verificó contra el panel real de Hotmart (`FICHA-MERCADO.md`, `GARANTIA_PENDIENTE_VERIFICACION`) — ahora que la cuenta de Hotmart ya existe y está probada, esto SÍ se puede cerrar, pendiente de que el usuario confirme el plazo real de reembolso configurado en su producto de Hotmart.
 
 `tsc --noEmit` ✓ `npm run build` ✓ (mismas 18 rutas). Los veredictos formales de landing/paywall siguen NO LISTA en `docs/revisiones/` hasta que exista una captura real — pero los defectos de código que SÍ eran accionables sin foto quedaron corregidos y verificados contra los logs del propio servidor.
+
+## Garantía verificada y restaurada en landing/paywall (2026-08-23)
+El usuario revisó su panel real de Hotmart (AlgebraX → Pricing → "Deadline to request refund"): **7 días** — confirma el número que ya se usaba de forma provisional. `FICHA-MERCADO.md` actualizada: `GARANTIA_PENDIENTE_VERIFICACION` cerrado, reemplazado por una entrada con la fuente (panel de Hotmart) y la fecha.
+
+Con el dato ya verificado, se restauró la garantía en las 2 pantallas de venta:
+- **Landing** (`app/app/page.tsx`): sección `<Garantia>` reinsertada entre Oferta y FAQ (orden canónico del 19), con nombre propio ("la Garantía del Primer Paso Entendido"), condición honesta de 23 palabras (bajo el límite de 30) y piso legal citando a Hotmart explícitamente. Además, `garantiaCorta` pasada al `<Oferta>` — queda junto al CTA del plan Anual, resolviendo el defecto #1 del veredicto viejo de landing ("la garantía no aparece junto al CTA de compra").
+- **Paywall** (`app/app/paywall/page.tsx`): mismo `garantiaCorta` pasado a su `<Oferta>` (el paywall es una pantalla de decisión corta, no lleva la sección completa de Garantía — ya tenía CTA propio en el hero desde la ronda anterior).
+
+Verificado en navegador (texto de página renderizado, ambas rutas) que el texto de garantía aparece correctamente en las 2 pantallas, sin errores nuevos en los logs del servidor. `tsc --noEmit` ✓ `npm run build` ✓ (mismas 18 rutas).

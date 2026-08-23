@@ -32,5 +32,5 @@
 - Pico de demanda esperable: temporada de exámenes/parciales (varía por calendario escolar de cada país LATAM) — hipótesis razonable, sin dato medido todavía.
 - Regulación: usuarios menores de edad (13-19 años) → ver `47-LEGAL-FISCAL-Y-PRIVACIDAD.md` antes de recolectar datos personales reales (Sesión 6/7).
 
-## Problema conocido (grepeable — ver también ESTADO.md)
-GARANTIA_PENDIENTE_VERIFICACION: el plazo de "7 días" de la Garantía del Primer Paso Entendido es una cifra PROVISIONAL basada en el estándar típico de Hotmart, no en el panel real de la cuenta (que no existe todavía). Antes de encender tráfico pagado, se debe: (1) crear la cuenta de Hotmart, (2) configurar el producto y leer el plazo real de reembolso que ofrece, (3) actualizar esta ficha con el dato verificado y fecha, (4) ajustar el copy si el plazo real es distinto a 7 días.
+## Garantía — VERIFICADA (2026-08-23)
+El usuario confirmó en su panel real de Hotmart (AlgebraX → Pricing → "Deadline to request refund"): **7 días**. Coincide con la cifra que ya se usaba de forma provisional — queda confirmada, con fuente y fecha. La "Garantía del Primer Paso Entendido" (7 días) puede usarse en el copy de venta con seguridad.

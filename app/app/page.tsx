@@ -8,6 +8,7 @@ import { Agitacion } from '@/components/landing/Agitacion';
 import { Solucion } from '@/components/landing/Solucion';
 import { AppPorDentro } from '@/components/landing/AppPorDentro';
 import { Oferta } from '@/components/landing/Oferta';
+import { Garantia } from '@/components/landing/Garantia';
 import { Faq } from '@/components/landing/Faq';
 import { CtaFinal } from '@/components/landing/CtaFinal';
 import { FooterLegal } from '@/components/landing/FooterLegal';
@@ -117,6 +118,7 @@ export default function Home() {
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
         tituloMarked="Empieza gratis. Álgebra clara desde [acento]$0.14 al día[/acento]"
+        garantiaCorta="Respaldado por la Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
@@ -156,6 +158,12 @@ export default function Home() {
         }}
       />
 
+      {/* 7. GARANTÍA — plazo verificado contra el panel real de Hotmart (2026-08-23) */}
+      <Garantia
+        nombre="la Garantía del Primer Paso Entendido"
+        condicionMarked="Si en los primeros 7 días sientes que AlgebraX no te ayuda a entender el álgebra, te devolvemos tu dinero — sin preguntas incómodas."
+        pisoLegal="Respaldada por la política de reembolso de Hotmart (7 días)"
+      />
 
       {/* 8. FAQ */}
       <Faq
