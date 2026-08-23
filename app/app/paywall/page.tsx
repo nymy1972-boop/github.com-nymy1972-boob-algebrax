@@ -105,7 +105,7 @@ function PaywallContent() {
 
       <Oferta
         kicker="TU PLAN"
-        tituloMarked="Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
+        tituloMarked="Tu plan de álgebra desde [acento]$0.14 al día[/acento]"
         garantiaCorta="Respaldado por la Garantía del Primer Paso Entendido — 7 días"
         stack={{
           lineas: [
