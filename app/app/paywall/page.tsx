@@ -139,6 +139,7 @@ function PaywallContent() {
           features: [
             'Todos los módulos de álgebra desbloqueados',
             'Modo Examen ilimitado con temporizador',
+            'Reporte de errores comunes para repasar',
             'Cancelas cuando quieras',
           ],
         }}

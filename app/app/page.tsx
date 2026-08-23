@@ -27,7 +27,7 @@ export default function Home() {
     <div className="min-h-dvh bg-[var(--bg)] text-[var(--text-primary)] [font-family:var(--font-body)]">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[var(--radius-button)] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-[14px] focus:font-bold focus:text-[var(--bg)]"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[var(--radius-button)] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-[var(--bg)]"
       >
         Saltar al contenido
       </a>
@@ -50,7 +50,7 @@ export default function Home() {
             }}
           >
             <div
-              className="relative aspect-[9/19.5] h-[86%] overflow-hidden rounded-[30px] border-[5px] shadow-[var(--shadow-2)]"
+              className="relative aspect-[9/19.5] h-[86%] overflow-hidden rounded-[32px] border-4 shadow-[var(--shadow-2)]"
               style={{ borderColor: 'color-mix(in oklab, var(--text-primary) 90%, var(--accent))' }}
             >
               <img
@@ -68,8 +68,8 @@ export default function Home() {
         id="main"
         titulo="¿Te suena?"
         preguntas={[
-          { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio para copiar la respuesta porque te resulta difícil resolverlo por tu cuenta?' },
-          { icon: AlarmClock, textoMarked: '¿Sientes que necesitas repetir el mismo tipo de ejercicio varias veces para que te quede claro?' },
+          { icon: Camera, textoMarked: '¿Le tomas foto al ejercicio porque no sabes resolverlo tú solo?' },
+          { icon: AlarmClock, textoMarked: '¿Repites el mismo ejercicio muchas veces y aún no te queda claro?' },
           { icon: Ban, textoMarked: '¿Odias que las apps te bloqueen justo cuando más necesitas practicar?' },
         ]}
       />
@@ -116,7 +116,7 @@ export default function Home() {
 
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}
       <Oferta
-        tituloMarked="Empieza gratis. Practica álgebra a tu ritmo desde [acento]$0.14 al día[/acento]"
+        tituloMarked="Empieza gratis. Álgebra clara desde [acento]$0.14 al día[/acento]"
         stack={{
           lineas: [
             { resultado: 'AlgebraX Premium: todos los módulos + Modo Examen ilimitado (12 meses)', valor: '$120' },
@@ -150,6 +150,7 @@ export default function Home() {
           features: [
             'Todos los módulos de álgebra desbloqueados',
             'Modo Examen ilimitado con temporizador',
+            'Reporte de errores comunes para repasar',
             'Cancelas cuando quieras',
           ],
         }}
