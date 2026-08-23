@@ -63,10 +63,6 @@ export async function POST(request: NextRequest) {
   const email = body.data?.buyer?.email as string | undefined;
   const subscriberCode = body.data?.subscription?.subscriber?.code as string | undefined;
 
-  if (!email) {
-    return NextResponse.json({ error: 'Falta el email del comprador' }, { status: 400 });
-  }
-
   const supabase = createAdminClient();
 
   // Idempotencia mínima: usar el id de la transacción/evento si Hotmart lo manda
@@ -76,34 +72,51 @@ export async function POST(request: NextRequest) {
   switch (evento) {
     case 'PURCHASE_APPROVED':
     case 'PURCHASE_COMPLETE': {
+      if (!email) {
+        return NextResponse.json({ error: 'Falta el email del comprador' }, { status: 400 });
+      }
+
+      const buscarPorEmail = () => supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+
       // Modelo 2B (freemium): buscar por email PRIMERO — si el usuario ya se
       // registró gratis, se SUBE a Pro (nunca se crea una cuenta duplicada).
-      const { data: existing } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
+      let { data: existing } = await buscarPorEmail();
 
-      if (existing) {
-        await supabase
-          .from('profiles')
-          .update({ plan: 'premium', hotmart_subscriber_code: subscriberCode ?? null })
-          .eq('id', existing.id);
-      } else {
+      if (!existing) {
         // No hay cuenta todavía: crear usuario passwordless — el email de
         // bienvenida (Resend) trae el magic link de acceso.
         const { data: created, error } = await supabase.auth.admin.createUser({
           email,
           email_confirm: true,
         });
+
         if (error || !created.user) {
-          return NextResponse.json({ error: 'No se pudo crear el usuario' }, { status: 500 });
+          // Carrera real (confirmada con una prueba real de Hotmart): PURCHASE_APPROVED
+          // y PURCHASE_COMPLETE llegan casi al mismo tiempo para la misma compra — si el
+          // otro evento ya creó la cuenta entre nuestro select y este createUser, Supabase
+          // rechaza el email duplicado. Reintentamos el select (la otra petición ya debería
+          // haber terminado) antes de rendirnos, en vez de fallar con 500 por una carrera
+          // esperada entre los propios eventos de Hotmart.
+          let reintento = null;
+          for (let i = 0; i < 3 && !reintento; i++) {
+            await new Promise((r) => setTimeout(r, 400));
+            reintento = (await buscarPorEmail()).data;
+          }
+          if (!reintento) {
+            console.error('[hotmart webhook] no se pudo crear ni encontrar el usuario tras reintentos:', error);
+            return NextResponse.json({ error: 'No se pudo crear el usuario' }, { status: 500 });
+          }
+          existing = reintento;
+        } else {
+          existing = { id: created.user.id };
         }
-        await supabase
-          .from('profiles')
-          .update({ plan: 'premium', hotmart_subscriber_code: subscriberCode ?? null })
-          .eq('id', created.user.id);
       }
+
+      await supabase
+        .from('profiles')
+        .update({ plan: 'premium', hotmart_subscriber_code: subscriberCode ?? null })
+        .eq('id', existing.id);
+
       // Best-effort: si el correo falla, la cuenta/plan ya quedaron correctos
       // igual — el estudiante puede entrar más tarde con su correo en /entrar.
       await enviarAccesoPorCorreo(supabase, email);
@@ -112,7 +125,14 @@ export async function POST(request: NextRequest) {
 
     case 'PURCHASE_EXPIRED':
     case 'SUBSCRIPTION_CANCELLATION': {
-      await supabase.from('profiles').update({ plan: 'free' }).eq('hotmart_subscriber_code', subscriberCode ?? '__none__');
+      // Hotmart no siempre manda el email del comprador en estos 2 eventos
+      // (confirmado con una prueba real: SUBSCRIPTION_CANCELLATION llegó sin
+      // "Contact email") — a diferencia de la compra/aprobación, aquí SIEMPRE
+      // se identifica al usuario por el código de suscriptor, nunca por email.
+      if (!subscriberCode) {
+        return NextResponse.json({ error: 'Falta el código de suscriptor' }, { status: 400 });
+      }
+      await supabase.from('profiles').update({ plan: 'free' }).eq('hotmart_subscriber_code', subscriberCode);
       break;
     }
 
