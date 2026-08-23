@@ -25,6 +25,13 @@ const MODEL = process.env.AI_MODEL_DEEPSEEK || 'deepseek-chat';
 const TIMEOUT_MS = 8000;
 const MAX_TOKENS = 150;
 const LIMITE_POR_MINUTO = 20;
+// Circuit-breaker de costo (48-RIGOR-DE-ENTREGA): el límite por IP es best-effort
+// (en memoria, se puede esquivar rotando de IP) y el chequeo de Origin no detiene
+// a un atacante deliberado (un script puede mandar cualquier Origin, esa cabecera
+// solo la hace cumplir el navegador real). Este es el tope DURO global, contra la
+// tabla real ai_calls — 1000 respuestas reales/día es ~20-30x el uso orgánico
+// esperado en esta etapa, deja margen amplio y sigue acotando el peor caso.
+const LIMITE_DIARIO_GLOBAL = 1000;
 
 const contadorPorIp = new Map<string, { conteo: number; desde: number }>();
 
@@ -50,6 +57,24 @@ function dentroDelLimite(request: Request): boolean {
   if (entrada.conteo >= LIMITE_POR_MINUTO) return false;
   entrada.conteo += 1;
   return true;
+}
+
+/** true si ya se alcanzó el tope diario global de respuestas reales de IA. Si la
+ *  medición falla, NO bloquea (falla a favor del estudiante, no del ahorro). */
+async function circuitBreakerActivo(): Promise<boolean> {
+  try {
+    const inicioDelDia = new Date();
+    inicioDelDia.setUTCHours(0, 0, 0, 0);
+    const { count, error } = await createAdminClient()
+      .from('ai_calls')
+      .select('id', { count: 'exact', head: true })
+      .eq('exito', true)
+      .gte('created_at', inicioDelDia.toISOString());
+    if (error) return false;
+    return (count ?? 0) >= LIMITE_DIARIO_GLOBAL;
+  } catch {
+    return false;
+  }
 }
 
 interface BodyEsperado {
@@ -106,6 +131,11 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
+    registrarLlamadaIA({ exito: false, fallback: true, duracionMs: Date.now() - inicio });
+    return NextResponse.json({ explicacion: body.fallback });
+  }
+
+  if (await circuitBreakerActivo()) {
     registrarLlamadaIA({ exito: false, fallback: true, duracionMs: Date.now() - inicio });
     return NextResponse.json({ explicacion: body.fallback });
   }

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { enviarCorreoRachaEnRiesgo } from '@/lib/email';
+import { enviarCorreoRachaEnRiesgo, sitioUrl } from '@/lib/email';
 
 // Disparador externo de retención (56-MOMENTOS-EMOCIONALES): sin esto, la
 // app depende 100% de que el estudiante se acuerde solo de volver — el
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       const { data: link, error: linkError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email,
-        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://algebrax.app'}/entrar` },
+        options: { redirectTo: `${sitioUrl()}/entrar` },
       });
       if (linkError || !link?.properties?.action_link) {
         fallidos += 1;

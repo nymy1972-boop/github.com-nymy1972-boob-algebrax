@@ -7,7 +7,7 @@ import { Resend } from 'resend';
 // a premium aunque el correo falle, así el estudiante puede entrar con
 // "¿Olvidaste tu acceso?" en /entrar usando el mismo correo de la compra).
 
-function sitioUrl(): string {
+export function sitioUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return 'http://localhost:3000';
