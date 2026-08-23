@@ -113,6 +113,26 @@ export default function Home() {
         ]}
         ctaLabel={CTA_LABEL}
         ctaHref={CTA_HREF}
+        testimonios={[
+          {
+            quote:
+              'He estado utilizando la app AlgebraX y he notado una mejora en la actitud respecto a la forma como afronta sus ejercicios de álgebra: entender el porqué de los resultados ha hecho que afronte con más confianza los retos en esta área.',
+            nombre: 'Leo',
+            contexto: 'Padre de estudiante de secundaria',
+          },
+          {
+            quote:
+              'Lo que más se me complicaba era la multiplicación. Me ayudó a entender y a estar más tranquilo en los exámenes. La recomiendo a más estudiantes porque es fácil de usar, explica los ejercicios de manera sencilla y es la única que me recuerda que debo usar lápiz y papel para estudiar.',
+            nombre: 'S.',
+            contexto: 'Estudiante de secundaria',
+          },
+          {
+            quote:
+              'Mi hija ha usado la app para estudiar y nos ha gustado mucho porque con la app yo también puedo ayudarle a ella, ya que encontramos la explicación de los ejercicios. Además, a ella le gusta recoger puntos y gemas, es como un juego.',
+            nombre: 'Adri',
+            contexto: 'Acompaña a su hija en álgebra',
+          },
+        ]}
       />
 
       {/* 6. OFERTA — freemium sin trial (02C nicho Educación): CTA lleva a /onboarding */}

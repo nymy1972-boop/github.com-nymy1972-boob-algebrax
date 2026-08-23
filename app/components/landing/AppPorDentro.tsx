@@ -22,6 +22,15 @@ export interface FrameCarrusel {
   nombrePantalla?: string;
 }
 
+export interface Testimonio {
+  /** Cita textual REAL — nunca inventada (regla dura de 19-PAGINA-DE-VENTAS). */
+  quote: string;
+  /** Nombre o inicial que la persona autorizó mostrar. */
+  nombre: string;
+  /** Rol/contexto sin dato identificable de un menor ("Padre de estudiante de secundaria"). */
+  contexto: string;
+}
+
 export interface AppPorDentroProps {
   kicker?: string;
   /** Copy MARCADO del título (máx 8 palabras). */
@@ -31,6 +40,8 @@ export interface AppPorDentroProps {
   /** CTA mid-page: mismas medidas y MISMO verbo del CTA héroe (19). */
   ctaLabel: string;
   ctaHref: string;
+  /** Solo se pintan con ≥3 testimonios REALES — regla dura de 19 (con <3, se omiten). */
+  testimonios?: Testimonio[];
   id?: string;
 }
 
@@ -40,6 +51,7 @@ export function AppPorDentro({
   frames,
   ctaLabel,
   ctaHref,
+  testimonios,
   id,
 }: AppPorDentroProps) {
   warnCopy('AppPorDentro → título', tituloMarked, 8);
@@ -164,6 +176,32 @@ export function AppPorDentro({
             ))}
           </div>
         </motion.div>
+
+        {/* Testimonios REALES (19 §5, ≥3 obligatorio o se omiten — nunca placeholder) */}
+        {testimonios && testimonios.length >= 3 && (
+          <motion.div variants={item} className="mx-auto mt-12 grid max-w-[980px] grid-cols-1 gap-5 md:grid-cols-3">
+            {testimonios.map((t, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-4 rounded-[16px] border border-[color-mix(in_oklab,var(--text-tertiary)_20%,transparent)] bg-[var(--surface)] p-6"
+              >
+                <p className="text-[16px] leading-[1.5] text-[var(--text-primary)]">&ldquo;{t.quote}&rdquo;</p>
+                <div className="mt-auto flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--accent)_15%,transparent)] text-[15px] font-bold text-[var(--accent)]"
+                  >
+                    {t.nombre.charAt(0)}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[var(--text-primary)]">{t.nombre}</p>
+                    <p className="text-[13px] text-[var(--text-tertiary)]">{t.contexto}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        )}
 
         {/* CTA mid-page (reglas de CTA de 19): tras la prueba visual, cuando la confianza es alta */}
         <motion.div variants={item} className="mt-10 flex justify-center">
